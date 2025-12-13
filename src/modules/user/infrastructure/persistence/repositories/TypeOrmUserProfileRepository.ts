@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../../../config/database';
 import { IUserProfileRepository } from '../../../domain/repositories/IUserProfileRepository';
 import { UserProfile } from '../../../domain/entities/UserProfile';
-import { UserProfileEntity } from '../entities/UserProfileEntity';
+import { UserProfileEntity } from '../../entities/UserProfileEntity';
 import { UserProfileMapper } from '../mappers/UserProfileMapper';
 
 export class TypeOrmUserProfileRepository implements IUserProfileRepository {

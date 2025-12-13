@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { UserPreferences } from '../../../domain/entities/UserProfile';
+import { UserPreferences } from '@modules/user/domain/entities/UserProfile';
 
 @Entity('user_profiles')
 export class UserProfileEntity {

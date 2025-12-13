@@ -1,5 +1,5 @@
 import { UserProfile } from '../../../domain/entities/UserProfile';
-import { UserProfileEntity } from '../entities/UserProfileEntity';
+import { UserProfileEntity } from '../../entities/UserProfileEntity';
 
 export class UserProfileMapper {
     public static toDomain(entity: UserProfileEntity): UserProfile {
