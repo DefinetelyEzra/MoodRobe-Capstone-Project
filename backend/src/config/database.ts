@@ -1,5 +1,9 @@
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
+import { UserEntity } from '@modules/user/infrastructure/entities/UserEntity';
+import { UserProfileEntity } from '@modules/user/infrastructure/entities/UserProfileEntity';
+// Add imports for any other entities here, e.g.:
+// import { AestheticEntity } from '@modules/aesthetic/infrastructure/persistence/entities/AestheticEntity';
 
 dotenv.config();
 
@@ -12,7 +16,7 @@ export const AppDataSource = new DataSource({
     database: process.env.DB_NAME,
     synchronize: false,
     logging: process.env.NODE_ENV === 'development',
-    entities: ['src/modules/**/infrastructure/persistence/entities/*.ts'],
+    entities: [UserEntity, UserProfileEntity /*, AestheticEntity, etc. */],
     migrations: ['src/shared/infrastructure/migrations/*.ts'],
 });
 
@@ -20,6 +24,8 @@ export const initializeDatabase = async () => {
     try {
         await AppDataSource.initialize();
         console.log('✅ Database connection established');
+        // Optional: Log loaded entities for debugging
+        console.log('Loaded entities:', AppDataSource.entityMetadatas.map(m => m.name));
     } catch (error) {
         console.error('❌ Database connection failed:', error);
         process.exit(1);
