@@ -23,16 +23,29 @@ export interface QuizQuestion {
 export interface QuizOption {
     id: string;
     text: string;
-    aestheticIds: string[];
+    aestheticWeights: Record<string, number>;
 }
 
 export interface QuizAnswer {
     questionId: string;
-    answerId: string;
+    optionId: string;
 }
 
 export interface StyleQuizResult {
-    recommendedAesthetic: Aesthetic;
-    score: number;
-    alternativeAesthetics?: Aesthetic[];
+    topAesthetic: {
+        id: string;
+        name: string;
+        description: string;
+        imageUrl?: string;
+        score: number;
+        percentage: number;
+    };
+    alternativeAesthetics: Array<{
+        id: string;
+        name: string;
+        description: string;
+        imageUrl?: string;
+        score: number;
+        percentage: number;
+    }>;
 }

@@ -9,6 +9,7 @@ import { LoginPage } from '@/pages/LoginPage';
 import { RegisterPage } from '@/pages/RegisterPage';
 import { HomePage } from '@/pages/HomePage';
 import { AestheticSelectionPage } from '@/pages/AestheticSelectionPage';
+import { StyleQuizPage } from '@/pages/StyleQuizPage';
 
 function App() {
   return (
@@ -35,6 +36,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <AestheticSelectionPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/style-quiz"
+                element={
+                  <ProtectedRoute>
+                    <StyleQuizPage />
                   </ProtectedRoute>
                 }
               />

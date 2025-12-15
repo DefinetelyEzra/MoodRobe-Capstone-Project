@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import { Aesthetic, QuizAnswer, StyleQuizResult, QuizQuestion } from '@/types/aesthetic.types';
+import { Aesthetic, QuizQuestion, QuizAnswer, StyleQuizResult } from '@/types/aesthetic.types';
 
 export const aestheticApi = {
     getAll: async (): Promise<Aesthetic[]> => {
@@ -14,12 +14,12 @@ export const aestheticApi = {
 
     search: async (keyword: string): Promise<Aesthetic[]> => {
         const response = await apiClient.get('/aesthetics/search', {
-            params: { keyword },
+            params: { keyword }
         });
         return response.data;
     },
 
-    getQuizQuestions: async (): Promise<QuizQuestion[]> => {
+    getQuizQuestions: async (): Promise<{ questions: QuizQuestion[] }> => {
         const response = await apiClient.get('/aesthetics/quiz/questions');
         return response.data;
     },
@@ -27,5 +27,5 @@ export const aestheticApi = {
     submitQuiz: async (answers: QuizAnswer[]): Promise<StyleQuizResult> => {
         const response = await apiClient.post('/aesthetics/quiz/submit', { answers });
         return response.data;
-    },
+    }
 };

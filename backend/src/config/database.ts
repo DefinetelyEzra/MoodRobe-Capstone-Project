@@ -4,6 +4,9 @@ import { UserEntity } from '@modules/user/infrastructure/entities/UserEntity';
 import { UserProfileEntity } from '@modules/user/infrastructure/entities/UserProfileEntity';
 import { MerchantEntity } from '@modules/merchant/infrastructure/entities/MerchantEntity';
 import { MerchantStaffEntity } from '@modules/merchant/infrastructure/entities/MerchantStaffEntity';
+import { ProductEntity } from '@modules/product/infrastructure/entities/ProductEntity';
+import { ProductImageEntity } from '@modules/product/infrastructure/entities/ProductImageEntity';
+import { ProductVariantEntity } from '@modules/product/infrastructure/entities/ProductVariantEntity';
 
 dotenv.config();
 
@@ -16,7 +19,7 @@ export const AppDataSource = new DataSource({
     database: process.env.DB_NAME,
     synchronize: false,
     logging: process.env.NODE_ENV === 'development',
-    entities: [UserEntity, UserProfileEntity, MerchantEntity, MerchantStaffEntity ],
+    entities: [UserEntity, UserProfileEntity, MerchantEntity, MerchantStaffEntity, ProductEntity, ProductImageEntity, ProductVariantEntity ],
     migrations: ['src/shared/infrastructure/migrations/*.ts'],
 });
 
