@@ -11,12 +11,14 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onDismiss }) => {
     const [isExiting, setIsExiting] = useState(false);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsExiting(true);
-            setTimeout(() => onDismiss(toast.id), 300);
-        }, toast.duration || 5000);
+        if ((toast.duration ?? 0) > 0) {
+            const timer = setTimeout(() => {
+                setIsExiting(true);
+                setTimeout(() => onDismiss(toast.id), 300);
+            }, toast.duration);
 
-        return () => clearTimeout(timer);
+            return () => clearTimeout(timer);
+        }
     }, [toast, onDismiss]);
 
     const handleDismiss = (): void => {

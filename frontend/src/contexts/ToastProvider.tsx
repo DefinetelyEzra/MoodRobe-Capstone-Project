@@ -12,15 +12,9 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const showToast = useCallback((message: string, type: ToastType, duration = 5000): void => {
         const id = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
         const newToast: Toast = { id, message, type, duration };
-        
-        setToasts((prev) => [...prev, newToast]);
 
-        if (duration > 0) {
-            setTimeout(() => {
-                hideToast(id);
-            }, duration);
-        }
-    }, [hideToast]);
+        setToasts((prev) => [...prev, newToast]);
+    }, []);
 
     const contextValue = useMemo(
         () => ({

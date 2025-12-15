@@ -1,4 +1,5 @@
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios from 'axios';
+import { setupInterceptors } from './interceptors'; 
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -10,32 +11,7 @@ export const apiClient = axios.create({
     timeout: 10000,
 });
 
-// Request interceptor - attach JWT token
-apiClient.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error: AxiosError) => {
-        return Promise.reject(error);
-    }
-);
-
-// Response interceptor - handle errors globally
-apiClient.interceptors.response.use(
-    (response: AxiosResponse) => response,
-    (error: AxiosError) => {
-        if (error.response?.status === 401) {
-            // Token expired or invalid
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('user');
-            globalThis.location.href = '/login';
-        }
-        return Promise.reject(error);
-    }
-);
+// Attach interceptors
+setupInterceptors(apiClient);
 
 export default apiClient;

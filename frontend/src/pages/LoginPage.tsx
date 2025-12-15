@@ -12,12 +12,16 @@ export const LoginPage: React.FC = () => {
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState<string>('');
 
     const { login } = useAuth();
     const { showToast } = useToast();
     const navigate = useNavigate();
 
     const handleChange = (field: 'email' | 'password', value: string): void => {
+        // Clear error when user starts typing
+        if (error) setError('');
+
         if (field === 'email') setEmail(value);
         if (field === 'password') setPassword(value);
     };
@@ -50,14 +54,17 @@ export const LoginPage: React.FC = () => {
         }
 
         setIsLoading(true);
+        setError(''); // Clear previous errors
 
         try {
             await login({ email: email.trim(), password });
+            showToast('Login successful!', 'success', 3000);
             navigate('/');
         } catch (err) {
             const errorInfo = getErrorInfo(err);
+            setError(errorInfo.message);
             showToast(errorInfo.message, errorInfo.type, 5000);
-            console.error('Login error:', err); 
+            console.error('Login error:', err);
         } finally {
             setIsLoading(false);
         }
@@ -101,6 +108,13 @@ export const LoginPage: React.FC = () => {
                             <h2 className="text-2xl font-bold text-gray-900 mb-1">LOG IN</h2>
                             <p className="text-sm text-gray-600">Welcome back to your style journey</p>
                         </div>
+
+                        {/* Error Message Display */}
+                        {error && (
+                            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                <p className="text-sm text-red-600 text-center">{error}</p>
+                            </div>
+                        )}
 
                         {/* Form */}
                         <form onSubmit={handleSubmit} className="space-y-4">
