@@ -3,8 +3,11 @@ import { AuthContext, AuthContextType } from './AuthContext';
 import { LoginDto, RegisterDto, User } from '@/types/user.types';
 import { authApi } from '@/api/auth.api';
 import { userApi } from '@/api/user.api';
+import { useToast } from '@/hooks/useToast';
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const { showToast } = useToast();
+
     // Initialize state from localStorage during first render
     const [state, setState] = useState<{
         user: User | null;
@@ -30,7 +33,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         });
         localStorage.setItem('accessToken', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
-    }, []);
+        showToast('Login successful! Welcome back.', 'success', 3000);
+    }, [showToast]);
 
     const register = useCallback(async (data: RegisterDto): Promise<void> => {
         const response = await authApi.register(data);
@@ -41,7 +45,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         });
         localStorage.setItem('accessToken', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
-    }, []);
+        showToast('Registration successful! Welcome to MoodRobe.', 'success', 3000);
+    }, [showToast]);
 
     const logout = useCallback((): void => {
         setState({
@@ -50,7 +55,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             isLoading: false,
         });
         authApi.logout();
-    }, []);
+        showToast('You have been logged out successfully.', 'info', 3000);
+    }, [showToast]);
 
     const refreshUser = useCallback(async (): Promise<void> => {
         if (state.token) {

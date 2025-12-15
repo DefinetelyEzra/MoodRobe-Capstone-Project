@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { getErrorMessage } from '@/utils/errorHandler';
-import { AlertCircle, X, Eye, EyeOff } from 'lucide-react';
+import { useToast } from '@/hooks/useToast';
+import { getErrorInfo } from '@/utils/errorHandler'; 
+import { Eye, EyeOff } from 'lucide-react'; 
 import { FaMedium, FaFacebookF, FaLinkedinIn, FaTwitter } from 'react-icons/fa';
 import { IconType } from 'react-icons';
 
@@ -13,59 +14,57 @@ export const RegisterPage: React.FC = () => {
         password: '',
         confirmPassword: '',
     });
-    const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const { register } = useAuth();
+    const { showToast } = useToast(); 
     const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
-        // Clear error when user starts typing
-        if (error) setError('');
     };
 
     const validateForm = (): boolean => {
         if (!formData.name.trim()) {
-            setError('Please enter your full name');
+            showToast('Please enter your full name', 'warning', 4000);
             return false;
         }
 
         if (formData.name.trim().length < 2) {
-            setError('Name must be at least 2 characters');
+            showToast('Name must be at least 2 characters', 'warning', 4000);
             return false;
         }
 
         if (!formData.email.trim()) {
-            setError('Please enter your email address');
+            showToast('Please enter your email address', 'warning', 4000);
             return false;
         }
 
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-            setError('Please enter a valid email address');
+            showToast('Please enter a valid email address', 'warning', 4000);
             return false;
         }
 
         if (!formData.password) {
-            setError('Please enter your password');
+            showToast('Please enter your password', 'warning', 4000);
             return false;
         }
 
         if (formData.password.length < 8) {
-            setError('Password must be at least 8 characters');
+            showToast('Password must be at least 8 characters', 'warning', 4000);
             return false;
         }
 
         if (!formData.confirmPassword) {
-            setError('Please confirm your password');
+            showToast('Please confirm your password', 'warning', 4000);
             return false;
         }
 
         if (formData.password !== formData.confirmPassword) {
-            setError('Passwords do not match');
+            showToast('Passwords do not match', 'warning', 4000);
             return false;
         }
 
@@ -87,9 +86,11 @@ export const RegisterPage: React.FC = () => {
                 email: formData.email.trim(),
                 password: formData.password,
             });
+            showToast('Registration successful!', 'success', 3000);
             navigate('/aesthetic-selection');
         } catch (err) {
-            setError(getErrorMessage(err));
+            const errorInfo = getErrorInfo(err);
+            showToast(errorInfo.message, errorInfo.type, 5000);
         } finally {
             setIsLoading(false);
         }
@@ -133,25 +134,6 @@ export const RegisterPage: React.FC = () => {
                             <h2 className="text-2xl font-bold text-gray-900 mb-1">REGISTER</h2>
                             <p className="text-sm text-gray-600">Start discovering your perfect aesthetic</p>
                         </div>
-
-                        {/* Persistent Error Alert */}
-                        {error && (
-                            <div className="mb-4 bg-red-50/95 backdrop-blur-sm border border-red-200 rounded-lg p-4 animate-shake">
-                                <div className="flex items-start">
-                                    <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 mr-3 shrink-0" />
-                                    <div className="flex-1">
-                                        <p className="text-sm font-medium text-red-800">{error}</p>
-                                    </div>
-                                    <button
-                                        onClick={() => setError('')}
-                                        className="ml-2 text-red-600 hover:text-red-800 transition-colors"
-                                        aria-label="Dismiss error"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            </div>
-                        )}
 
                         {/* Form */}
                         <form onSubmit={handleSubmit} className="space-y-4">

@@ -1,49 +1,49 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { getErrorMessage } from '@/utils/errorHandler';
-import { AlertCircle, X, Eye, EyeOff } from 'lucide-react';
+import { useToast } from '@/hooks/useToast';
+import { getErrorInfo } from '@/utils/errorHandler';
+import { Eye, EyeOff } from 'lucide-react';
 import { FaMedium, FaFacebookF, FaLinkedinIn, FaTwitter } from 'react-icons/fa';
 import { IconType } from 'react-icons';
 
 export const LoginPage: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
     const { login } = useAuth();
+    const { showToast } = useToast();
     const navigate = useNavigate();
 
-    const handleChange = (field: 'email' | 'password', value: string) => {
+    const handleChange = (field: 'email' | 'password', value: string): void => {
         if (field === 'email') setEmail(value);
         if (field === 'password') setPassword(value);
-        // Clear error when user starts typing
-        if (error) setError('');
     };
 
     const validateForm = (): boolean => {
         if (!email.trim()) {
-            setError('Please enter your email address');
+            showToast('Please enter your email address', 'warning', 4000);
             return false;
         }
 
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            setError('Please enter a valid email address');
+            showToast('Please enter a valid email address', 'warning', 4000);
             return false;
         }
 
         if (!password) {
-            setError('Please enter your password');
+            showToast('Please enter your password', 'warning', 4000);
             return false;
         }
 
         return true;
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
+        e.stopPropagation();
 
         if (!validateForm()) {
             return;
@@ -55,7 +55,9 @@ export const LoginPage: React.FC = () => {
             await login({ email: email.trim(), password });
             navigate('/');
         } catch (err) {
-            setError(getErrorMessage(err));
+            const errorInfo = getErrorInfo(err);
+            showToast(errorInfo.message, errorInfo.type, 5000);
+            console.error('Login error:', err); 
         } finally {
             setIsLoading(false);
         }
@@ -99,25 +101,6 @@ export const LoginPage: React.FC = () => {
                             <h2 className="text-2xl font-bold text-gray-900 mb-1">LOG IN</h2>
                             <p className="text-sm text-gray-600">Welcome back to your style journey</p>
                         </div>
-
-                        {/* Persistent Error Alert */}
-                        {error && (
-                            <div className="mb-4 bg-red-50/95 backdrop-blur-sm border border-red-200 rounded-lg p-4 animate-shake">
-                                <div className="flex items-start">
-                                    <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 mr-3 shrink-0" />
-                                    <div className="flex-1">
-                                        <p className="text-sm font-medium text-red-800">{error}</p>
-                                    </div>
-                                    <button
-                                        onClick={() => setError('')}
-                                        className="ml-2 text-red-600 hover:text-red-800 transition-colors"
-                                        aria-label="Dismiss error"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            </div>
-                        )}
 
                         {/* Form */}
                         <form onSubmit={handleSubmit} className="space-y-4">
@@ -235,7 +218,7 @@ const SocialIcons: React.FC = () => {
             },
         ];
 
-    const handleSocialClick = (href: string, label: string) => {
+    const handleSocialClick = (href: string, label: string): void => {
         console.log(`Navigating to ${label}`);
         window.open(href, '_blank', 'noopener noreferrer');
     };
@@ -251,6 +234,7 @@ const SocialIcons: React.FC = () => {
                         className={`w-10 h-10 bg-white/80 backdrop-blur-sm hover:bg-white rounded-full flex items-center justify-center text-gray-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1 ${social.color}`}
                         aria-label={`Follow us on ${social.label}`}
                         title={`Follow us on ${social.label}`}
+                        type="button"
                     >
                         <Icon size={16} />
                     </button>

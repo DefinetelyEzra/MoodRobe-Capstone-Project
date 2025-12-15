@@ -34,7 +34,8 @@ CREATE TABLE merchants (
   business_details JSONB DEFAULT '{}',
   email VARCHAR(255) UNIQUE NOT NULL,
   is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE merchant_staff (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthProvider';
 import { AestheticProvider } from '@/contexts/AestheticProvider';
+import { ToastProvider } from './contexts/ToastProvider';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 // Pages
@@ -12,36 +13,38 @@ import { AestheticSelectionPage } from '@/pages/AestheticSelectionPage';
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <AestheticProvider>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+      <ToastProvider>
+        <AuthProvider>
+          <AestheticProvider>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
 
-            {/* Protected routes */}
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <HomePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/aesthetic-selection"
-              element={
-                <ProtectedRoute>
-                  <AestheticSelectionPage />
-                </ProtectedRoute>
-              }
-            />
+              {/* Protected routes */}
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <HomePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/aesthetic-selection"
+                element={
+                  <ProtectedRoute>
+                    <AestheticSelectionPage />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </AestheticProvider>
-      </AuthProvider>
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </AestheticProvider>
+        </AuthProvider>
+      </ToastProvider>
     </BrowserRouter>
   );
 }

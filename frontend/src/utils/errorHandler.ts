@@ -1,6 +1,11 @@
 import { AxiosError } from 'axios';
 import { ApiErrorResponse } from '@/types/api.types';
 
+export interface ErrorInfo {
+    message: string;
+    type: 'error' | 'warning';
+}
+
 export const getErrorMessage = (error: unknown): string => {
     if (error instanceof AxiosError) {
         const axiosError = error as AxiosError<ApiErrorResponse>;
@@ -45,4 +50,22 @@ export const getErrorMessage = (error: unknown): string => {
     }
 
     return 'An unexpected error occurred. Please try again.';
+};
+
+export const getErrorInfo = (error: unknown): ErrorInfo => {
+    const message = getErrorMessage(error);
+
+    if (error instanceof AxiosError) {
+        const axiosError = error as AxiosError<ApiErrorResponse>;
+
+        // Network errors are warnings (user action might help)
+        if (axiosError.code === 'ECONNABORTED' ||
+            axiosError.code === 'ERR_NETWORK' ||
+            axiosError.code === 'ETIMEDOUT') {
+            return { message, type: 'warning' };
+        }
+    }
+
+    // All other errors are treated as errors
+    return { message, type: 'error' };
 };

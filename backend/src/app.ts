@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { UserRoutes } from './modules/user/presentation/routes/UserRoutes';
 import { AestheticRoutes } from './modules/aesthetic/presentation/routes/AestheticRoutes';
+import { MerchantRoutes } from '@modules/merchant/presentation/routes/MerchantRoutes';
 
 export const createApp = (): Application => {
     const app = express();
@@ -28,6 +29,7 @@ export const createApp = (): Application => {
     // Module routes
     app.use('/api/users', UserRoutes.create());
     app.use('/api/aesthetics', AestheticRoutes.create());
+    app.use('/api/merchants', MerchantRoutes.create());
 
     return app;
 };
