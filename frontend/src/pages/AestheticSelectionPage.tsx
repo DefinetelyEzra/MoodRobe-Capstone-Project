@@ -6,6 +6,7 @@ import { Button } from '@/components/common/Button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { useAesthetic } from '@/hooks/useAesthetic';
 import { useAuth } from '@/hooks/useAuth';
+import { useApi } from '@/hooks/useApi';
 import { userApi } from '@/api/user.api';
 import { Aesthetic } from '@/types/aesthetic.types';
 
@@ -14,7 +15,14 @@ export const AestheticSelectionPage: React.FC = () => {
     const { refreshUser } = useAuth();
     const navigate = useNavigate();
     const [selectedId, setSelectedId] = useState<string | null>(null);
-    const [isSaving, setIsSaving] = useState(false);
+
+    // Use api hook for selecting aesthetic
+    const {
+        isLoading: isSaving,
+        execute: selectAestheticApi
+    } = useApi<void, string>((aestheticId) =>
+        userApi.selectAesthetic(aestheticId)
+    );
 
     const handleSelect = async (aesthetic: Aesthetic) => {
         setSelectedId(aesthetic.id);
@@ -23,9 +31,8 @@ export const AestheticSelectionPage: React.FC = () => {
     const handleConfirm = async () => {
         if (!selectedId) return;
 
-        setIsSaving(true);
         try {
-            await userApi.selectAesthetic(selectedId);
+            await selectAestheticApi(selectedId);
             const selected = availableAesthetics.find((a) => a.id === selectedId);
             if (selected) {
                 setSelectedAesthetic(selected);
@@ -34,8 +41,6 @@ export const AestheticSelectionPage: React.FC = () => {
             navigate('/');
         } catch (error) {
             console.error('Failed to save aesthetic:', error);
-        } finally {
-            setIsSaving(false);
         }
     };
 

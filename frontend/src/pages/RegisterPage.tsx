@@ -2,10 +2,17 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
+import { useApi } from '@/hooks/useApi';
 import { getErrorInfo } from '@/utils/errorHandler'; 
 import { Eye, EyeOff } from 'lucide-react'; 
 import { FaMedium, FaFacebookF, FaLinkedinIn, FaTwitter } from 'react-icons/fa';
 import { IconType } from 'react-icons';
+
+interface RegisterCredentials {
+    name: string;
+    email: string;
+    password: string;
+}
 
 export const RegisterPage: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -14,13 +21,20 @@ export const RegisterPage: React.FC = () => {
         password: '',
         confirmPassword: '',
     });
-    const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const { register } = useAuth();
     const { showToast } = useToast(); 
     const navigate = useNavigate();
+
+    // Use api hook for registration
+    const {
+        isLoading,
+        execute: performRegister
+    } = useApi<void, RegisterCredentials>((credentials) =>
+        register(credentials)
+    );
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -78,10 +92,8 @@ export const RegisterPage: React.FC = () => {
             return;
         }
 
-        setIsLoading(true);
-
         try {
-            await register({
+            await performRegister({
                 name: formData.name.trim(),
                 email: formData.email.trim(),
                 password: formData.password,
@@ -91,8 +103,6 @@ export const RegisterPage: React.FC = () => {
         } catch (err) {
             const errorInfo = getErrorInfo(err);
             showToast(errorInfo.message, errorInfo.type, 5000);
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -293,6 +303,7 @@ const SocialIcons: React.FC = () => {
                         className={`w-10 h-10 bg-white/80 backdrop-blur-sm hover:bg-white rounded-full flex items-center justify-center text-gray-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1 ${social.color}`}
                         aria-label={`Follow us on ${social.label}`}
                         title={`Follow us on ${social.label}`}
+                        type="button"
                     >
                         <Icon size={16} />
                     </button>

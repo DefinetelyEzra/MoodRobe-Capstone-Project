@@ -2,15 +2,20 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
+import { useApi } from '@/hooks/useApi';
 import { getErrorInfo } from '@/utils/errorHandler';
 import { Eye, EyeOff } from 'lucide-react';
 import { FaMedium, FaFacebookF, FaLinkedinIn, FaTwitter } from 'react-icons/fa';
 import { IconType } from 'react-icons';
 
+interface LoginCredentials {
+    email: string;
+    password: string;
+}
+
 export const LoginPage: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState<string>('');
 
@@ -18,10 +23,17 @@ export const LoginPage: React.FC = () => {
     const { showToast } = useToast();
     const navigate = useNavigate();
 
+    // Use api hook for login
+    const {
+        isLoading,
+        execute: performLogin
+    } = useApi<void, LoginCredentials>((credentials) =>
+        login(credentials)
+    );
+
     const handleChange = (field: 'email' | 'password', value: string): void => {
         // Clear error when user starts typing
         if (error) setError('');
-
         if (field === 'email') setEmail(value);
         if (field === 'password') setPassword(value);
     };
@@ -31,17 +43,14 @@ export const LoginPage: React.FC = () => {
             showToast('Please enter your email address', 'warning', 4000);
             return false;
         }
-
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             showToast('Please enter a valid email address', 'warning', 4000);
             return false;
         }
-
         if (!password) {
             showToast('Please enter your password', 'warning', 4000);
             return false;
         }
-
         return true;
     };
 
@@ -53,11 +62,10 @@ export const LoginPage: React.FC = () => {
             return;
         }
 
-        setIsLoading(true);
         setError(''); // Clear previous errors
 
         try {
-            await login({ email: email.trim(), password });
+            await performLogin({ email: email.trim(), password });
             showToast('Login successful!', 'success', 3000);
             navigate('/');
         } catch (err) {
@@ -65,8 +73,6 @@ export const LoginPage: React.FC = () => {
             setError(errorInfo.message);
             showToast(errorInfo.message, errorInfo.type, 5000);
             console.error('Login error:', err);
-        } finally {
-            setIsLoading(false);
         }
     };
 

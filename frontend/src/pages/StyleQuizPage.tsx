@@ -1,20 +1,23 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { aestheticApi } from '@/api/aesthetic.api';
 import { userApi } from '@/api/user.api';
 import { useAesthetic } from '@/hooks/useAesthetic';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
+import { useApi } from '@/hooks/useApi';
 import { QuizQuestion, QuizAnswer, StyleQuizResult } from '@/types/aesthetic.types';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
+
+interface QuizQuestionsResponse {
+    questions: QuizQuestion[];
+}
 
 export const StyleQuizPage: React.FC = () => {
     const [questions, setQuestions] = useState<QuizQuestion[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState<QuizAnswer[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [result, setResult] = useState<StyleQuizResult | null>(null);
 
     const navigate = useNavigate();
@@ -22,22 +25,44 @@ export const StyleQuizPage: React.FC = () => {
     const { refreshUser } = useAuth();
     const { showToast } = useToast();
 
-    const loadQuestions = useCallback(async (): Promise<void> => {
-        try {
-            setIsLoading(true);
-            const data = await aestheticApi.getQuizQuestions();
-            setQuestions(data.questions);
-        } catch (error) {
-            console.error('Failed to load quiz questions:', error);
-            showToast('Failed to load quiz questions', 'error');
-        } finally {
-            setIsLoading(false);
-        }
-    }, [showToast]);
+    // Use api hook for loading quiz questions
+    const {
+        isLoading,
+        execute: fetchQuestions
+    } = useApi<QuizQuestionsResponse, void>(() =>
+        aestheticApi.getQuizQuestions()
+    );
+
+    // Use api hook for submitting quiz
+    const {
+        isLoading: isSubmitting,
+        execute: submitQuizApi
+    } = useApi<StyleQuizResult, QuizAnswer[]>((quizAnswers) =>
+        aestheticApi.submitQuiz(quizAnswers)
+    );
+
+    // Use api hook for selecting aesthetic
+    const {
+        execute: selectAestheticApi
+    } = useApi<void, string>((aestheticId) =>
+        userApi.selectAesthetic(aestheticId)
+    );
 
     useEffect(() => {
+        const loadQuestions = async () => {
+            try {
+                const data = await fetchQuestions();
+                if (data) {
+                    setQuestions(data.questions);
+                }
+            } catch (error) {
+                console.error('Failed to load quiz questions:', error);
+                showToast('Failed to load quiz questions', 'error');
+            }
+        };
+
         loadQuestions();
-    }, [loadQuestions]);
+    }, [fetchQuestions, showToast]);
 
     const handleOptionSelect = (optionId: string): void => {
         const currentQuestion = questions[currentQuestionIndex];
@@ -63,21 +88,20 @@ export const StyleQuizPage: React.FC = () => {
 
     const handleSubmit = async (): Promise<void> => {
         try {
-            setIsSubmitting(true);
-            const quizResult = await aestheticApi.submitQuiz(answers);
-            setResult(quizResult);
+            const quizResult = await submitQuizApi(answers);
+            if (quizResult) {
+                setResult(quizResult);
 
-            // Auto-select the top aesthetic
-            await userApi.selectAesthetic(quizResult.topAesthetic.id);
-            await loadAesthetics();
-            await refreshUser();
+                // Auto-select the top aesthetic
+                await selectAestheticApi(quizResult.topAesthetic.id);
+                await loadAesthetics();
+                await refreshUser();
 
-            showToast('Quiz completed! Your aesthetic has been set.', 'success');
+                showToast('Quiz completed! Your aesthetic has been set.', 'success');
+            }
         } catch (error) {
             console.error('Failed to submit quiz:', error);
             showToast('Failed to submit quiz', 'error');
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
@@ -223,16 +247,16 @@ export const StyleQuizPage: React.FC = () => {
                                 key={option.id}
                                 onClick={() => handleOptionSelect(option.id)}
                                 className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${currentAnswer === option.id
-                                        ? 'border-purple-600 bg-purple-50'
-                                        : 'border-gray-200 hover:border-purple-300 bg-white'
+                                    ? 'border-purple-600 bg-purple-50'
+                                    : 'border-gray-200 hover:border-purple-300 bg-white'
                                     }`}
                                 type="button"
                             >
                                 <div className="flex items-center">
                                     <div
                                         className={`w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center ${currentAnswer === option.id
-                                                ? 'border-purple-600 bg-purple-600'
-                                                : 'border-gray-300'
+                                            ? 'border-purple-600 bg-purple-600'
+                                            : 'border-gray-300'
                                             }`}
                                     >
                                         {currentAnswer === option.id && (
