@@ -1,4 +1,4 @@
-import { Money } from "../value-objects/Money";
+import { Money } from "@shared/domain/value-objects/Money";
 
 export interface ProductVariantProps {
     id: string;

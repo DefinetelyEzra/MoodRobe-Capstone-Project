@@ -1,5 +1,5 @@
 import { Product } from '../../../domain/entities/Product';
-import { Money } from '../../../domain/value-objects/Money';
+import { Money } from '@shared/domain/value-objects/Money';
 import { ProductEntity } from '../../entities/ProductEntity';
 
 export class ProductMapper {

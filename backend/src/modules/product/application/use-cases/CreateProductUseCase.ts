@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Product } from '../../domain/entities/Product';
 import { ProductVariant } from '../../domain/entities/ProductVariant';
 import { ProductImage } from '../../domain/entities/ProductImage';
-import { Money } from '../../domain/value-objects/Money';
+import { Money } from '@shared/domain/value-objects/Money';
 import { IProductRepository } from '../../domain/repositories/IProductRepository';
 import { IProductVariantRepository } from '../../domain/repositories/IProductVariantRepository';
 import { IProductImageRepository } from '../../domain/repositories/IProductImageRepository';

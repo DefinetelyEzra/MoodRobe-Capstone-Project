@@ -1,4 +1,4 @@
-import { Email } from "../value-objects/Email";
+import { Email } from "@shared/domain/value-objects/Email";
 import { BusinessDetails } from '../value-objects/BusinessDetails';
 
 export class Merchant {

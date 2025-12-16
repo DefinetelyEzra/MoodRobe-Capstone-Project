@@ -8,7 +8,7 @@ export class Email {
 
         const trimmedEmail = email.trim();
 
-        if (!this.isValid(trimmedEmail)) {
+        if (!Email.isValid(trimmedEmail)) {
             throw new Error('Invalid email format');
         }
 
@@ -19,9 +19,18 @@ export class Email {
         this.value = trimmedEmail.toLowerCase();
     }
 
-    private isValid(email: string): boolean {
+    private static isValid(email: string): boolean {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
+    }
+
+    public static validate(email: string): boolean {
+        try {
+            new Email(email);
+            return true;
+        } catch {
+            return false;
+        }
     }
 
     public toString(): string {
@@ -34,5 +43,9 @@ export class Email {
 
     public getDomain(): string {
         return this.value.split('@')[1];
+    }
+
+    public getValue(): string {
+        return this.value;
     }
 }

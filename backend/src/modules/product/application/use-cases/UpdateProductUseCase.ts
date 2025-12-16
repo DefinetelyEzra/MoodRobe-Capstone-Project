@@ -3,7 +3,7 @@ import { IMerchantStaffRepository } from '../../../merchant/domain/repositories/
 import { ProductNotFoundException, UnauthorizedProductAccessException } from '../../domain/exceptions/ProductExceptions';
 import { UpdateProductDto } from '../dto/UpdateProductDto';
 import { ProductResponseDto } from '../dto/CreateProductDto';
-import { Money } from '../../domain/value-objects/Money';
+import { Money } from '@shared/domain/value-objects/Money';
 import { IProductVariantRepository } from '@modules/product/domain/repositories/IProductVariantRepository';
 
 import { IProductImageRepository } from '../../domain/repositories/IProductImageRepository';

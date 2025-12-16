@@ -1,5 +1,5 @@
 import { ProductVariant } from '../../../domain/entities/ProductVariant';
-import { Money } from '../../../domain/value-objects/Money';
+import { Money } from '@shared/domain/value-objects/Money';
 import { ProductVariantEntity } from '../../entities/ProductVariantEntity';
 
 export class ProductVariantMapper {

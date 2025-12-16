@@ -13,7 +13,6 @@ export class Money {
             throw new Error('Currency must be a 3-letter code (e.g., USD, EUR)');
         }
 
-        // Round to 2 decimal places
         this.amount = Math.round(amount * 100) / 100;
         this.currency = currency.toUpperCase();
     }
@@ -33,10 +32,17 @@ export class Money {
 
     public subtract(other: Money): Money {
         this.ensureSameCurrency(other);
-        return new Money(this.amount - other.amount, this.currency);
+        const result = this.amount - other.amount;
+        if (result < 0) {
+            throw new Error('Subtraction would result in negative amount');
+        }
+        return new Money(result, this.currency);
     }
 
     public multiply(factor: number): Money {
+        if (factor < 0) {
+            throw new Error('Factor cannot be negative');
+        }
         return new Money(this.amount * factor, this.currency);
     }
 
@@ -60,7 +66,9 @@ export class Money {
 
     private ensureSameCurrency(other: Money): void {
         if (this.currency !== other.currency) {
-            throw new Error(`Cannot operate on different currencies: ${this.currency} and ${other.currency}`);
+            throw new Error(
+                `Cannot operate on different currencies: ${this.currency} and ${other.currency}`
+            );
         }
     }
 }

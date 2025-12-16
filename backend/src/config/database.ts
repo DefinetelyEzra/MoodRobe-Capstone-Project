@@ -7,6 +7,10 @@ import { MerchantStaffEntity } from '@modules/merchant/infrastructure/entities/M
 import { ProductEntity } from '@modules/product/infrastructure/entities/ProductEntity';
 import { ProductImageEntity } from '@modules/product/infrastructure/entities/ProductImageEntity';
 import { ProductVariantEntity } from '@modules/product/infrastructure/entities/ProductVariantEntity';
+import { OrderEntity } from '@modules/order/infrastructure/entities/OrderEntity';
+import { OrderLineEntity } from '@modules/order/infrastructure/entities/OrderLineEntity';
+import { CartEntity } from '@modules/cart/infrastructure/entities/CartEntity';
+import { CartItemEntity } from '@modules/cart/infrastructure/entities/CartItemEntity';
 
 dotenv.config();
 
@@ -19,7 +23,17 @@ export const AppDataSource = new DataSource({
     database: process.env.DB_NAME,
     synchronize: false,
     logging: process.env.NODE_ENV === 'development',
-    entities: [UserEntity, UserProfileEntity, MerchantEntity, MerchantStaffEntity, ProductEntity, ProductImageEntity, ProductVariantEntity ],
+    entities: [UserEntity,
+        UserProfileEntity,
+        MerchantEntity,
+        MerchantStaffEntity,
+        ProductEntity,
+        ProductImageEntity,
+        ProductVariantEntity,
+        CartEntity,
+        CartItemEntity,
+        OrderEntity,
+        OrderLineEntity],
     migrations: ['src/shared/infrastructure/migrations/*.ts'],
 });
 
