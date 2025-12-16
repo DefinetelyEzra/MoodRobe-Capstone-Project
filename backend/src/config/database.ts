@@ -11,6 +11,7 @@ import { OrderEntity } from '@modules/order/infrastructure/entities/OrderEntity'
 import { OrderLineEntity } from '@modules/order/infrastructure/entities/OrderLineEntity';
 import { CartEntity } from '@modules/cart/infrastructure/entities/CartEntity';
 import { CartItemEntity } from '@modules/cart/infrastructure/entities/CartItemEntity';
+import { PaymentEntity } from '@modules/payment/infrastructure/entities/PaymentEntity';
 
 dotenv.config();
 
@@ -33,7 +34,8 @@ export const AppDataSource = new DataSource({
         CartEntity,
         CartItemEntity,
         OrderEntity,
-        OrderLineEntity],
+        OrderLineEntity,
+        PaymentEntity ],
     migrations: ['src/shared/infrastructure/migrations/*.ts'],
 });
 
