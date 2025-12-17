@@ -11,7 +11,7 @@ import { userApi } from '@/api/user.api';
 import { Aesthetic } from '@/types/aesthetic.types';
 
 export const AestheticSelectionPage: React.FC = () => {
-    const { availableAesthetics, isLoading, setSelectedAesthetic } = useAesthetic();
+    const { error, availableAesthetics, isLoading, setSelectedAesthetic } = useAesthetic();
     const { refreshUser } = useAuth();
     const navigate = useNavigate();
     const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -52,6 +52,19 @@ export const AestheticSelectionPage: React.FC = () => {
         );
     }
 
+    // error handling
+    if (error) {
+        return (
+            <Layout>
+                <div className="max-w-4xl mx-auto text-center py-12">
+                    <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Aesthetics</h2>
+                    <p className="text-gray-600 mb-6">{error}</p>
+                    <Button onClick={() => globalThis.location.reload()}>Retry</Button>
+                </div>
+            </Layout>
+        );
+    }
+
     return (
         <Layout>
             <div className="max-w-6xl mx-auto">
@@ -84,7 +97,7 @@ export const AestheticSelectionPage: React.FC = () => {
                                 </h3>
                                 <p className="text-gray-600 text-sm mb-4">{aesthetic.description}</p>
                                 <div className="flex gap-2 flex-wrap">
-                                    {aesthetic.themeProperties.colorPalette.slice(0, 5).map((color) => (
+                                    {aesthetic.themeProperties.colors.slice(0, 5).map((color) => (
                                         <div
                                             key={color}
                                             className="w-8 h-8 rounded-full border-2 border-gray-200"

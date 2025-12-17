@@ -9,11 +9,13 @@ export interface Aesthetic {
 }
 
 export interface ThemeProperties {
-    colorPalette: string[];
-    typography: string;
-    imagery: string;
+    colors: string[];
+    style: string;
+    mood?: string;
+    patterns?: string[];
+    textures?: string[];
+    keywords?: string[];
 }
-
 export interface QuizQuestion {
     id: string;
     question: string;

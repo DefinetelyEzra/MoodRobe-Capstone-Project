@@ -120,6 +120,22 @@ export const StyleQuizPage: React.FC = () => {
         );
     }
 
+    if (!questions || questions.length === 0) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-purple-50 to-teal-50">
+                <div className="text-center">
+                    <p className="text-gray-600 mb-4">No quiz questions available</p>
+                    <button
+                        onClick={() => navigate('/')}
+                        className="px-6 py-3 bg-purple-600 text-white rounded-lg"
+                    >
+                        Back to Home
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     if (result) {
         return (
             <div className="min-h-screen bg-linear-to-br from-purple-50 to-teal-50">

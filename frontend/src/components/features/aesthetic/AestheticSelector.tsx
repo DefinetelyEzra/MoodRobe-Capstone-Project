@@ -50,8 +50,8 @@ export const AestheticSelector: React.FC<AestheticSelectorProps> = ({
                                 <div
                                     className="w-full h-full flex items-center justify-center"
                                     style={{
-                                        background: `linear-gradient(135deg, ${aesthetic.themeProperties.colorPalette[0] || '#14b8a6'
-                                            }, ${aesthetic.themeProperties.colorPalette[1] || '#0f766e'
+                                        background: `linear-gradient(135deg, ${aesthetic.themeProperties.colors[0] || '#14b8a6'
+                                            }, ${aesthetic.themeProperties.colors[1] || '#0f766e'
                                             })`
                                     }}
                                 >
@@ -103,8 +103,8 @@ export const AestheticSelector: React.FC<AestheticSelectorProps> = ({
                                 <div
                                     className="w-full h-full"
                                     style={{
-                                        background: `linear-gradient(135deg, ${aesthetic.themeProperties.colorPalette[0] || '#14b8a6'
-                                            }, ${aesthetic.themeProperties.colorPalette[1] || '#0f766e'
+                                        background: `linear-gradient(135deg, ${aesthetic.themeProperties.colors[0] || '#14b8a6'
+                                            }, ${aesthetic.themeProperties.colors[1] || '#0f766e'
                                             })`
                                     }}
                                 />
@@ -131,7 +131,7 @@ export const AestheticSelector: React.FC<AestheticSelectorProps> = ({
 
                             {/* Color palette preview */}
                             <div className="flex gap-2 flex-wrap">
-                                {aesthetic.themeProperties.colorPalette.slice(0, 5).map((color) => (
+                                {aesthetic.themeProperties.colors.slice(0, 5).map((color) => (
                                     <div
                                         key={`${aesthetic.id}-color-${color}`}
                                         className="w-8 h-8 rounded-full border-2 border-gray-200 shadow-sm"

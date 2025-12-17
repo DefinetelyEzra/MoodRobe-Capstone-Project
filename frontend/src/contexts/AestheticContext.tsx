@@ -5,6 +5,7 @@ export interface AestheticContextType {
   selectedAesthetic: Aesthetic | null;
   availableAesthetics: Aesthetic[];
   isLoading: boolean;
+  error: string | null;
   setSelectedAesthetic: (aesthetic: Aesthetic | null) => void;
   loadAesthetics: () => Promise<void>;
 }

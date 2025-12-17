@@ -24,10 +24,13 @@ export class ThemeProperties {
             throw new Error('Theme must have a style');
         }
 
-        // Validate color format (basic hex color validation)
+        // Validate color format; allow hex colors (#FFFFFF) or named colors (red, neon-blue, etc.)
         properties.colors.forEach((color) => {
-            if (!/^#[0-9A-F]{6}$/i.test(color) && !/^[a-z]+$/i.test(color)) {
-                throw new Error(`Invalid color format: ${color}`);
+            const isHexColor = /^#[0-9A-F]{6}$/i.test(color) || /^#[0-9A-F]{3}$/i.test(color);
+            const isNamedColor = /^[a-z-]+$/i.test(color); // Allow letters and hyphens
+            
+            if (!isHexColor && !isNamedColor) {
+                throw new Error(`Invalid color format: ${color}. Must be hex (#fff or #ffffff) or named color (red, neon-blue)`);
             }
         });
     }

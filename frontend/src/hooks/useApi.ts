@@ -18,6 +18,14 @@ export function useApi<T, P = void>(
 
     const abortControllerRef = useRef<AbortController | null>(null);
 
+    // Store apiFunction in a ref to avoid recreating execute on every render
+    const apiFunctionRef = useRef(apiFunction);
+
+    // Update the ref when apiFunction changes
+    useEffect(() => {
+        apiFunctionRef.current = apiFunction;
+    }, [apiFunction]);
+
     const execute = useCallback(async (params?: P): Promise<T> => {
         // Cancel previous request
         if (abortControllerRef.current) {
@@ -30,7 +38,7 @@ export function useApi<T, P = void>(
         setState({ data: null, isLoading: true, error: null });
 
         try {
-            const response = await apiFunction(params as P);
+            const response = await apiFunctionRef.current(params as P);
             if (!abortController.signal.aborted) {
                 setState({ data: response, isLoading: false, error: null });
                 return response;
@@ -46,7 +54,7 @@ export function useApi<T, P = void>(
         } finally {
             abortControllerRef.current = null;
         }
-    }, [apiFunction]);
+    }, []);
 
     useEffect(() => {
         return () => {

@@ -8,10 +8,12 @@ export const AestheticProvider: React.FC<{ children: ReactNode }> = ({ children 
     const [selectedAesthetic, setSelectedAesthetic] = useState<Aesthetic | null>(null);
     const [availableAesthetics, setAvailableAesthetics] = useState<Aesthetic[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const { user } = useAuth();
 
     const loadAesthetics = useCallback(async (): Promise<void> => {
         setIsLoading(true);
+        setError(null);
         try {
             const aesthetics = await aestheticApi.getAll();
             setAvailableAesthetics(aesthetics);
@@ -23,8 +25,19 @@ export const AestheticProvider: React.FC<{ children: ReactNode }> = ({ children 
                     setSelectedAesthetic(selected);
                 }
             }
-        } catch (error) {
+        } catch (error: unknown) {
             console.error('Failed to load aesthetics:', error);
+
+            // Handle the error appropriately
+            let errorMessage = 'Failed to load aesthetics';
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } else if (error && typeof error === 'object' && 'response' in error) {
+                // For API errors with response property
+                const apiError = error as { response?: { data?: { error?: string } } };
+                errorMessage = apiError.response?.data?.error || errorMessage;
+            }
+            setError(errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -40,20 +53,20 @@ export const AestheticProvider: React.FC<{ children: ReactNode }> = ({ children 
     }, []);
 
     useEffect(() => {
-        if (user) {
-            loadAesthetics();
-        }
-    }, [user, loadAesthetics]);
+        // Only load aesthetics once when component mounts
+        loadAesthetics();
+    }, [loadAesthetics]); 
 
     const contextValue = useMemo<AestheticContextType>(
         () => ({
             selectedAesthetic,
             availableAesthetics,
             isLoading,
+            error,
             setSelectedAesthetic: handleSetSelectedAesthetic,
             loadAesthetics,
         }),
-        [selectedAesthetic, availableAesthetics, isLoading, handleSetSelectedAesthetic, loadAesthetics]
+        [selectedAesthetic, availableAesthetics, isLoading, error, handleSetSelectedAesthetic, loadAesthetics]
     );
 
     return <AestheticContext.Provider value={contextValue}>{children}</AestheticContext.Provider>;

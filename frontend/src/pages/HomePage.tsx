@@ -42,12 +42,15 @@ export const HomePage: React.FC = () => {
 
     // Fetch featured products based on selected aesthetic
     useEffect(() => {
-        if (selectedAesthetic?.id) {
-            fetchProducts(selectedAesthetic.id).catch((error) => {
+    if (selectedAesthetic?.id) {
+        fetchProducts(selectedAesthetic.id).catch((error) => {
+            // Don't log aborted requests as errors
+            if (error?.name !== 'AbortError' && error?.message !== 'Request aborted') {
                 console.error('Failed to fetch products:', error);
-            });
-        }
-    }, [selectedAesthetic, fetchProducts]);
+            }
+        });
+    }
+}, [selectedAesthetic?.id, fetchProducts]);
 
     const handleAestheticSelect = async (aesthetic: Aesthetic) => {
         try {

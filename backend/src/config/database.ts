@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 import { UserEntity } from '@modules/user/infrastructure/entities/UserEntity';
 import { UserProfileEntity } from '@modules/user/infrastructure/entities/UserProfileEntity';
+import { AestheticEntity } from '@modules/aesthetic/infrastructure/entities/AestheticEntity';
 import { MerchantEntity } from '@modules/merchant/infrastructure/entities/MerchantEntity';
 import { MerchantStaffEntity } from '@modules/merchant/infrastructure/entities/MerchantStaffEntity';
 import { ProductEntity } from '@modules/product/infrastructure/entities/ProductEntity';
@@ -26,6 +27,7 @@ export const AppDataSource = new DataSource({
     logging: process.env.NODE_ENV === 'development',
     entities: [UserEntity,
         UserProfileEntity,
+        AestheticEntity,
         MerchantEntity,
         MerchantStaffEntity,
         ProductEntity,

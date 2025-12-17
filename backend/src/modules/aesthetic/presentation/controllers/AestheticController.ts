@@ -48,9 +48,11 @@ export class AestheticController {
 
     public getAll = async (req: Request, res: Response): Promise<void> => {
         try {
+            console.log('GET /aesthetics called');
             const result = await this.getAllAestheticsUseCase.execute();
             res.status(200).json(result);
         } catch (error) {
+            console.error('Error in getAll controller:', error); 
             this.handleError(error, res);
         }
     };
