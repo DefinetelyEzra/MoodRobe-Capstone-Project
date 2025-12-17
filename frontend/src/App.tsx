@@ -2,7 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthProvider';
 import { AestheticProvider } from '@/contexts/AestheticProvider';
 import { ToastProvider } from './contexts/ToastProvider';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { ProtectedRoute } from '@/components/routes/ProtectedRoute';
+import { Layout } from './components/layout/Layout';
 
 // Pages
 import { LoginPage } from '@/pages/LoginPage';
@@ -22,31 +23,19 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
 
-              {/* Protected routes */}
+              {/* Protected routes with Layout */}
               <Route
                 path="/"
                 element={
                   <ProtectedRoute>
-                    <HomePage />
+                    <Layout />
                   </ProtectedRoute>
                 }
-              />
-              <Route
-                path="/aesthetic-selection"
-                element={
-                  <ProtectedRoute>
-                    <AestheticSelectionPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/style-quiz"
-                element={
-                  <ProtectedRoute>
-                    <StyleQuizPage />
-                  </ProtectedRoute>
-                }
-              />
+              >
+                <Route index element={<HomePage />} />
+                <Route path="aesthetic-selection" element={<AestheticSelectionPage />} />
+                <Route path="style-quiz" element={<StyleQuizPage />} />
+              </Route>
 
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
