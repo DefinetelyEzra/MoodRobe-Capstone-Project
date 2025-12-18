@@ -69,7 +69,7 @@ export class CreateProductUseCase {
                 return ProductImage.create(
                     imageId,
                     productId,
-                    imageDto.url,
+                    imageDto.imageUrl,
                     imageDto.isPrimary || index === 0,
                     imageDto.displayOrder ?? index
                 );
@@ -144,7 +144,7 @@ export class CreateProductUseCase {
             images: images.map((img) => ({
                 id: img.id,
                 productId: img.productId,
-                url: img.url,
+                imageUrl: img.url,
                 isPrimary: img.isPrimary,
                 displayOrder: img.displayOrder,
             })),

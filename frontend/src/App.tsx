@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthProvider';
 import { AestheticProvider } from '@/contexts/AestheticProvider';
+import { CartProvider } from './contexts';
 import { ToastProvider } from './contexts/ToastProvider';
 import { ProtectedRoute } from '@/components/routes/ProtectedRoute';
 import { Layout } from './components/layout/Layout';
@@ -13,6 +14,7 @@ import { AestheticSelectionPage } from '@/pages/AestheticSelectionPage';
 import { StyleQuizPage } from '@/pages/StyleQuizPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { ProductsPage } from '@/pages/ProductsPage';
+import { ProductDetailsPage } from './pages/ProductDetailsPage';
 
 function App() {
   return (
@@ -20,30 +22,33 @@ function App() {
       <ToastProvider>
         <AuthProvider>
           <AestheticProvider>
-            <Routes>
-              {/* Public routes */}
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
+            <CartProvider>
+              <Routes>
+                {/* Public routes */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
 
-              {/* Protected routes with Layout */}
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <Layout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<HomePage />} />
-                <Route path="aesthetic-selection" element={<AestheticSelectionPage />} />
-                <Route path="style-quiz" element={<StyleQuizPage />} />
-                <Route path="profile" element={<ProfilePage />} />
-                <Route path="products" element={<ProductsPage />} />
-              </Route>
+                {/* Protected routes with Layout */}
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <Layout />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route index element={<HomePage />} />
+                  <Route path="aesthetic-selection" element={<AestheticSelectionPage />} />
+                  <Route path="style-quiz" element={<StyleQuizPage />} />
+                  <Route path="profile" element={<ProfilePage />} />
+                  <Route path="products" element={<ProductsPage />} />
+                  <Route path="products/:id" element={<ProductDetailsPage />} />
+                </Route>
 
-              {/* Fallback */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+                {/* Fallback */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </CartProvider>
           </AestheticProvider>
         </AuthProvider>
       </ToastProvider>

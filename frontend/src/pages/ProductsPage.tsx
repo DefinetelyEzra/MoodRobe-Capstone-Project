@@ -35,6 +35,7 @@ export const ProductsPage: React.FC = () => {
         minPrice: undefined,
         maxPrice: undefined,
         aestheticTags: selectedAesthetic ? [selectedAesthetic.id] : undefined,
+        isActive: true,
         limit: 20,
         offset: 0,
     });

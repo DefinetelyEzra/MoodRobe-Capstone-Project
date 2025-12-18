@@ -59,7 +59,8 @@ export class GetProductByIdUseCase {
             images: images.map((img) => ({
                 id: img.id,
                 productId: img.productId,
-                url: img.url,
+                imageUrl: img.url,
+                altText: undefined,
                 isPrimary: img.isPrimary,
                 displayOrder: img.displayOrder,
             })),

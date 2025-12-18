@@ -18,7 +18,7 @@ export interface CreateVariantDto {
 }
 
 export interface CreateImageDto {
-    url: string;
+    imageUrl: string;
     isPrimary?: boolean;
     displayOrder?: number;
 }
@@ -58,7 +58,7 @@ export interface VariantResponseDto {
 export interface ImageResponseDto {
     id: string;
     productId: string;
-    url: string;
+    imageUrl: string;
     isPrimary: boolean;
     displayOrder: number;
 }

@@ -69,7 +69,7 @@ export class AddProductImageUseCase {
         return {
             id: image.id,
             productId: image.productId,
-            url: image.url,
+            imageUrl: image.url,
             isPrimary: image.isPrimary,
             displayOrder: image.displayOrder,
         };
