@@ -15,6 +15,7 @@ import { StyleQuizPage } from '@/pages/StyleQuizPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { ProductsPage } from '@/pages/ProductsPage';
 import { ProductDetailsPage } from './pages/ProductDetailsPage';
+import { CartPage } from './pages/CartPage';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
                   <Route path="profile" element={<ProfilePage />} />
                   <Route path="products" element={<ProductsPage />} />
                   <Route path="products/:id" element={<ProductDetailsPage />} />
+                  <Route path="cart" element={<CartPage />} /> 
                 </Route>
 
                 {/* Fallback */}

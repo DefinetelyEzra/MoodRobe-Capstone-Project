@@ -1,5 +1,7 @@
 import { ICartRepository } from '../../domain/repositories/ICartRepository';
 import { ICartItemRepository } from '../../domain/repositories/ICartItemRepository';
+import { IProductRepository } from '../../../product/domain/repositories/IProductRepository';
+import { IProductVariantRepository } from '../../../product/domain/repositories/IProductVariantRepository';
 import { CartItemNotFoundException } from '../../domain/exceptions/CartExceptions';
 import { CartResponseDto } from '../dto/CartDto';
 import { GetOrCreateCartUseCase } from './GetOrCreateCartUseCase';
@@ -9,11 +11,15 @@ export class RemoveItemFromCartUseCase {
 
     constructor(
         private readonly cartRepository: ICartRepository,
-        private readonly cartItemRepository: ICartItemRepository
+        private readonly cartItemRepository: ICartItemRepository,
+        private readonly productRepository?: IProductRepository,
+        private readonly variantRepository?: IProductVariantRepository
     ) {
         this.getOrCreateCartUseCase = new GetOrCreateCartUseCase(
             cartRepository,
-            cartItemRepository
+            cartItemRepository,
+            productRepository,
+            variantRepository
         );
     }
 

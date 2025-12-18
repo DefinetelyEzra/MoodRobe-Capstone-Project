@@ -19,7 +19,9 @@ export class AddItemToCartUseCase {
     ) {
         this.getOrCreateCartUseCase = new GetOrCreateCartUseCase(
             cartRepository,
-            cartItemRepository
+            cartItemRepository,
+            productRepository,
+            variantRepository
         );
     }
 
@@ -28,7 +30,6 @@ export class AddItemToCartUseCase {
         let cart = await this.cartRepository.findByUserId(userId);
         if (!cart) {
             const cartId = uuidv4();
-            // Fixed: Remove duplicate save() call
             cart = await this.cartRepository.save(
                 (await import('../../domain/entities/Cart')).Cart.create(cartId, userId)
             );
@@ -96,7 +97,7 @@ export class AddItemToCartUseCase {
         cart.updatedAt = new Date();
         await this.cartRepository.update(cart);
 
-        // Return updated cart
+        // Return updated cart with product details
         return this.getOrCreateCartUseCase.execute(userId);
     }
 }

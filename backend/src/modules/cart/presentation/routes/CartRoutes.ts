@@ -22,10 +22,12 @@ export class CartRoutes {
         const productRepository = new TypeOrmProductRepository();
         const variantRepository = new TypeOrmProductVariantRepository();
 
-        // Initialize use cases
+        // Initialize use cases; pass product repositories to GetOrCreateCartUseCase
         const getOrCreateCartUseCase = new GetOrCreateCartUseCase(
             cartRepository,
-            cartItemRepository
+            cartItemRepository,
+            productRepository,
+            variantRepository
         );
         const addItemToCartUseCase = new AddItemToCartUseCase(
             cartRepository,

@@ -7,17 +7,9 @@ export interface UpdateCartItemDto {
     quantity: number;
 }
 
-export interface CartResponseDto {
-    id: string;
-    userId: string;
-    items: CartItemResponseDto[];
-    itemCount: number;
-    subtotal: {
-        amount: number;
-        currency: string;
-    };
-    createdAt: Date;
-    updatedAt: Date;
+export interface PriceDto {
+    amount: number;
+    currency: string;
 }
 
 export interface CartItemResponseDto {
@@ -25,13 +17,20 @@ export interface CartItemResponseDto {
     productVariantId: string;
     productName: string;
     quantity: number;
-    unitPrice: {
-        amount: number;
-        currency: string;
-    };
-    lineTotal: {
-        amount: number;
-        currency: string;
-    };
+    unitPrice: PriceDto;
+    lineTotal: PriceDto;
     addedAt: Date;
+    productId?: string;
+    imageUrl?: string;
+    variantAttributes?: Record<string, string | number | boolean>;
+}
+
+export interface CartResponseDto {
+    id: string;
+    userId: string;
+    items: CartItemResponseDto[];
+    itemCount: number;
+    subtotal: PriceDto;
+    createdAt: Date;
+    updatedAt: Date;
 }

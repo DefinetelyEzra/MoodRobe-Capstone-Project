@@ -1,5 +1,6 @@
 import { ICartRepository } from '../../domain/repositories/ICartRepository';
 import { ICartItemRepository } from '../../domain/repositories/ICartItemRepository';
+import { IProductRepository } from '../../../product/domain/repositories/IProductRepository';
 import { IProductVariantRepository } from '../../../product/domain/repositories/IProductVariantRepository';
 import { CartItemNotFoundException, InsufficientStockException } from '../../domain/exceptions/CartExceptions';
 import { UpdateCartItemDto, CartResponseDto } from '../dto/CartDto';
@@ -11,11 +12,14 @@ export class UpdateCartItemQuantityUseCase {
     constructor(
         private readonly cartRepository: ICartRepository,
         private readonly cartItemRepository: ICartItemRepository,
-        private readonly variantRepository: IProductVariantRepository
+        private readonly variantRepository: IProductVariantRepository,
+        private readonly productRepository?: IProductRepository
     ) {
         this.getOrCreateCartUseCase = new GetOrCreateCartUseCase(
             cartRepository,
-            cartItemRepository
+            cartItemRepository,
+            productRepository,
+            variantRepository
         );
     }
 

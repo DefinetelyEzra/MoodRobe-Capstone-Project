@@ -55,23 +55,33 @@ export const ProductDetailsPage: React.FC = () => {
         }).format(price.amount);
     };
 
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
         if (!product) return;
 
         const variantToAdd = selectedVariant ?? product.variants?.[0];
+
+        if (!variantToAdd?.id) {
+            showToast('Please select a variant', 'error');
+            return;
+        }
 
         if (variantToAdd?.stockQuantity === 0) {
             showToast('This product is out of stock', 'error');
             return;
         }
 
-        addItem({
-            productId: product.id,
-            variantId: variantToAdd?.id,
-            quantity
-        });
+        try {
+            await addItem({
+                productId: product.id,
+                variantId: variantToAdd.id,
+                quantity
+            });
 
-        showToast('Added to cart successfully', 'success');
+            showToast('Added to cart successfully', 'success');
+        } catch (error) {
+            console.error('Failed to add to cart:', error);
+            showToast('Failed to add to cart', 'error');
+        }
     };
 
     const handleQuantityChange = (newQuantity: number) => {
@@ -159,8 +169,8 @@ export const ProductDetailsPage: React.FC = () => {
                                     key={image.id}
                                     onClick={() => setSelectedImage(index)}
                                     className={`rounded-lg overflow-hidden border-2 transition-all ${selectedImage === index
-                                            ? 'border-teal-600 ring-2 ring-teal-200'
-                                            : 'border-gray-200 hover:border-gray-300'
+                                        ? 'border-teal-600 ring-2 ring-teal-200'
+                                        : 'border-gray-200 hover:border-gray-300'
                                         }`}
                                 >
                                     <img
