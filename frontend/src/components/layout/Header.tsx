@@ -1,7 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, User, Menu, LogOut } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, LogOut, Store } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useMerchant } from '@/hooks/useMerchant';
 import { useToast } from '@/hooks/useToast';
 
 interface HeaderProps {
@@ -11,6 +12,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     const navigate = useNavigate();
     const { logout } = useAuth();
+    const { merchants } = useMerchant();
     const { showToast } = useToast();
 
     const handleLogout = () => {
@@ -18,6 +20,8 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         showToast('Logged out successfully!', 'success', 3000);
         navigate('/login');
     };
+
+    const hasMerchantAccount = merchants.length > 0;
 
     return (
         <header className="bg-teal-800 text-white shadow-md sticky top-0 z-50">
@@ -60,6 +64,15 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                             >
                                 Aesthetics
                             </button>
+                            {hasMerchantAccount && (
+                                <button
+                                    onClick={() => navigate('/merchant/dashboard')}
+                                    className="hover:text-teal-200 transition-colors text-sm font-medium flex items-center"
+                                >
+                                    <Store className="w-4 h-4 mr-1" />
+                                    Merchant
+                                </button>
+                            )}
                         </nav>
                     </div>
 
@@ -89,6 +102,16 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                         >
                             <User className="w-5 h-5" />
                         </button>
+                        {hasMerchantAccount && (
+                            <button
+                                onClick={() => navigate('/merchant/dashboard')}
+                                className="hover:text-teal-200 transition-colors md:hidden"
+                                aria-label="Merchant dashboard"
+                                title="Merchant Dashboard"
+                            >
+                                <Store className="w-5 h-5" />
+                            </button>
+                        )}
                         <button
                             onClick={handleLogout}
                             className="hover:text-teal-200 transition-colors"

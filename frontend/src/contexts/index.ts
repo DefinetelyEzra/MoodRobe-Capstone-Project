@@ -12,3 +12,8 @@ export type { AestheticContextType } from './AestheticContext';
 export { CartContext } from './CartContext';
 export { CartProvider } from './CartProvider';
 export type { CartContextType } from './CartContext';
+
+// Merchant exports
+export { MerchantContext } from './MerchantContext';
+export { MerchantProvider } from './MerchantProvider';
+export type { MerchantContextType } from './MerchantContext';
