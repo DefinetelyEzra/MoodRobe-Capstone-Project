@@ -17,17 +17,14 @@ export function useApi<T, P = void>(
     });
 
     const abortControllerRef = useRef<AbortController | null>(null);
-
-    // Store apiFunction in a ref to avoid recreating execute on every render
     const apiFunctionRef = useRef(apiFunction);
 
-    // Update the ref when apiFunction changes
     useEffect(() => {
         apiFunctionRef.current = apiFunction;
     }, [apiFunction]);
 
     const execute = useCallback(async (params?: P): Promise<T> => {
-        // Cancel previous request
+        // Cancel previous request only if there's one in progress
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
         }
@@ -35,24 +32,34 @@ export function useApi<T, P = void>(
         const abortController = new AbortController();
         abortControllerRef.current = abortController;
 
-        setState({ data: null, isLoading: true, error: null });
+        setState(prev => ({ ...prev, isLoading: true, error: null }));
 
         try {
             const response = await apiFunctionRef.current(params as P);
+
+            // Only update state if request wasn't aborted
             if (!abortController.signal.aborted) {
                 setState({ data: response, isLoading: false, error: null });
+                abortControllerRef.current = null;
                 return response;
             }
-            throw new Error('Request aborted');
+
+            // Request was aborted, throw abort error
+            const abortError = new Error('Request aborted');
+            abortError.name = 'AbortError';
+            throw abortError;
         } catch (err) {
-            if (err instanceof Error && err.name === 'AbortError') {
-                throw err;
+            // Don't update state if request was aborted
+            if (abortController.signal.aborted) {
+                const abortError = new Error('Request aborted');
+                abortError.name = 'AbortError';
+                throw abortError;
             }
+
             const error = err as AxiosError;
             setState({ data: null, isLoading: false, error });
-            throw error;
-        } finally {
             abortControllerRef.current = null;
+            throw error;
         }
     }, []);
 

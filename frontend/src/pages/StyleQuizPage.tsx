@@ -52,17 +52,24 @@ export const StyleQuizPage: React.FC = () => {
         const loadQuestions = async () => {
             try {
                 const data = await fetchQuestions();
-                if (data) {
+                if (data?.questions && data.questions.length > 0) {
                     setQuestions(data.questions);
+                } else {
+                    showToast('No quiz questions available', 'error');
                 }
             } catch (error) {
+                // Don't show error for aborted requests
+                if (error && typeof error === 'object' && 'name' in error && error.name === 'AbortError') {
+                    return;
+                }
                 console.error('Failed to load quiz questions:', error);
-                showToast('Failed to load quiz questions', 'error');
+                showToast('Failed to load quiz questions. Please try again.', 'error');
             }
         };
 
         loadQuestions();
-    }, [fetchQuestions, showToast]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleOptionSelect = (optionId: string): void => {
         const currentQuestion = questions[currentQuestionIndex];
@@ -120,7 +127,7 @@ export const StyleQuizPage: React.FC = () => {
         );
     }
 
-    if (!questions || questions.length === 0) {
+    if (!isLoading && (!questions || questions.length === 0)) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-purple-50 to-teal-50">
                 <div className="text-center">

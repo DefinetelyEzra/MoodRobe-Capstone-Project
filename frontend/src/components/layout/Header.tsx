@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, User, Menu } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, LogOut } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/useToast';
 
 interface HeaderProps {
     onMenuClick: () => void;
@@ -8,6 +10,14 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     const navigate = useNavigate();
+    const { logout } = useAuth();
+    const { showToast } = useToast();
+
+    const handleLogout = () => {
+        logout();
+        showToast('Logged out successfully!', 'success', 3000);
+        navigate('/login');
+    };
 
     return (
         <header className="bg-teal-800 text-white shadow-md sticky top-0 z-50">
@@ -78,6 +88,14 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                             aria-label="User profile"
                         >
                             <User className="w-5 h-5" />
+                        </button>
+                        <button
+                            onClick={handleLogout}
+                            className="hover:text-teal-200 transition-colors"
+                            aria-label="Logout"
+                            title="Logout"
+                        >
+                            <LogOut className="w-5 h-5" />
                         </button>
                     </div>
                 </div>

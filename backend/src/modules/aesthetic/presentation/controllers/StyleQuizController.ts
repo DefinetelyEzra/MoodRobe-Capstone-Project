@@ -23,13 +23,19 @@ export class StyleQuizController {
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
-                res.status(400).json({ errors: errors.array() });
+                console.error('Validation errors:', errors.array());
+                res.status(400).json({
+                    error: 'Validation failed',
+                    details: errors.array()
+                });
                 return;
             }
 
+            console.log('Quiz submission received:', req.body);
             const result = await this.submitStyleQuizUseCase.execute(req.body);
             res.status(200).json(result);
         } catch (error) {
+            console.error('Quiz submission error:', error);
             this.handleError(error, res);
         }
     };

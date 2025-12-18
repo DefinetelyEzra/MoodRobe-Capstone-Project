@@ -11,6 +11,8 @@ import { RegisterPage } from '@/pages/RegisterPage';
 import { HomePage } from '@/pages/HomePage';
 import { AestheticSelectionPage } from '@/pages/AestheticSelectionPage';
 import { StyleQuizPage } from '@/pages/StyleQuizPage';
+import { ProfilePage } from '@/pages/ProfilePage';
+import { ProductsPage } from '@/pages/ProductsPage';
 
 function App() {
   return (
@@ -35,6 +37,8 @@ function App() {
                 <Route index element={<HomePage />} />
                 <Route path="aesthetic-selection" element={<AestheticSelectionPage />} />
                 <Route path="style-quiz" element={<StyleQuizPage />} />
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="products" element={<ProductsPage />} />
               </Route>
 
               {/* Fallback */}
