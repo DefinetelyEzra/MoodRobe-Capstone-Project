@@ -1,6 +1,6 @@
-import { AppDataSource } from "@config/database";
-import { Repository } from "typeorm";
-import { AdminActivityLogEntity } from "../../entities/AdminActivityLogEntity";
+import { Repository } from 'typeorm';
+import { AppDataSource } from '@config/database';
+import { AdminActivityLogEntity } from '../../entities/AdminActivityLogEntity';
 import { v4 as uuidv4 } from 'uuid';
 
 export class TypeOrmActivityLogRepository {
@@ -13,7 +13,12 @@ export class TypeOrmActivityLogRepository {
     async create(data: Omit<AdminActivityLogEntity, 'id' | 'createdAt'>): Promise<AdminActivityLogEntity> {
         const log = this.repository.create({
             id: uuidv4(),
-            ...data
+            adminEmail: data.adminEmail,
+            action: data.action,
+            resourceType: data.resourceType,
+            resourceId: data.resourceId,
+            details: data.details,
+            createdAt: new Date()
         });
         return this.repository.save(log);
     }

@@ -17,7 +17,11 @@ export class TypeOrmContentRepository {
         return this.repository.findOne({ where: { sectionKey } });
     }
 
-    async updateBySectionKey(sectionKey: string, content: string, metadata?: Record<string, any>): Promise<HomepageContentEntity | null> {
+    async updateBySectionKey(
+        sectionKey: string,
+        content: string,
+        metadata?: Record<string, any>
+    ): Promise<HomepageContentEntity | null> {
         const entity = await this.findBySectionKey(sectionKey);
         if (!entity) return null;
 

@@ -18,12 +18,19 @@ export class AdminController {
         private readonly userRepository: TypeOrmUserRepository
     ) { }
 
+    private async getAdminEmail(userId: string): Promise<string> {
+        const user = await this.userRepository.findById(userId);
+        if (!user) throw new Error('User not found');
+        return user.getEmail();
+    }
+
     // Carousel Management
     public getAllCarousel = async (req: AuthRequest, res: Response): Promise<void> => {
         try {
             const carousel = await this.manageCarouselUseCase.getAll();
             res.status(200).json(carousel);
         } catch (error) {
+            console.error('Get all carousel error:', error);
             this.handleError(error, res);
         }
     };
@@ -33,58 +40,94 @@ export class AdminController {
             const carousel = await this.manageCarouselUseCase.getActive();
             res.status(200).json(carousel);
         } catch (error) {
+            console.error('Get active carousel error:', error);
             this.handleError(error, res);
         }
     };
 
     public createCarousel = async (req: AuthRequest, res: Response): Promise<void> => {
         try {
+            // Log incoming request
+            console.log('Create carousel request body:', req.body);
+            console.log('User ID:', req.userId);
+
+            // Validate request
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
-                res.status(400).json({ errors: errors.array() });
+                console.log('Validation errors:', errors.array());
+                res.status(400).json({
+                    error: 'Validation failed',
+                    errors: errors.array()
+                });
                 return;
             }
 
-            const user = await this.userRepository.findById(req.userId!);
-            const adminEmail = user!.getEmail();
+            if (!req.userId) {
+                res.status(401).json({ error: 'Unauthorized - No user ID' });
+                return;
+            }
 
+            // Get admin email
+            const adminEmail = await this.getAdminEmail(req.userId);
+            console.log('Admin email:', adminEmail);
+
+            // Create carousel
             const carousel = await this.manageCarouselUseCase.create(req.body, adminEmail);
+            console.log('Carousel created:', carousel);
+
             res.status(201).json(carousel);
         } catch (error) {
+            console.error('Create carousel error:', error);
             this.handleError(error, res);
         }
     };
 
     public updateCarousel = async (req: AuthRequest, res: Response): Promise<void> => {
         try {
+            console.log('Update carousel request:', { id: req.params.id, body: req.body });
+
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
-                res.status(400).json({ errors: errors.array() });
+                console.log('Validation errors:', errors.array());
+                res.status(400).json({
+                    error: 'Validation failed',
+                    errors: errors.array()
+                });
                 return;
             }
 
-            const user = await this.userRepository.findById(req.userId!);
-            const adminEmail = user!.getEmail();
+            if (!req.userId) {
+                res.status(401).json({ error: 'Unauthorized' });
+                return;
+            }
 
+            const adminEmail = await this.getAdminEmail(req.userId);
             const carousel = await this.manageCarouselUseCase.update(
                 req.params.id,
                 req.body,
                 adminEmail
             );
+
             res.status(200).json(carousel);
         } catch (error) {
+            console.error('Update carousel error:', error);
             this.handleError(error, res);
         }
     };
 
     public deleteCarousel = async (req: AuthRequest, res: Response): Promise<void> => {
         try {
-            const user = await this.userRepository.findById(req.userId!);
-            const adminEmail = user!.getEmail();
+            if (!req.userId) {
+                res.status(401).json({ error: 'Unauthorized' });
+                return;
+            }
 
+            const adminEmail = await this.getAdminEmail(req.userId);
             await this.manageCarouselUseCase.delete(req.params.id, adminEmail);
+
             res.status(200).json({ message: 'Carousel item deleted successfully' });
         } catch (error) {
+            console.error('Delete carousel error:', error);
             this.handleError(error, res);
         }
     };
@@ -95,6 +138,7 @@ export class AdminController {
             const content = await this.manageContentUseCase.getAll();
             res.status(200).json(content);
         } catch (error) {
+            console.error('Get all content error:', error);
             this.handleError(error, res);
         }
     };
@@ -106,28 +150,43 @@ export class AdminController {
             );
             res.status(200).json(content);
         } catch (error) {
+            console.error('Get content by section key error:', error);
             this.handleError(error, res);
         }
     };
 
     public updateContent = async (req: AuthRequest, res: Response): Promise<void> => {
         try {
+            console.log('Update content request:', {
+                sectionKey: req.params.sectionKey,
+                body: req.body
+            });
+
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
-                res.status(400).json({ errors: errors.array() });
+                console.log('Validation errors:', errors.array());
+                res.status(400).json({
+                    error: 'Validation failed',
+                    errors: errors.array()
+                });
                 return;
             }
 
-            const user = await this.userRepository.findById(req.userId!);
-            const adminEmail = user!.getEmail();
+            if (!req.userId) {
+                res.status(401).json({ error: 'Unauthorized' });
+                return;
+            }
 
+            const adminEmail = await this.getAdminEmail(req.userId);
             const content = await this.manageContentUseCase.update(
                 req.params.sectionKey,
                 req.body,
                 adminEmail
             );
+
             res.status(200).json(content);
         } catch (error) {
+            console.error('Update content error:', error);
             this.handleError(error, res);
         }
     };
@@ -139,6 +198,7 @@ export class AdminController {
             const logs = await this.getActivityLogUseCase.getRecent(limit);
             res.status(200).json(logs);
         } catch (error) {
+            console.error('Get activity log error:', error);
             this.handleError(error, res);
         }
     };
@@ -149,7 +209,10 @@ export class AdminController {
         } else if (error instanceof InvalidContentException) {
             res.status(400).json({ error: error.message });
         } else if (error instanceof Error) {
-            res.status(400).json({ error: error.message });
+            res.status(400).json({
+                error: error.message,
+                details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            });
         } else {
             res.status(500).json({ error: 'Internal server error' });
         }

@@ -11,7 +11,9 @@ export class TypeOrmCarouselRepository {
     }
 
     async findAll(): Promise<HomepageCarouselEntity[]> {
-        return this.repository.find({ order: { displayOrder: 'ASC' } });
+        return this.repository.find({
+            order: { displayOrder: 'ASC' }
+        });
     }
 
     async findActive(): Promise<HomepageCarouselEntity[]> {
@@ -28,14 +30,33 @@ export class TypeOrmCarouselRepository {
     async create(data: Partial<HomepageCarouselEntity>): Promise<HomepageCarouselEntity> {
         const carousel = this.repository.create({
             id: uuidv4(),
-            ...data
+            imageUrl: data.imageUrl!,
+            title: data.title,
+            subtitle: data.subtitle,
+            linkUrl: data.linkUrl,
+            displayOrder: data.displayOrder ?? 0,
+            isActive: data.isActive ?? true,
+            createdAt: new Date(),
+            updatedAt: new Date()
         });
         return this.repository.save(carousel);
     }
 
     async update(id: string, data: Partial<HomepageCarouselEntity>): Promise<HomepageCarouselEntity | null> {
-        await this.repository.update(id, data);
-        return this.findById(id);
+        const entity = await this.findById(id);
+        if (!entity) return null;
+
+        // Update only provided fields
+        if (data.imageUrl !== undefined) entity.imageUrl = data.imageUrl;
+        if (data.title !== undefined) entity.title = data.title;
+        if (data.subtitle !== undefined) entity.subtitle = data.subtitle;
+        if (data.linkUrl !== undefined) entity.linkUrl = data.linkUrl;
+        if (data.displayOrder !== undefined) entity.displayOrder = data.displayOrder;
+        if (data.isActive !== undefined) entity.isActive = data.isActive;
+
+        entity.updatedAt = new Date();
+
+        return this.repository.save(entity);
     }
 
     async delete(id: string): Promise<boolean> {

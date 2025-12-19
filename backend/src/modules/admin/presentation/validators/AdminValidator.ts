@@ -9,19 +9,19 @@ export class AdminValidator {
                 .isURL()
                 .withMessage('Invalid image URL'),
             body('title')
-                .optional()
+                .optional({ values: 'falsy' })
                 .isString()
                 .withMessage('Title must be a string')
                 .isLength({ max: 255 })
                 .withMessage('Title cannot exceed 255 characters'),
             body('subtitle')
-                .optional()
+                .optional({ values: 'falsy' })
                 .isString()
                 .withMessage('Subtitle must be a string')
                 .isLength({ max: 255 })
                 .withMessage('Subtitle cannot exceed 255 characters'),
             body('linkUrl')
-                .optional()
+                .optional({ values: 'falsy' })
                 .isURL()
                 .withMessage('Invalid link URL'),
             body('displayOrder')
@@ -38,17 +38,17 @@ export class AdminValidator {
                 .isURL()
                 .withMessage('Invalid image URL'),
             body('title')
-                .optional()
+                .optional({ values: 'falsy' })
                 .isString()
                 .isLength({ max: 255 })
                 .withMessage('Title cannot exceed 255 characters'),
             body('subtitle')
-                .optional()
+                .optional({ values: 'falsy' })
                 .isString()
                 .isLength({ max: 255 })
                 .withMessage('Subtitle cannot exceed 255 characters'),
             body('linkUrl')
-                .optional()
+                .optional({ values: 'falsy' })
                 .isURL()
                 .withMessage('Invalid link URL'),
             body('displayOrder')

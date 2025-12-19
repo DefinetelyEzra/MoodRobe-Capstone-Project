@@ -1,4 +1,10 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+    Entity,
+    PrimaryColumn,
+    Column,
+    CreateDateColumn,
+    UpdateDateColumn
+} from 'typeorm';
 
 @Entity('homepage_content')
 export class HomepageContentEntity {
