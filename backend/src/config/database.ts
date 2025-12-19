@@ -13,6 +13,9 @@ import { OrderLineEntity } from '@modules/order/infrastructure/entities/OrderLin
 import { CartEntity } from '@modules/cart/infrastructure/entities/CartEntity';
 import { CartItemEntity } from '@modules/cart/infrastructure/entities/CartItemEntity';
 import { PaymentEntity } from '@modules/payment/infrastructure/entities/PaymentEntity';
+import { HomepageCarouselEntity } from '@modules/admin/infrastructure/entities/HomepageCarouselEntity';
+import { HomepageContentEntity } from '@modules/admin/infrastructure/entities/HomepageContentEntity';
+import { AdminActivityLogEntity } from '@modules/admin/infrastructure/entities/AdminActivityLogEntity';
 
 dotenv.config();
 
@@ -25,7 +28,8 @@ export const AppDataSource = new DataSource({
     database: process.env.DB_NAME,
     synchronize: false,
     logging: process.env.NODE_ENV === 'development',
-    entities: [UserEntity,
+    entities: [
+        UserEntity,
         UserProfileEntity,
         AestheticEntity,
         MerchantEntity,
@@ -37,7 +41,11 @@ export const AppDataSource = new DataSource({
         CartItemEntity,
         OrderEntity,
         OrderLineEntity,
-        PaymentEntity ],
+        PaymentEntity,
+        HomepageCarouselEntity,
+        HomepageContentEntity,
+        AdminActivityLogEntity
+    ],
     migrations: ['src/shared/infrastructure/migrations/*.ts'],
 });
 

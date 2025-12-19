@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, User, Menu, LogOut, Store } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, LogOut, Store, Shield } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useMerchant } from '@/hooks/useMerchant';
 import { useToast } from '@/hooks/useToast';
@@ -9,9 +9,11 @@ interface HeaderProps {
     onMenuClick: () => void;
 }
 
+const ADMIN_EMAIL = 'ezraagun@gmail.com';
+
 export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     const navigate = useNavigate();
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
     const { merchants } = useMerchant();
     const { showToast } = useToast();
 
@@ -22,6 +24,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     };
 
     const hasMerchantAccount = merchants.length > 0;
+    const isAdmin = user?.email === ADMIN_EMAIL;
 
     return (
         <header className="bg-teal-800 text-white shadow-md sticky top-0 z-50">
@@ -73,6 +76,15 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                                     Merchant
                                 </button>
                             )}
+                            {isAdmin && (
+                                <button
+                                    onClick={() => navigate('/admin')}
+                                    className="hover:text-teal-200 transition-colors text-sm font-medium flex items-center"
+                                >
+                                    <Shield className="w-4 h-4 mr-1" />
+                                    Admin
+                                </button>
+                            )}
                         </nav>
                     </div>
 
@@ -110,6 +122,16 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                                 title="Merchant Dashboard"
                             >
                                 <Store className="w-5 h-5" />
+                            </button>
+                        )}
+                        {isAdmin && (
+                            <button
+                                onClick={() => navigate('/admin')}
+                                className="hover:text-teal-200 transition-colors md:hidden"
+                                aria-label="Admin dashboard"
+                                title="Admin Dashboard"
+                            >
+                                <Shield className="w-5 h-5" />
                             </button>
                         )}
                         <button

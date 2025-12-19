@@ -5,6 +5,7 @@ import { MerchantProvider } from '@/contexts/MerchantProvider';
 import { CartProvider } from './contexts';
 import { ToastProvider } from './contexts/ToastProvider';
 import { ProtectedRoute } from '@/components/routes/ProtectedRoute';
+import { AdminRoute } from '@/components/routes/AdminRoute';
 import { Layout } from './components/layout/Layout';
 
 // Pages
@@ -26,6 +27,9 @@ import { CreateProductPage } from '@/pages/product/CreateProductPage';
 import { EditProductPage } from '@/pages/product/EditProductPage';
 import { ManageStaffPage } from '@/pages/merchant/ManageStaffPage';
 import { MerchantSettingsPage } from '@/pages/merchant/MerchantSettingsPage';
+
+// Admin Pages
+import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
 
 function App() {
   return (
@@ -74,6 +78,18 @@ function App() {
                     <Route path="products/:id" element={<EditProductPage />} />
                     <Route path="staff" element={<ManageStaffPage />} />
                     <Route path="settings" element={<MerchantSettingsPage />} />
+                  </Route>
+
+                  {/* Protected admin routes with Layout */}
+                  <Route
+                    path="/admin"
+                    element={
+                      <AdminRoute>
+                        <Layout />
+                      </AdminRoute>
+                    }
+                  >
+                    <Route index element={<AdminDashboardPage />} />
                   </Route>
 
                   {/* Fallback */}
