@@ -2,7 +2,7 @@ export class Money {
     private readonly amount: number;
     private readonly currency: string;
 
-    constructor(amount: number, currency: string = 'USD') {
+    constructor(amount: number, currency: string = 'NGN') {
         if (amount < 0) {
             throw new Error('Amount cannot be negative');
         }
@@ -10,7 +10,7 @@ export class Money {
             throw new Error('Currency cannot be empty');
         }
         if (currency.length !== 3) {
-            throw new Error('Currency must be a 3-letter code (e.g., USD, EUR)');
+            throw new Error('Currency must be a 3-letter code (e.g., NGN, USD, EUR)');
         }
 
         this.amount = Math.round(amount * 100) / 100;
@@ -70,5 +70,20 @@ export class Money {
                 `Cannot operate on different currencies: ${this.currency} and ${other.currency}`
             );
         }
+    }
+
+    // Static factory method for NGN
+    public static fromNGN(amount: number): Money {
+        return new Money(amount, 'NGN');
+    }
+
+    // Convert to Kobo (smallest unit for NGN)
+    public toMinorUnits(): number {
+        return Math.round(this.amount * 100);
+    }
+
+    // Create from Kobo
+    public static fromMinorUnits(kobo: number, currency: string = 'NGN'): Money {
+        return new Money(kobo / 100, currency);
     }
 }

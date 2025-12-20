@@ -36,7 +36,7 @@ export class CreateOrderFromCartUseCase {
         // Validate stock for all items
         await this.validateStock(cart.getItems());
 
-        // Calculate order totals
+        // Calculate order totals (now includes shipping)
         const orderItems = cart.getItems().map((item) => ({
             unitPrice: item.getUnitPrice(),
             quantity: item.quantity,
@@ -44,7 +44,8 @@ export class CreateOrderFromCartUseCase {
 
         const orderTotal = this.calculationService.calculateTotal(
             orderItems,
-            dto.discountPercentage || 0
+            dto.discountPercentage || 0,
+            dto.shippingAddress.state // Pass state for potential shipping calculation
         );
 
         // Create shipping address
@@ -139,6 +140,10 @@ export class CreateOrderFromCartUseCase {
             discount: {
                 amount: order.getTotal().getDiscount().getAmount(),
                 currency: order.getTotal().getDiscount().getCurrency(),
+            },
+            shipping: {
+                amount: order.getTotal().getShipping().getAmount(),
+                currency: order.getTotal().getShipping().getCurrency(),
             },
             totalAmount: {
                 amount: order.getTotal().getTotalAmount().getAmount(),

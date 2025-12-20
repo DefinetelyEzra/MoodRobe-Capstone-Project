@@ -34,7 +34,7 @@ export class Order {
         public readonly orderNumber: string,
         public status: OrderStatus,
         public paymentStatus: PaymentStatus,
-        public readonly total: OrderTotal, // Changed to public readonly
+        public readonly total: OrderTotal, 
         public shippingAddress: Address,
         public readonly createdAt: Date = new Date(),
         public updatedAt: Date = new Date()

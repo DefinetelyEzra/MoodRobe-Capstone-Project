@@ -1,57 +1,76 @@
-import { Money } from "@shared/domain/value-objects/Money";
+import { Money } from '@shared/domain/value-objects/Money';
 import { OrderTotal } from '../value-objects/OrderTotal';
 
-export interface OrderItem {
-  unitPrice: Money;
-  quantity: number;
+interface OrderItem {
+    unitPrice: Money;
+    quantity: number;
 }
 
 export class OrderCalculationService {
-  private readonly taxRate: number;
+    // Shipping configuration
+    private static readonly DEFAULT_SHIPPING_FEE = 500; // 500 NGN
+    private static readonly FREE_SHIPPING_THRESHOLD = 50000; // Free shipping above 50,000 NGN
 
-  constructor(taxRate: number = 0.08) {
-    // Default 8% tax rate
-    if (taxRate < 0 || taxRate > 1) {
-      throw new Error('Tax rate must be between 0 and 1');
-    }
-    this.taxRate = taxRate;
-  }
+    private getShippingFee(): Money {
+        // Get from env or use default
+        const feeFromEnv = process.env.DEFAULT_SHIPPING_FEE 
+            ? Number.parseInt(process.env.DEFAULT_SHIPPING_FEE) / 100 // Convert from kobo to naira
+            : OrderCalculationService.DEFAULT_SHIPPING_FEE;
 
-  public calculateSubtotal(items: OrderItem[]): Money {
-    if (items.length === 0) {
-      return new Money(0);
+        return new Money(feeFromEnv, 'NGN');
     }
 
-    const currency = items[0].unitPrice.getCurrency();
-    let total = new Money(0, currency);
-
-    for (const item of items) {
-      const lineTotal = item.unitPrice.multiply(item.quantity);
-      total = total.add(lineTotal);
+    private isFreeShippingEligible(subtotal: Money): boolean {
+        const threshold = new Money(OrderCalculationService.FREE_SHIPPING_THRESHOLD, 'NGN');
+        return subtotal.isGreaterThan(threshold) || subtotal.equals(threshold);
     }
 
-    return total;
-  }
+    // Remove tax calculation completely
+    public calculateTotal(
+        items: OrderItem[],
+        discountPercentage: number = 0,
+        shippingDestination?: string
+    ): OrderTotal {
+        // Calculate subtotal
+        const subtotal = items.reduce((total, item) => {
+            const lineTotal = item.unitPrice.multiply(item.quantity);
+            return total.add(lineTotal);
+        }, new Money(0, 'NGN'));
 
-  public calculateTax(subtotal: Money): Money {
-    return subtotal.multiply(this.taxRate);
-  }
+        // Calculate discount
+        const discountAmount = discountPercentage > 0
+            ? subtotal.multiply(discountPercentage / 100)
+            : new Money(0, 'NGN');
 
-  public calculateDiscount(subtotal: Money, discountPercentage: number): Money {
-    if (discountPercentage < 0 || discountPercentage > 100) {
-      throw new Error('Discount percentage must be between 0 and 100');
+        // NO TAX for Nigerian market
+        const tax = new Money(0, 'NGN');
+
+        // Calculate shipping
+        const shipping = this.isFreeShippingEligible(subtotal)
+            ? new Money(0, 'NGN')
+            : this.getShippingFee();
+
+        return new OrderTotal(
+            subtotal,
+            tax, // Always 0
+            discountAmount,
+            shipping
+        );
     }
-    return subtotal.multiply(discountPercentage / 100);
-  }
 
-  public calculateTotal(
-    items: OrderItem[],
-    discountPercentage: number = 0
-  ): OrderTotal {
-    const subtotal = this.calculateSubtotal(items);
-    const tax = this.calculateTax(subtotal);
-    const discount = this.calculateDiscount(subtotal, discountPercentage);
+    public recalculateWithDiscount(
+        currentTotal: OrderTotal,
+        discountPercentage: number
+    ): OrderTotal {
+        const discountAmount = discountPercentage > 0
+            ? currentTotal.getSubtotal().multiply(discountPercentage / 100)
+            : new Money(0, 'NGN');
 
-    return OrderTotal.create(subtotal, tax, discount);
-  }
+        return new OrderTotal(
+            currentTotal.getSubtotal(),
+            new Money(0, 'NGN'), // No tax
+            discountAmount,
+            currentTotal.getShipping()
+        );
+    }
 }

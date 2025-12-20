@@ -60,6 +60,10 @@ export class GetUserOrdersUseCase {
                 amount: order.getTotal().getDiscount().getAmount(),
                 currency: order.getTotal().getDiscount().getCurrency(),
             },
+            shipping: {
+                amount: order.getTotal().getShipping().getAmount(),
+                currency: order.getTotal().getShipping().getCurrency(),
+            },
             totalAmount: {
                 amount: order.getTotal().getTotalAmount().getAmount(),
                 currency: order.getTotal().getTotalAmount().getCurrency(),

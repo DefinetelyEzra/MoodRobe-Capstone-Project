@@ -19,6 +19,10 @@ export interface OrderResponseDto {
         amount: number;
         currency: string;
     };
+    shipping: {
+        amount: number;
+        currency: string;
+    };
     discount: {
         amount: number;
         currency: string;

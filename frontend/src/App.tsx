@@ -8,23 +8,39 @@ import { ProtectedRoute } from '@/components/routes/ProtectedRoute';
 import { AdminRoute } from '@/components/routes/AdminRoute';
 import { Layout } from './components/layout/Layout';
 
-// Pages
+// Auth Pages
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { RegisterPage } from '@/pages/auth/RegisterPage';
 import { HomePage } from '@/pages/auth/HomePage';
+
+// Aesthetic Pages
 import { AestheticSelectionPage } from '@/pages/aesthetic/AestheticSelectionPage';
 import { StyleQuizPage } from '@/pages/aesthetic/StyleQuizPage';
+
+// User Pages
 import { ProfilePage } from '@/pages/user/ProfilePage';
+
+// Product Pages
 import { ProductsPage } from '@/pages/product/ProductsPage';
 import { ProductDetailsPage } from './pages/product/ProductDetailsPage';
+import { ManageProductsPage } from '@/pages/product/ManageProductsPage';
+import { CreateProductPage } from '@/pages/product/CreateProductPage';
+import { EditProductPage } from '@/pages/product/EditProductPage';
+
+// Cart & Checkout Pages
 import { CartPage } from './pages/cart/CartPage';
+import { CheckoutPage } from './pages/cart/CheckoutPage';
+
+// Order Pages
+import { OrderHistoryPage } from '@/pages/order/OrderHistoryPage';
+import { OrderDetailsPage } from '@/pages/order/OrderDetailsPage';
+
+// Payment Pages
+import { PaymentCallbackPage } from '@/pages/payment/PaymentCallbackPage';
 
 // Merchant Pages
 import { MerchantDashboardPage } from '@/pages/merchant/MerchantDashboardPage';
 import { CreateMerchantPage } from '@/pages/merchant/CreateMerchantPage';
-import { ManageProductsPage } from '@/pages/product/ManageProductsPage';
-import { CreateProductPage } from '@/pages/product/CreateProductPage';
-import { EditProductPage } from '@/pages/product/EditProductPage';
 import { ManageStaffPage } from '@/pages/merchant/ManageStaffPage';
 import { MerchantSettingsPage } from '@/pages/merchant/MerchantSettingsPage';
 
@@ -44,6 +60,9 @@ function App() {
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/register" element={<RegisterPage />} />
 
+                  {/* Payment callback (public, handles redirect from Paystack) */}
+                  <Route path="/payment/callback" element={<PaymentCallbackPage />} />
+
                   {/* Protected customer routes with Layout */}
                   <Route
                     path="/"
@@ -57,9 +76,18 @@ function App() {
                     <Route path="aesthetic-selection" element={<AestheticSelectionPage />} />
                     <Route path="style-quiz" element={<StyleQuizPage />} />
                     <Route path="profile" element={<ProfilePage />} />
+                    
+                    {/* Products */}
                     <Route path="products" element={<ProductsPage />} />
                     <Route path="products/:id" element={<ProductDetailsPage />} />
+                    
+                    {/* Cart & Checkout */}
                     <Route path="cart" element={<CartPage />} />
+                    <Route path="checkout" element={<CheckoutPage />} />
+                    
+                    {/* Orders */}
+                    <Route path="orders" element={<OrderHistoryPage />} />
+                    <Route path="orders/:id" element={<OrderDetailsPage />} />
                   </Route>
 
                   {/* Protected merchant routes with Layout */}

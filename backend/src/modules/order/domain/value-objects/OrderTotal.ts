@@ -1,21 +1,35 @@
-import { Money } from "@shared/domain/value-objects/Money";
+import { Money } from '@shared/domain/value-objects/Money';
 
 export class OrderTotal {
-    private constructor(
-        private readonly subtotal: Money,
-        private readonly tax: Money,
-        private readonly discount: Money,
-        private readonly totalAmount: Money
-    ) { }
+    private readonly subtotal: Money;
+    private readonly tax: Money;
+    private readonly discount: Money;
+    private readonly shipping: Money;
+    private readonly totalAmount: Money;
 
-    public static create(
+    constructor(
         subtotal: Money,
-        tax: Money = new Money(0),
-        discount: Money = new Money(0)
-    ): OrderTotal {
-        // Calculate total: subtotal + tax - discount
-        const totalAmount = subtotal.add(tax).subtract(discount);
-        return new OrderTotal(subtotal, tax, discount, totalAmount);
+        tax: Money,
+        discount: Money,
+        shipping: Money
+    ) {
+        this.subtotal = subtotal;
+        this.tax = tax;
+        this.discount = discount;
+        this.shipping = shipping;
+
+        // Calculate total: subtotal - discount + shipping (no tax)
+        let total = subtotal;
+
+        if (discount.getAmount() > 0) {
+            total = total.subtract(discount);
+        }
+
+        if (shipping.getAmount() > 0) {
+            total = total.add(shipping);
+        }
+
+        this.totalAmount = total;
     }
 
     public static reconstitute(
@@ -24,7 +38,12 @@ export class OrderTotal {
         discount: Money,
         totalAmount: Money
     ): OrderTotal {
-        return new OrderTotal(subtotal, tax, discount, totalAmount);
+        // Assume all Money objects use the same currency; add checks if needed
+        const shippingAmount = totalAmount.getAmount() - subtotal.getAmount() + discount.getAmount();
+        const shipping = new Money(shippingAmount, subtotal.getCurrency());
+
+        // Instantiate using the constructor, which will recalculate totalAmount internally
+        return new OrderTotal(subtotal, tax, discount, shipping);
     }
 
     public getSubtotal(): Money {
@@ -39,7 +58,36 @@ export class OrderTotal {
         return this.discount;
     }
 
+    public getShipping(): Money {
+        return this.shipping;
+    }
+
     public getTotalAmount(): Money {
         return this.totalAmount;
+    }
+
+    public toJSON() {
+        return {
+            subtotal: {
+                amount: this.subtotal.getAmount(),
+                currency: this.subtotal.getCurrency()
+            },
+            tax: {
+                amount: this.tax.getAmount(),
+                currency: this.tax.getCurrency()
+            },
+            discount: {
+                amount: this.discount.getAmount(),
+                currency: this.discount.getCurrency()
+            },
+            shipping: {
+                amount: this.shipping.getAmount(),
+                currency: this.shipping.getCurrency()
+            },
+            totalAmount: {
+                amount: this.totalAmount.getAmount(),
+                currency: this.totalAmount.getCurrency()
+            }
+        };
     }
 }
