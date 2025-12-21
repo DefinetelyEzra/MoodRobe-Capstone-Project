@@ -16,8 +16,8 @@ export const orderApi = {
 
     // Get user's orders
     getUserOrders: async (params?: OrderSearchParams): Promise<Order[]> => {
-        const response = await apiClient.get('/orders/user', { params });
-        return response.data;
+        const response = await apiClient.get('/orders/my-orders', { params });
+        return response.data.orders; 
     },
 
     // Cancel order

@@ -41,13 +41,6 @@ export class InitiatePaymentUseCase {
             throw new Error('Unauthorized: Order does not belong to user');
         }
 
-        // Validate order can accept payment
-        if (!this.validationService.canInitiatePayment(order)) {
-            throw new Error(
-                `Cannot initiate payment for order with status: ${order.status}`
-            );
-        }
-
         // Create payment record
         const paymentId = uuidv4();
         const reference = `PAY-${Date.now()}-${uuidv4().substring(0, 8)}`;

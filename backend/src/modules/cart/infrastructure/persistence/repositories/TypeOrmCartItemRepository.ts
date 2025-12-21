@@ -4,56 +4,67 @@ import { ICartItemRepository } from '../../../domain/repositories/ICartItemRepos
 import { CartItem } from '../../../domain/entities/CartItem';
 import { CartItemEntity } from '../../entities/CartItemEntity';
 import { CartItemMapper } from '../mappers/CartItemMapper';
-import { ProductEntity } from '@modules/product/infrastructure/entities/ProductEntity';
-import { ProductVariantEntity } from '@modules/product/infrastructure/entities/ProductVariantEntity';
 
 export class TypeOrmCartItemRepository implements ICartItemRepository {
     private readonly repository: Repository<CartItemEntity>;
-    private readonly productRepository: Repository<ProductEntity>;
-    private readonly variantRepository: Repository<ProductVariantEntity>;
 
     constructor() {
         this.repository = AppDataSource.getRepository(CartItemEntity);
-        this.productRepository = AppDataSource.getRepository(ProductEntity);
-        this.variantRepository = AppDataSource.getRepository(ProductVariantEntity);
     }
 
     public async save(item: CartItem): Promise<CartItem> {
-        const entity = CartItemMapper.toEntity(item);
+        console.log('💾 Saving cart item:', {
+            id: item.id,
+            cartId: item.cartId,
+            productVariantId: item.productVariantId,
+            productName: item.productName,
+            quantity: item.quantity
+        });
+
+        const entity = CartItemMapper.toEntity(item, item.cartId);
         const savedEntity = await this.repository.save(entity);
-        return CartItemMapper.toDomain(savedEntity, item.productName);
+
+        console.log('✅ Cart item saved to DB:', {
+            id: savedEntity.id,
+            cartId: savedEntity.cartId,
+            productName: savedEntity.productName
+        });
+
+        return CartItemMapper.toDomain(savedEntity);
     }
 
     public async saveMany(items: CartItem[]): Promise<CartItem[]> {
-        const entities = items.map((item) => CartItemMapper.toEntity(item));
+        const entities = items.map((item) => CartItemMapper.toEntity(item, item.cartId));
         const savedEntities = await this.repository.save(entities);
-        return Promise.all(
-            savedEntities.map(async (entity, index) =>
-                CartItemMapper.toDomain(entity, items[index].productName)
-            )
-        );
+        return savedEntities.map(entity => CartItemMapper.toDomain(entity));
     }
 
     public async findById(id: string): Promise<CartItem | null> {
         const entity = await this.repository.findOne({ where: { id } });
         if (!entity) return null;
 
-        const productName = await this.getProductName(entity.productVariantId);
-        return CartItemMapper.toDomain(entity, productName);
+        return CartItemMapper.toDomain(entity);
     }
 
     public async findByCartId(cartId: string): Promise<CartItem[]> {
+        console.log('🔍 Finding cart items for cartId:', cartId);
+
         const entities = await this.repository.find({
             where: { cartId },
-            order: { addedAt: 'ASC' },
+            order: { createdAt: 'ASC' },
         });
 
-        return Promise.all(
-            entities.map(async (entity) => {
-                const productName = await this.getProductName(entity.productVariantId);
-                return CartItemMapper.toDomain(entity, productName);
-            })
-        );
+        console.log('📋 Found cart items:', {
+            cartId,
+            count: entities.length,
+            items: entities.map(e => ({
+                id: e.id,
+                productName: e.productName,
+                quantity: e.quantity
+            }))
+        });
+
+        return entities.map(entity => CartItemMapper.toDomain(entity));
     }
 
     public async findByCartAndVariant(
@@ -66,14 +77,13 @@ export class TypeOrmCartItemRepository implements ICartItemRepository {
 
         if (!entity) return null;
 
-        const productName = await this.getProductName(entity.productVariantId);
-        return CartItemMapper.toDomain(entity, productName);
+        return CartItemMapper.toDomain(entity);
     }
 
     public async update(item: CartItem): Promise<CartItem> {
-        const entity = CartItemMapper.toEntity(item);
+        const entity = CartItemMapper.toEntity(item, item.cartId);
         const updatedEntity = await this.repository.save(entity);
-        return CartItemMapper.toDomain(updatedEntity, item.productName);
+        return CartItemMapper.toDomain(updatedEntity);
     }
 
     public async delete(id: string): Promise<void> {
@@ -89,21 +99,5 @@ export class TypeOrmCartItemRepository implements ICartItemRepository {
         productVariantId: string
     ): Promise<void> {
         await this.repository.delete({ cartId, productVariantId });
-    }
-
-    private async getProductName(productVariantId: string): Promise<string> {
-        const variant = await this.variantRepository.findOne({
-            where: { id: productVariantId },
-        });
-
-        if (!variant) {
-            return 'Unknown Product';
-        }
-
-        const product = await this.productRepository.findOne({
-            where: { id: variant.productId },
-        });
-
-        return product?.name || 'Unknown Product';
     }
 }

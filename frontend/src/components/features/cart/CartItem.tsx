@@ -16,11 +16,8 @@ export const CartItem: React.FC<CartItemProps> = ({
     onRemove,
     isUpdating,
 }) => {
-    const formatPrice = (price: { amount: number; currency: string }) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: price.currency || 'USD',
-        }).format(price.amount);
+    const formatPrice = (amount: number) => {
+        return `₦${amount.toLocaleString('en-NG')}`;
     };
 
     const handleIncrement = async () => {
@@ -43,7 +40,7 @@ export const CartItem: React.FC<CartItemProps> = ({
             <div className="flex-1">
                 <h3 className="font-semibold text-gray-900 mb-1">{item.productName}</h3>
                 <p className="text-sm text-gray-600">
-                    {formatPrice(item.unitPrice)} each
+                    {formatPrice(item.unitPrice.amount)} each
                 </p>
             </div>
 
@@ -77,7 +74,7 @@ export const CartItem: React.FC<CartItemProps> = ({
             {/* Line Total */}
             <div className="text-right min-w-25">
                 <p className="font-bold text-gray-900">
-                    {formatPrice(item.lineTotal)}
+                    {formatPrice(item.lineTotal.amount)}
                 </p>
             </div>
 

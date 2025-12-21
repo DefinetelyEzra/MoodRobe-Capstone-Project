@@ -3,28 +3,30 @@ import { Money } from '@shared/domain/value-objects/Money';
 import { CartItemEntity } from '../../entities/CartItemEntity';
 
 export class CartItemMapper {
-    public static toDomain(entity: CartItemEntity, productName: string): CartItem {
-        const unitPrice = new Money(entity.unitPrice);
+    public static toDomain(entity: CartItemEntity): CartItem {
+        const unitPrice = new Money(entity.unitPrice, entity.currency);
 
         return CartItem.reconstitute(
             entity.id,
             entity.cartId,
             entity.productVariantId,
-            productName,
+            entity.productName,
             entity.quantity,
             unitPrice,
-            entity.addedAt
+            entity.createdAt
         );
     }
 
-    public static toEntity(domain: CartItem): CartItemEntity {
+    public static toEntity(domain: CartItem, cartId: string): CartItemEntity {
         const entity = new CartItemEntity();
         entity.id = domain.id;
-        entity.cartId = domain.cartId;
+        entity.cartId = cartId;
         entity.productVariantId = domain.productVariantId;
+        entity.productName = domain.productName;
         entity.quantity = domain.quantity;
         entity.unitPrice = domain.getUnitPrice().getAmount();
-        entity.addedAt = domain.addedAt;
+        entity.currency = domain.getUnitPrice().getCurrency();
+        entity.createdAt = domain.addedAt;
         return entity;
     }
 }

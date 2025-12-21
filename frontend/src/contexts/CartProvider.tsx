@@ -74,7 +74,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         try {
             setIsLoading(true);
             await cartApi.clearCart();
-            setCart(null);
+            // Fetch the empty cart instead of setting to null
+            const emptyCart = await cartApi.getCart();
+            setCart(emptyCart);
         } catch (error) {
             console.error('Failed to clear cart:', error);
             throw error;
@@ -94,6 +96,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setCart(cartData);
         } catch (error) {
             console.error('Failed to refresh cart:', error);
+            // Don't throw - just log the error
         } finally {
             setIsLoading(false);
         }
@@ -103,7 +106,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const items = useMemo(() => {
         if (!cart?.items) return [];
         return cart.items.map(item => ({
-            productId: item.productId || item.productVariantId, // Use productId if available, fallback to variantId
+            productId: item.productId || item.productVariantId,
             variantId: item.productVariantId,
             quantity: item.quantity
         }));

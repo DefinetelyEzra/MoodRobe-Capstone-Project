@@ -7,11 +7,7 @@ export class PaymentValidator {
                 .notEmpty()
                 .withMessage('Order ID is required')
                 .isUUID()
-                .withMessage('Order ID must be a valid UUID'),
-            body('callbackUrl')
-                .optional()
-                .isURL()
-                .withMessage('Callback URL must be a valid URL')
+                .withMessage('Order ID must be a valid UUID')
         ];
     }
 

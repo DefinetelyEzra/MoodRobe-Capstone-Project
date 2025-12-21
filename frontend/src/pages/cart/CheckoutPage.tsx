@@ -61,16 +61,17 @@ export const CheckoutPage: React.FC = () => {
 
     const handlePlaceOrder = async () => {
         try {
-            console.log('Creating order with address:', address);
-
+            // Validate cart before proceeding
             if (!cart?.items || cart.items.length === 0) {
                 showToast('Your cart is empty. Please add items first.', 'error');
                 navigate('/products');
                 return;
             }
 
-            console.log('Cart items:', cart.items);
-            console.log('Cart items count:', cart.items.length);
+            console.log('🛒 Cart validation passed:', {
+                itemCount: cart.items.length,
+                cartId: cart.id
+            });
 
             // Create order
             const order = await createOrder({
@@ -82,32 +83,52 @@ export const CheckoutPage: React.FC = () => {
                 throw new Error('Failed to create order');
             }
 
-            console.log('Order created:', order);
+            console.log('✅ Order created successfully:', {
+                orderId: order.id,
+                orderNumber: order.orderNumber,
+                totalAmount: order.totalAmount
+            });
+
             showToast('Order created successfully!', 'success');
 
-            // Initiate payment
             const callbackUrl = `${globalThis.location.origin}/payment/callback`;
+
+            console.log('💳 Initiating payment:', {
+                orderId: order.id,
+                callbackUrl: callbackUrl
+            });
+
             const paymentData = await initiatePayment({
                 orderId: order.id,
-                callbackUrl
+                callbackUrl: callbackUrl
             });
 
             if (!paymentData) {
                 throw new Error('Failed to initiate payment');
             }
 
-            console.log('Payment initiated:', paymentData);
+            console.log('✅ Payment initiated:', {
+                paymentId: paymentData.paymentId,
+                reference: paymentData.reference
+            });
 
-            // Redirect to Paystack or Mock
+            // Redirect to payment gateway
             globalThis.location.href = paymentData.authorizationUrl;
         } catch (error) {
-            console.error('Checkout error:', error);
+            console.error('❌ Checkout error:', error);
 
-            // Extract the actual error message from backend
             let errorMessage = 'Failed to complete checkout';
 
             if (error && typeof error === 'object' && 'response' in error) {
-                const axiosError = error as { response?: { data?: { error?: string; message?: string; errors?: Array<{ msg: string }> } } };
+                const axiosError = error as {
+                    response?: {
+                        data?: {
+                            error?: string;
+                            message?: string;
+                            errors?: Array<{ msg: string }>
+                        }
+                    }
+                };
 
                 if (axiosError.response?.data?.error) {
                     errorMessage = axiosError.response.data.error;
@@ -120,7 +141,6 @@ export const CheckoutPage: React.FC = () => {
                 errorMessage = error.message;
             }
 
-            console.log('Error details:', errorMessage);
             showToast(errorMessage, 'error', 5000);
         }
     };

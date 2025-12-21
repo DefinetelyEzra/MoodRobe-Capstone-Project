@@ -20,19 +20,9 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
 }) => {
     const navigate = useNavigate();
 
-    const formatPrice = (price: { amount: number; currency: string }) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: price.currency || 'USD',
-        }).format(price.amount);
+    const formatPrice = (amount: number) => {
+        return `₦${amount.toLocaleString('en-NG')}`;
     };
-
-    // Calculate estimated tax (example: 10%)
-    const taxRate = 0.1;
-    const estimatedTax = subtotal.amount * taxRate;
-
-    // Calculate total
-    const total = subtotal.amount + estimatedTax;
 
     const handleCheckout = () => {
         if (onCheckout) {
@@ -49,28 +39,13 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
             <div className="space-y-3 mb-4">
                 <div className="flex justify-between text-gray-600">
                     <span>Items ({itemCount})</span>
-                    <span>{formatPrice(subtotal)}</span>
-                </div>
-
-                <div className="flex justify-between text-gray-600">
-                    <span>Estimated Tax</span>
-                    <span>
-                        {new Intl.NumberFormat('en-US', {
-                            style: 'currency',
-                            currency: subtotal.currency || 'USD',
-                        }).format(estimatedTax)}
-                    </span>
+                    <span>{formatPrice(subtotal.amount)}</span>
                 </div>
 
                 <div className="border-t border-gray-200 pt-3 mt-3">
                     <div className="flex justify-between text-lg font-bold text-gray-900">
                         <span>Total</span>
-                        <span>
-                            {new Intl.NumberFormat('en-US', {
-                                style: 'currency',
-                                currency: subtotal.currency || 'USD',
-                            }).format(total)}
-                        </span>
+                        <span>{formatPrice(subtotal.amount)}</span>
                     </div>
                 </div>
             </div>

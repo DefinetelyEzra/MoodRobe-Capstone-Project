@@ -193,7 +193,7 @@ export const ProductsPage: React.FC = () => {
                                     </p>
                                     <div className="flex items-center justify-between">
                                         <p className="text-lg font-bold text-teal-600">
-                                            ${product.basePrice.amount.toFixed(2)}
+                                            ₦{product.basePrice.amount.toLocaleString('en-NG')}
                                         </p>
                                         <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                                             {product.category}

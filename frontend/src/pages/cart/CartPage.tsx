@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, ArrowLeft } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
@@ -11,8 +11,15 @@ import { Button } from '@/components/common/Button';
 export const CartPage: React.FC = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
-    const { cart, isLoading, updateQuantity, removeItem, clearCart } = useCart();
+    const { cart, isLoading, updateQuantity, removeItem, clearCart, refreshCart } = useCart();
     const [updatingItemId, setUpdatingItemId] = useState<string | null>(null);
+
+    // Refresh cart when component mounts
+    useEffect(() => {
+        if (refreshCart) {
+            refreshCart();
+        }
+    }, [refreshCart]);
 
     const handleUpdateQuantity = async (productVariantId: string, quantity: number) => {
         if (quantity < 1) {

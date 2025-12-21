@@ -28,24 +28,37 @@ export class PaymentController {
 
     public initiatePayment = async (req: AuthRequest, res: Response): Promise<void> => {
         try {
+            console.log('🔍 PaymentController.initiatePayment - Request received');
+            console.log('📦 Body:', JSON.stringify(req.body, null, 2));
+            console.log('👤 UserId:', req.userId);
+
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
+                console.error('❌ Validation errors:', JSON.stringify(errors.array(), null, 2));
                 res.status(400).json({ errors: errors.array() });
                 return;
             }
 
             if (!req.userId) {
+                console.error('❌ Unauthorized - No userId');
                 res.status(401).json({ error: 'Unauthorized' });
                 return;
             }
 
+            console.log('✅ Validation passed, executing use case...');
             const result = await this.initiatePaymentUseCase.execute(
                 req.body,
                 req.userId
             );
 
+            console.log('✅ Payment initiated successfully:', {
+                paymentId: result.paymentId,
+                reference: result.reference
+            });
+
             res.status(201).json(result);
         } catch (error) {
+            console.error('❌ PaymentController.initiatePayment - Error:', error);
             this.handleError(error, res);
         }
     };

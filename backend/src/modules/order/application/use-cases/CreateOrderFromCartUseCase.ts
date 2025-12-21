@@ -27,32 +27,67 @@ export class CreateOrderFromCartUseCase {
         dto: CreateOrderDto,
         userId: string
     ): Promise<OrderResponseDto> {
+        console.log('🔍 CreateOrderFromCartUseCase - Starting execution');
+        console.log('📦 User ID:', userId);
+        console.log('📦 DTO:', JSON.stringify(dto, null, 2));
+
         // Get user's cart
+        console.log('🛒 Fetching cart for user:', userId);
         const cart = await this.cartRepository.findByUserId(userId);
-        if (!cart || cart.getItems().length === 0) {
+
+        console.log('🛒 Cart retrieved:', {
+            exists: !!cart,
+            cartId: cart?.id,
+            itemCount: cart?.getItems()?.length || 0,
+            items: cart?.getItems()?.map(item => ({
+                productName: item.productName,
+                quantity: item.quantity,
+                productVariantId: item.productVariantId
+            }))
+        });
+
+        if (!cart) {
+            console.error('❌ Cart not found for user:', userId);
+            throw new EmptyCartException();
+        }
+
+        const cartItems = cart.getItems();
+        console.log('📋 Cart items:', cartItems.length);
+
+        if (cartItems.length === 0) {
+            console.error('❌ Cart is empty for user:', userId);
             throw new EmptyCartException();
         }
 
         // Validate stock for all items
-        await this.validateStock(cart.getItems());
+        console.log('✅ Validating stock for items...');
+        await this.validateStock(cartItems);
+        console.log('✅ Stock validation passed');
 
-        // Calculate order totals (now includes shipping)
-        const orderItems = cart.getItems().map((item) => ({
+        // Calculate order totals 
+        const orderItems = cartItems.map((item) => ({
             unitPrice: item.getUnitPrice(),
             quantity: item.quantity,
         }));
 
+        console.log('💰 Calculating order total...');
         const orderTotal = this.calculationService.calculateTotal(
             orderItems,
             dto.discountPercentage || 0,
             dto.shippingAddress.state // Pass state for potential shipping calculation
         );
+        console.log('💰 Order total calculated:', {
+            subtotal: orderTotal.getSubtotal().getAmount(),
+            shipping: orderTotal.getShipping().getAmount(),
+            total: orderTotal.getTotalAmount().getAmount()
+        });
 
         // Create shipping address
         const shippingAddress = new Address(dto.shippingAddress);
 
         // Generate order number
         const orderNumber = OrderNumber.generate();
+        console.log('📋 Order number generated:', orderNumber.toString());
 
         // Create order
         const orderId = uuidv4();
@@ -63,12 +98,16 @@ export class CreateOrderFromCartUseCase {
             orderTotal,
             shippingAddress
         );
+        console.log('📦 Order entity created:', orderId);
 
         // Create order lines
         const orderLines: OrderLine[] = [];
-        for (const cartItem of cart.getItems()) {
+        console.log('📝 Creating order lines...');
+
+        for (const cartItem of cartItems) {
             const variant = await this.variantRepository.findById(cartItem.productVariantId);
             if (!variant) {
+                console.error('❌ Variant not found:', cartItem.productVariantId);
                 throw new Error(`Variant not found: ${cartItem.productVariantId}`);
             }
 
@@ -88,20 +127,33 @@ export class CreateOrderFromCartUseCase {
             );
             orderLines.push(orderLine);
 
+            console.log('📝 Order line created:', {
+                productName: cartItem.productName,
+                quantity: cartItem.quantity
+            });
+
             // Decrease stock
             variant.decreaseStock(cartItem.quantity);
             await this.variantRepository.update(variant);
+            console.log('📉 Stock decreased for variant:', cartItem.productVariantId);
         }
 
         // Save order
+        console.log('💾 Saving order to database...');
         const savedOrder = await this.orderRepository.save(order);
+        console.log('✅ Order saved:', savedOrder.id);
 
         // Save order lines
+        console.log('💾 Saving order lines to database...');
         await this.orderLineRepository.saveMany(orderLines);
+        console.log('✅ Order lines saved:', orderLines.length);
 
         // Clear cart
+        console.log('🗑️ Clearing cart...');
         await this.cartRepository.clearCart(userId);
+        console.log('✅ Cart cleared');
 
+        console.log('🎉 Order creation completed successfully');
         return this.toResponseDto(savedOrder, orderLines);
     }
 
