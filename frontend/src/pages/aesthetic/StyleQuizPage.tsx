@@ -25,7 +25,6 @@ export const StyleQuizPage: React.FC = () => {
     const { refreshUser } = useAuth();
     const { showToast } = useToast();
 
-    // Use api hook for loading quiz questions
     const {
         isLoading,
         execute: fetchQuestions
@@ -33,7 +32,6 @@ export const StyleQuizPage: React.FC = () => {
         aestheticApi.getQuizQuestions()
     );
 
-    // Use api hook for submitting quiz
     const {
         isLoading: isSubmitting,
         execute: submitQuizApi
@@ -41,7 +39,6 @@ export const StyleQuizPage: React.FC = () => {
         aestheticApi.submitQuiz(quizAnswers)
     );
 
-    // Use api hook for selecting aesthetic
     const {
         execute: selectAestheticApi
     } = useApi<void, string>((aestheticId) =>
@@ -58,7 +55,6 @@ export const StyleQuizPage: React.FC = () => {
                     showToast('No quiz questions available', 'error');
                 }
             } catch (error) {
-                // Don't show error for aborted requests
                 if (error && typeof error === 'object' && 'name' in error && error.name === 'AbortError') {
                     return;
                 }
@@ -68,7 +64,7 @@ export const StyleQuizPage: React.FC = () => {
         };
 
         loadQuestions();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleOptionSelect = (optionId: string): void => {
@@ -98,12 +94,9 @@ export const StyleQuizPage: React.FC = () => {
             const quizResult = await submitQuizApi(answers);
             if (quizResult) {
                 setResult(quizResult);
-
-                // Auto-select the top aesthetic
                 await selectAestheticApi(quizResult.topAesthetic.id);
                 await loadAesthetics();
                 await refreshUser();
-
                 showToast('Quiz completed! Your aesthetic has been set.', 'success');
             }
         } catch (error) {
@@ -121,7 +114,7 @@ export const StyleQuizPage: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-purple-50 to-teal-50">
+            <div className="min-h-screen flex items-center justify-center bg-canvas">
                 <LoadingSpinner text="Loading quiz..." />
             </div>
         );
@@ -129,12 +122,12 @@ export const StyleQuizPage: React.FC = () => {
 
     if (!isLoading && (!questions || questions.length === 0)) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-purple-50 to-teal-50">
-                <div className="text-center">
-                    <p className="text-gray-600 mb-4">No quiz questions available</p>
+            <div className="min-h-screen flex items-center justify-center bg-canvas">
+                <div className="text-center bg-surface p-8 rounded-xl border border-border">
+                    <p className="text-text-secondary mb-4">No quiz questions available</p>
                     <button
                         onClick={() => navigate('/')}
-                        className="px-6 py-3 bg-purple-600 text-white rounded-lg"
+                        className="px-6 py-3 bg-accent hover:bg-accent-dark text-surface rounded-lg transition-colors"
                     >
                         Back to Home
                     </button>
@@ -145,37 +138,39 @@ export const StyleQuizPage: React.FC = () => {
 
     if (result) {
         return (
-            <div className="min-h-screen bg-linear-to-br from-purple-50 to-teal-50">
+            <div className="min-h-screen bg-canvas">
                 <div className="max-w-4xl mx-auto px-4 py-16">
-                    <div className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-100">
+                    <div className="bg-surface rounded-2xl shadow-lg p-8 border border-border">
                         <div className="text-center mb-8">
-                            <Sparkles className="w-16 h-16 text-purple-600 mx-auto mb-4" />
-                            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                            <div className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Sparkles className="w-10 h-10 text-accent" />
+                            </div>
+                            <h1 className="text-4xl font-bold text-text-primary mb-4">
                                 Your Perfect Match!
                             </h1>
-                            <p className="text-lg text-gray-600">
-                                Based on your answers, we&apos;ve found your ideal aesthetic
+                            <p className="text-lg text-text-secondary">
+                                Based on your answers, we've found your ideal aesthetic
                             </p>
                         </div>
 
                         {/* Top Aesthetic */}
-                        <div className="bg-linear-to-br from-purple-50 to-teal-50 rounded-xl p-8 mb-8">
+                        <div className="bg-linear-to-br from-canvas to-accent/5 rounded-xl p-8 mb-8 border border-border">
                             <div className="flex flex-col items-center">
                                 {result.topAesthetic.imageUrl && (
                                     <img
                                         src={result.topAesthetic.imageUrl}
                                         alt={result.topAesthetic.name}
-                                        className="w-48 h-48 object-cover rounded-lg mb-4 shadow-lg"
+                                        className="w-48 h-48 object-cover rounded-lg mb-4 shadow-md border border-border"
                                     />
                                 )}
-                                <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                                <h2 className="text-3xl font-bold text-text-primary mb-2">
                                     {result.topAesthetic.name}
                                 </h2>
-                                <p className="text-gray-600 text-center mb-4">
+                                <p className="text-text-secondary text-center mb-4">
                                     {result.topAesthetic.description}
                                 </p>
-                                <div className="flex items-center gap-2 text-purple-600 font-semibold">
-                                    <span className="text-2xl">{Math.round(result.topAesthetic.percentage)}%</span>
+                                <div className="flex items-center gap-2 text-accent font-semibold">
+                                    <span className="text-3xl">{Math.round(result.topAesthetic.percentage)}%</span>
                                     <span>Match</span>
                                 </div>
                             </div>
@@ -184,19 +179,19 @@ export const StyleQuizPage: React.FC = () => {
                         {/* Alternative Aesthetics */}
                         {result.alternativeAesthetics && result.alternativeAesthetics.length > 0 && (
                             <div className="mb-8">
-                                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                                <h3 className="text-xl font-semibold text-text-primary mb-4">
                                     You might also like:
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     {result.alternativeAesthetics.map((aesthetic) => (
                                         <div
                                             key={aesthetic.id}
-                                            className="bg-gray-50 rounded-lg p-4 border border-gray-200"
+                                            className="bg-canvas rounded-lg p-4 border border-border hover:border-accent transition-colors"
                                         >
-                                            <h4 className="font-semibold text-gray-900 mb-1">
+                                            <h4 className="font-semibold text-text-primary mb-1">
                                                 {aesthetic.name}
                                             </h4>
-                                            <p className="text-sm text-gray-600 mb-2">
+                                            <p className="text-sm text-accent font-medium">
                                                 {Math.round(aesthetic.percentage)}% match
                                             </p>
                                         </div>
@@ -206,17 +201,17 @@ export const StyleQuizPage: React.FC = () => {
                         )}
 
                         {/* Actions */}
-                        <div className="flex gap-4 justify-center">
+                        <div className="flex gap-4 justify-center flex-wrap">
                             <button
                                 onClick={() => navigate('/')}
-                                className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg"
+                                className="px-8 py-3 bg-accent hover:bg-accent-dark text-surface font-semibold rounded-lg transition-all duration-200 shadow-md"
                                 type="button"
                             >
                                 Start Shopping
                             </button>
                             <button
                                 onClick={() => navigate('/aesthetic-selection')}
-                                className="px-6 py-3 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-lg border border-gray-300 transition-all duration-200"
+                                className="px-8 py-3 bg-surface hover:bg-canvas text-text-primary font-semibold rounded-lg border border-border transition-all duration-200"
                                 type="button"
                             >
                                 View All Aesthetics
@@ -233,34 +228,34 @@ export const StyleQuizPage: React.FC = () => {
     const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-purple-50 to-teal-50">
+        <div className="min-h-screen bg-canvas">
             <div className="max-w-4xl mx-auto px-4 py-8">
                 {/* Header */}
                 <div className="mb-8">
                     <button
                         onClick={() => navigate('/')}
-                        className="flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-4"
+                        className="flex items-center text-accent hover:text-accent-dark transition-colors mb-4"
                         type="button"
                     >
                         <ArrowLeft className="w-5 h-5 mr-2" />
                         Back to Home
                     </button>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Style Quiz</h1>
-                    <p className="text-gray-600">
+                    <h1 className="text-3xl font-bold text-text-primary mb-2">Discover Your Style</h1>
+                    <p className="text-text-secondary">
                         Question {currentQuestionIndex + 1} of {questions.length}
                     </p>
                     {/* Progress Bar */}
-                    <div className="mt-4 bg-gray-200 rounded-full h-2 overflow-hidden">
+                    <div className="mt-4 bg-border rounded-full h-2.5 overflow-hidden">
                         <div
-                            className="bg-purple-600 h-full transition-all duration-300"
+                            className="bg-accent h-full transition-all duration-300 rounded-full"
                             style={{ width: `${progress}%` }}
                         />
                     </div>
                 </div>
 
                 {/* Question Card */}
-                <div className="bg-white rounded-2xl shadow-xl p-8 mb-6 border border-gray-100">
-                    <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+                <div className="bg-surface rounded-2xl shadow-lg p-8 mb-6 border border-border">
+                    <h2 className="text-2xl font-semibold text-text-primary mb-6">
                         {currentQuestion.question}
                     </h2>
 
@@ -270,23 +265,23 @@ export const StyleQuizPage: React.FC = () => {
                                 key={option.id}
                                 onClick={() => handleOptionSelect(option.id)}
                                 className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${currentAnswer === option.id
-                                    ? 'border-purple-600 bg-purple-50'
-                                    : 'border-gray-200 hover:border-purple-300 bg-white'
+                                        ? 'border-accent bg-accent/5 shadow-sm'
+                                        : 'border-border hover:border-accent/50 bg-surface hover:bg-canvas'
                                     }`}
                                 type="button"
                             >
                                 <div className="flex items-center">
                                     <div
-                                        className={`w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center ${currentAnswer === option.id
-                                            ? 'border-purple-600 bg-purple-600'
-                                            : 'border-gray-300'
+                                        className={`w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center transition-colors ${currentAnswer === option.id
+                                                ? 'border-accent bg-accent'
+                                                : 'border-text-secondary'
                                             }`}
                                     >
                                         {currentAnswer === option.id && (
-                                            <div className="w-2 h-2 bg-white rounded-full" />
+                                            <div className="w-2 h-2 bg-surface rounded-full" />
                                         )}
                                     </div>
-                                    <span className="text-gray-900">{option.text}</span>
+                                    <span className="text-text-primary font-medium">{option.text}</span>
                                 </div>
                             </button>
                         ))}
@@ -298,7 +293,7 @@ export const StyleQuizPage: React.FC = () => {
                     <button
                         onClick={handlePrevious}
                         disabled={currentQuestionIndex === 0}
-                        className="flex items-center px-6 py-3 text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                        className="flex items-center px-6 py-3 text-text-primary font-semibold rounded-lg border border-border hover:bg-canvas disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                         type="button"
                     >
                         <ArrowLeft className="w-5 h-5 mr-2" />
@@ -309,7 +304,7 @@ export const StyleQuizPage: React.FC = () => {
                         <button
                             onClick={handleSubmit}
                             disabled={!isQuizComplete || isSubmitting}
-                            className="flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg"
+                            className="flex items-center px-8 py-3 bg-accent hover:bg-accent-dark text-surface font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md"
                             type="button"
                         >
                             {isSubmitting ? (
@@ -328,7 +323,7 @@ export const StyleQuizPage: React.FC = () => {
                         <button
                             onClick={handleNext}
                             disabled={!currentAnswer}
-                            className="flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg"
+                            className="flex items-center px-8 py-3 bg-accent hover:bg-accent-dark text-surface font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md"
                             type="button"
                         >
                             <span>Next</span>

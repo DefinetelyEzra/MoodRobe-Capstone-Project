@@ -10,6 +10,7 @@ import { userApi } from '@/api/user.api';
 import { adminApi } from '@/api/admin.api';
 import { Product } from '@/types/product.types';
 import { Aesthetic } from '@/types/aesthetic.types';
+import { useMerchant } from '@/hooks/useMerchant';
 
 export const HomePage: React.FC = () => {
     const { refreshUser } = useAuth();
@@ -17,6 +18,7 @@ export const HomePage: React.FC = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
     const [currentSlide, setCurrentSlide] = useState(0);
+    const { currentMerchant } = useMerchant();
 
     const { data: productsData, isLoading, execute: fetchProducts } = useApi<
         { products: Product[] },
@@ -30,7 +32,6 @@ export const HomePage: React.FC = () => {
     const { data: carousel, execute: fetchCarousel } = useApi(() => adminApi.getActiveCarousel());
     const { data: content, execute: fetchContent } = useApi(() => adminApi.getAllContent());
 
-    // Use data directly instead of storing in state
     const carouselItems = useMemo(() => carousel || [], [carousel]);
 
     const contentMap = useMemo(() => {
@@ -93,7 +94,7 @@ export const HomePage: React.FC = () => {
             const primaryImage = product.images.find((img) => img.isPrimary);
             return primaryImage?.imageUrl || product.images[0].imageUrl;
         }
-        return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 300 400"%3E%3Crect fill="%23e5e7eb" width="300" height="400"/%3E%3Ctext fill="%239ca3af" font-family="sans-serif" font-size="18" dy="10.5" font-weight="bold" x="50%25" y="50%25" text-anchor="middle"%3ENo Image%3C/text%3E%3C/svg%3E';
+        return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 300 400"%3E%3Crect fill="%23EAEAE7" width="300" height="400"/%3E%3Ctext fill="%236B6B6B" font-family="sans-serif" font-size="18" dy="10.5" font-weight="bold" x="50%25" y="50%25" text-anchor="middle"%3ENo Image%3C/text%3E%3C/svg%3E';
     };
 
     const displayAesthetics = availableAesthetics?.slice(0, 6) || [];
@@ -113,9 +114,9 @@ export const HomePage: React.FC = () => {
     };
 
     return (
-        <div className="w-full">
+        <div className="w-full bg-canvas">
             {/* Hero Carousel */}
-            <div className="relative w-full h-96 md:h-125 bg-gray-900 overflow-hidden">
+            <div className="relative w-full h-96 md:h-125 bg-text-primary overflow-hidden">
                 {carouselItems.length > 0 ? (
                     <>
                         {carouselItems.map((item, index) => (
@@ -132,13 +133,13 @@ export const HomePage: React.FC = () => {
                                 >
                                     <div className="absolute inset-0 flex items-center justify-center">
                                         <div className="text-center">
-                                            <h1 className="text-5xl md:text-7xl font-bold text-white tracking-wider drop-shadow-lg">
+                                            <h1 className="text-5xl md:text-7xl font-bold text-surface tracking-wider drop-shadow-lg">
                                                 {item.title ||
                                                     contentMap.hero_tagline ||
                                                     'Shop By Vibe'}
                                             </h1>
                                             {item.subtitle && (
-                                                <p className="text-xl md:text-2xl text-white mt-4 drop-shadow-lg">
+                                                <p className="text-xl md:text-2xl text-surface mt-4 drop-shadow-lg">
                                                     {item.subtitle}
                                                 </p>
                                             )}
@@ -153,14 +154,14 @@ export const HomePage: React.FC = () => {
                             <>
                                 <button
                                     onClick={prevSlide}
-                                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white p-3 rounded-full transition-all"
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-surface/30 hover:bg-surface/50 text-surface p-3 rounded-full transition-all"
                                     aria-label="Previous slide"
                                 >
                                     <ChevronLeft className="w-6 h-6" />
                                 </button>
                                 <button
                                     onClick={nextSlide}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white p-3 rounded-full transition-all"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-surface/30 hover:bg-surface/50 text-surface p-3 rounded-full transition-all"
                                     aria-label="Next slide"
                                 >
                                     <ChevronRight className="w-6 h-6" />
@@ -173,8 +174,8 @@ export const HomePage: React.FC = () => {
                                             key={item.id}
                                             onClick={() => setCurrentSlide(carouselItems.indexOf(item))}
                                             className={`w-3 h-3 rounded-full transition-all ${carouselItems.indexOf(item) === currentSlide
-                                                    ? 'bg-white w-8'
-                                                    : 'bg-white/50'
+                                                ? 'bg-surface w-8'
+                                                : 'bg-surface/50'
                                                 }`}
                                             aria-label={`Go to slide ${carouselItems.indexOf(item) + 1}`}
                                         />
@@ -191,7 +192,7 @@ export const HomePage: React.FC = () => {
                         }}
                     >
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <h1 className="text-5xl md:text-7xl font-bold text-white tracking-wider drop-shadow-lg">
+                            <h1 className="text-5xl md:text-7xl font-bold text-surface tracking-wider drop-shadow-lg">
                                 {contentMap.hero_tagline || 'Shop By Vibe'}
                             </h1>
                         </div>
@@ -201,7 +202,7 @@ export const HomePage: React.FC = () => {
 
             {/* Aesthetic Categories */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-thin scrollbar-thumb-teal-600 scrollbar-track-gray-100">
+                <div className="overflow-x-auto pb-4 -mx-4 px-4">
                     <div className="flex space-x-6 md:space-x-8 min-w-max md:justify-center">
                         {displayAesthetics.map((aesthetic) => (
                             <button
@@ -216,8 +217,8 @@ export const HomePage: React.FC = () => {
                             >
                                 <div
                                     className={`w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden mb-3 ring-4 transition-all ${selectedAesthetic?.id === aesthetic.id
-                                            ? 'ring-teal-600 scale-105'
-                                            : 'ring-transparent group-hover:ring-teal-400'
+                                        ? 'ring-accent scale-105'
+                                        : 'ring-border group-hover:ring-accent-light'
                                         }`}
                                 >
                                     {aesthetic.imageUrl ? (
@@ -227,13 +228,13 @@ export const HomePage: React.FC = () => {
                                             className="w-full h-full object-cover"
                                         />
                                     ) : (
-                                        <div className="w-full h-full bg-linear-to-br from-teal-400 to-teal-600"></div>
+                                        <div className="w-full h-full bg-linear-to-br from-accent-light to-accent"></div>
                                     )}
                                 </div>
                                 <span
                                     className={`text-sm font-medium ${selectedAesthetic?.id === aesthetic.id
-                                            ? 'text-teal-700 underline decoration-2 underline-offset-4'
-                                            : 'text-gray-700'
+                                        ? 'text-accent underline decoration-2 underline-offset-4'
+                                        : 'text-text-primary'
                                         }`}
                                 >
                                     {aesthetic.name}
@@ -246,9 +247,9 @@ export const HomePage: React.FC = () => {
 
             {/* Curated Collections */}
             {selectedAesthetic && featuredProducts.length > 0 && !isLoading && (
-                <div className="bg-white py-16">
+                <div className="bg-surface py-16">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <h2 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-12 text-center">
+                        <h2 className="text-3xl md:text-4xl font-semibold text-text-primary mb-12 text-center">
                             Curated Collections
                         </h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
@@ -265,14 +266,14 @@ export const HomePage: React.FC = () => {
                                     tabIndex={0}
                                     className="cursor-pointer group"
                                 >
-                                    <div className="aspect-square overflow-hidden bg-gray-50 mb-4 rounded-lg">
+                                    <div className="aspect-square overflow-hidden bg-canvas mb-4 rounded-lg border border-border">
                                         <img
                                             src={getProductImage(product)}
                                             alt={product.name}
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                         />
                                     </div>
-                                    <h3 className="text-center text-sm font-medium text-gray-900 mb-1">
+                                    <h3 className="text-center text-sm font-medium text-text-primary mb-1">
                                         {collectionLabels[index] || product.name}
                                     </h3>
                                 </div>
@@ -284,47 +285,51 @@ export const HomePage: React.FC = () => {
 
             {/* Loading State */}
             {isLoading && (
-                <div className="text-center py-16 bg-white">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
-                    <p className="mt-4 text-gray-600">Loading products...</p>
+                <div className="text-center py-16 bg-surface">
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
+                    <p className="mt-4 text-text-secondary">Loading products...</p>
                 </div>
             )}
 
             {/* Merchant CTA */}
-            <div className="bg-stone-100 py-16">
+            <div className="bg-canvas py-16 border-t border-border">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-4">
-                        {contentMap.merchant_cta_title ||
-                            'Sell Your Vibe. Become a MoodRobe Merchant'}
+                    <h2 className="text-3xl md:text-4xl font-semibold text-text-primary mb-4">
+                        {currentMerchant
+                            ? 'Manage Your Store'
+                            : (contentMap.merchant_cta_title || 'Sell Your Vibe. Become a MoodRobe Merchant')
+                        }
                     </h2>
-                    <p className="text-gray-600 mb-6">
-                        {contentMap.merchant_cta_subtitle ||
-                            'Join our community of fashion creators'}
+                    <p className="text-text-secondary mb-6">
+                        {currentMerchant
+                            ? 'View your products, orders, and analytics'
+                            : (contentMap.merchant_cta_subtitle || 'Join our community of fashion creators')
+                        }
                     </p>
                     <button
-                        onClick={() => navigate('/merchant/register')}
-                        className="inline-block bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 rounded-md font-medium transition-colors"
+                        onClick={() => navigate(currentMerchant ? '/merchant/dashboard' : '/merchant/register')}
+                        className="inline-block bg-text-primary hover:bg-accent-dark text-surface px-8 py-3 rounded-md font-medium transition-colors"
                     >
-                        Join Now
+                        {currentMerchant ? 'Go to Dashboard' : 'Join Now'}
                     </button>
                 </div>
             </div>
 
             {/* Style Quiz CTA */}
             {!selectedAesthetic && (
-                <div className="bg-linear-to-r from-teal-700 to-teal-900 py-16">
-                    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+                <div className="bg-linear-to-r from-accent-dark to-accent py-16">
+                    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-surface">
                         <h3 className="text-3xl md:text-4xl font-bold mb-4">
                             {contentMap.style_quiz_title ||
                                 'NOT SURE? TAKE THE QUIZ AND FIND YOUR VIBE'}
                         </h3>
-                        <p className="text-teal-100 mb-8 text-lg">
+                        <p className="text-canvas mb-8 text-lg">
                             {contentMap.style_quiz_subtitle ||
                                 'Answer a few questions and discover the perfect aesthetic for your style'}
                         </p>
                         <button
                             onClick={() => navigate('/style-quiz')}
-                            className="bg-white text-teal-800 px-10 py-4 rounded-full font-bold text-lg hover:bg-teal-50 transition-all duration-300 shadow-lg"
+                            className="bg-surface text-accent px-10 py-4 rounded-full font-bold text-lg hover:bg-canvas transition-all duration-300 shadow-lg"
                         >
                             Start Style Quiz
                         </button>

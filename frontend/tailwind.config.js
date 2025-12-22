@@ -7,18 +7,20 @@ export default {
     theme: {
         extend: {
             colors: {
-                primary: {
-                    50: '#f0fdfa',
-                    100: '#ccfbf1',
-                    200: '#99f6e4',
-                    300: '#5eead4',
-                    400: '#2dd4bf',
-                    500: '#14b8a6',
-                    600: '#0d9488',
-                    700: '#0f766e',
-                    800: '#115e59',
-                    900: '#134e4a',
+                // Curator's Canvas Palette
+                canvas: '#F9F9F7',
+                surface: '#FFFFFF',
+                text: {
+                    primary: '#222222',
+                    secondary: '#6B6B6B',
                 },
+                accent: {
+                    DEFAULT: '#BC6C4A',
+                    light: '#D4856A',
+                    dark: '#9A5738',
+                },
+                border: '#EAEAE7',
+                input: '#F0F0F0',
             },
             fontFamily: {
                 sans: ['Inter', 'system-ui', 'sans-serif'],

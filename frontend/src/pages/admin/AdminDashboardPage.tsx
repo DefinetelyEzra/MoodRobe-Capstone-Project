@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Settings, Image, FileText, Activity } from 'lucide-react';
-import { Card } from '@/components/common/Card';
 import { CarouselManager } from '@/components/features/admin/CarouselManager';
 import { ContentEditor } from '@/components/features/admin/ContentEditor';
 import { ActivityLogViewer } from '@/components/features/admin/ActivityLogViewer';
@@ -17,19 +16,25 @@ export const AdminDashboardPage: React.FC = () => {
     ];
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="min-h-screen bg-canvas">
             {/* Header */}
-            <div className="mb-8">
-                <div className="flex items-center mb-2">
-                    <Settings className="w-8 h-8 text-teal-600 mr-3" />
-                    <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <div className="bg-linear-to-b from-accent/10 to-canvas border-b border-border">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <div className="flex items-center">
+                        <div className="w-16 h-16 bg-accent/10 rounded-xl flex items-center justify-center">
+                            <Settings className="w-8 h-8 text-accent" />
+                        </div>
+                        <div className="ml-4">
+                            <h1 className="text-4xl font-bold text-text-primary">Admin Dashboard</h1>
+                            <p className="text-text-secondary mt-2">Manage homepage content and settings</p>
+                        </div>
+                    </div>
                 </div>
-                <p className="text-gray-600">Manage homepage content and settings</p>
             </div>
 
-            {/* Tabs */}
-            <div className="mb-6">
-                <div className="border-b border-gray-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Tabs */}
+                <div className="mb-8 border-b border-border">
                     <nav className="-mb-px flex space-x-8">
                         {tabs.map((tab) => {
                             const Icon = tab.icon;
@@ -38,16 +43,16 @@ export const AdminDashboardPage: React.FC = () => {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`
-                                        group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm
+                                        group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors
                                         ${activeTab === tab.id
-                                            ? 'border-teal-600 text-teal-600'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                            ? 'border-accent text-accent'
+                                            : 'border-transparent text-text-secondary hover:text-text-primary hover:border-accent'
                                         }
                                     `}
                                 >
                                     <Icon className={`
                                         -ml-0.5 mr-2 h-5 w-5
-                                        ${activeTab === tab.id ? 'text-teal-600' : 'text-gray-400 group-hover:text-gray-500'}
+                                        ${activeTab === tab.id ? 'text-accent' : 'text-text-secondary group-hover:text-accent'}
                                     `} />
                                     {tab.label}
                                 </button>
@@ -55,14 +60,14 @@ export const AdminDashboardPage: React.FC = () => {
                         })}
                     </nav>
                 </div>
-            </div>
 
-            {/* Tab Content */}
-            <Card className="p-6">
-                {activeTab === 'carousel' && <CarouselManager />}
-                {activeTab === 'content' && <ContentEditor />}
-                {activeTab === 'activity' && <ActivityLogViewer />}
-            </Card>
+                {/* Tab Content */}
+                <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden p-8">
+                    {activeTab === 'carousel' && <CarouselManager />}
+                    {activeTab === 'content' && <ContentEditor />}
+                    {activeTab === 'activity' && <ActivityLogViewer />}
+                </div>
+            </div>
         </div>
     );
 };

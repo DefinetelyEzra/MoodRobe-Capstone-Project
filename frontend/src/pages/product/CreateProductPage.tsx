@@ -6,7 +6,6 @@ import { useToast } from '@/hooks/useToast';
 import { useAesthetic } from '@/hooks/useAesthetic';
 import { productApi, CreateProductRequest } from '@/api/product.api';
 import { Product } from '@/types/product.types';
-import { Card } from '@/components/common/Card';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 import { Package, ArrowLeft, Plus, X } from 'lucide-react';
@@ -133,50 +132,54 @@ export const CreateProductPage: React.FC = () => {
 
     if (!currentMerchant) {
         return (
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <Card className="text-center py-12">
-                    <p className="text-gray-600">Please select a merchant account</p>
-                </Card>
+            <div className="min-h-screen bg-canvas flex items-center justify-center">
+                <div className="bg-surface border border-border rounded-xl p-12 text-center max-w-md">
+                    <p className="text-text-secondary text-lg">Please select a merchant account</p>
+                </div>
             </div>
         );
     }
 
     if (!hasPermission('canManageProducts')) {
         return (
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <Card className="text-center py-12">
-                    <p className="text-red-600">You don't have permission to create products</p>
-                </Card>
+            <div className="min-h-screen bg-canvas flex items-center justify-center">
+                <div className="bg-surface border border-border rounded-xl p-12 text-center max-w-md">
+                    <p className="text-red-600 font-medium text-lg">You don't have permission to create products</p>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <button
-                onClick={() => navigate('/merchant/products')}
-                className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
-            >
-                <ArrowLeft className="w-5 h-5 mr-2" />
-                Back to Products
-            </button>
-
-            <Card>
-                <div className="flex items-center mb-6">
-                    <div className="p-3 bg-teal-100 rounded-lg">
-                        <Package className="w-8 h-8 text-teal-600" />
-                    </div>
-                    <div className="ml-4">
-                        <h1 className="text-2xl font-bold text-gray-900">Create New Product</h1>
-                        <p className="text-gray-600">Add a new product to your store</p>
+        <div className="min-h-screen bg-canvas">
+            {/* Header */}
+            <div className="bg-linear-to-b from-accent/10 to-canvas border-b border-border">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <button
+                        onClick={() => navigate('/merchant/dashboard')}
+                        className="flex items-center text-accent hover:text-accent-dark mb-4 transition-colors"
+                    >
+                        <ArrowLeft className="w-5 h-5 mr-2" />
+                        Back to Dashboard
+                    </button>
+                    <div className="flex items-center">
+                        <div className="w-16 h-16 bg-accent/10 rounded-xl flex items-center justify-center">
+                            <Package className="w-8 h-8 text-accent" />
+                        </div>
+                        <div className="ml-4">
+                            <h1 className="text-3xl font-bold text-text-primary">Create New Product</h1>
+                            <p className="text-text-secondary mt-1">Add a new product to your store</p>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <form onSubmit={handleSubmit} className="space-y-8">
                     {/* Basic Information */}
                     <div>
-                        <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
-                        <div className="space-y-4">
+                        <h2 className="text-xl font-semibold text-text-primary mb-6">Basic Information</h2>
+                        <div className="space-y-6">
                             <Input
                                 label="Product Name"
                                 required
@@ -186,7 +189,7 @@ export const CreateProductPage: React.FC = () => {
                             />
 
                             <div>
-                                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                                <label htmlFor="description" className="block text-sm font-medium text-text-primary mb-2">
                                     Description
                                 </label>
                                 <textarea
@@ -195,7 +198,7 @@ export const CreateProductPage: React.FC = () => {
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                     rows={4}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-surface text-text-primary placeholder-text-secondary"
                                     placeholder="Describe your product..."
                                 />
                             </div>
@@ -208,7 +211,7 @@ export const CreateProductPage: React.FC = () => {
                                 placeholder="e.g., T-Shirts, Dresses, Pants"
                             />
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-6">
                                 <Input
                                     label="Base Price"
                                     type="number"
@@ -221,14 +224,14 @@ export const CreateProductPage: React.FC = () => {
                                 />
 
                                 <div>
-                                    <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label htmlFor="currency" className="block text-sm font-medium text-text-primary mb-2">
                                         Currency
                                     </label>
                                     <select
                                         id="currency"
                                         value={formData.currency}
                                         onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                                        className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-surface text-text-primary"
                                     >
                                         <option value="USD">USD</option>
                                         <option value="EUR">EUR</option>
@@ -244,9 +247,9 @@ export const CreateProductPage: React.FC = () => {
                                     id="isActive"
                                     checked={formData.isActive}
                                     onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                                    className="rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                                    className="rounded border-border text-accent focus:ring-accent"
                                 />
-                                <label htmlFor="isActive" className="ml-2 text-sm text-gray-700">
+                                <label htmlFor="isActive" className="ml-3 text-sm text-text-primary font-medium">
                                     Active (visible to customers)
                                 </label>
                             </div>
@@ -254,19 +257,18 @@ export const CreateProductPage: React.FC = () => {
                     </div>
 
                     {/* Aesthetic Tags */}
-                    <div>
-                        <h2 className="text-lg font-semibold text-gray-900 mb-4">Aesthetic Tags</h2>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div className="pt-6 border-t border-border">
+                        <h2 className="text-xl font-semibold text-text-primary mb-6">Aesthetic Tags</h2>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                             {availableAesthetics?.map((aesthetic) => (
                                 <button
                                     key={aesthetic.id}
                                     type="button"
                                     onClick={() => toggleAesthetic(aesthetic.id)}
-                                    className={`p-3 rounded-lg border-2 transition-all ${
-                                        formData.aestheticTags.includes(aesthetic.id)
-                                            ? 'border-teal-500 bg-teal-50 text-teal-700'
-                                            : 'border-gray-200 bg-white text-gray-700 hover:border-teal-300'
-                                    }`}
+                                    className={`p-4 rounded-lg border transition-all text-sm font-medium ${formData.aestheticTags.includes(aesthetic.id)
+                                        ? 'border-accent bg-accent/10 text-accent shadow-sm'
+                                        : 'border-border bg-surface text-text-primary hover:border-accent hover:bg-accent/5'
+                                        }`}
                                 >
                                     {aesthetic.name}
                                 </button>
@@ -275,30 +277,30 @@ export const CreateProductPage: React.FC = () => {
                     </div>
 
                     {/* Variants */}
-                    <div>
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-semibold text-gray-900">Product Variants</h2>
-                            <Button type="button" variant="secondary" onClick={addVariant}>
+                    <div className="pt-6 border-t border-border">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-semibold text-text-primary">Product Variants</h2>
+                            <Button type="button" onClick={addVariant} className="flex items-center px-4 py-2 bg-accent hover:bg-accent-dark text-surface font-medium rounded-lg transition-colors shadow-sm">
                                 <Plus className="w-4 h-4 mr-2" />
                                 Add Variant
                             </Button>
                         </div>
 
                         {formData.variants.length === 0 ? (
-                            <p className="text-sm text-gray-600">No variants added. Add variants for different sizes, colors, etc.</p>
+                            <p className="text-sm text-text-secondary">No variants added. Add variants for different sizes, colors, etc.</p>
                         ) : (
-                            <div className="space-y-4">
+                            <div className="space-y-6">
                                 {formData.variants.map((variant, index) => (
-                                    <Card key={`variant-${variant.sku || index}`} className="relative">
+                                    <div key={`variant-${variant.sku || index}`} className="relative bg-surface border border-border rounded-xl p-6 shadow-sm">
                                         <button
                                             type="button"
                                             onClick={() => removeVariant(index)}
-                                            className="absolute top-4 right-4 text-red-600 hover:text-red-700"
+                                            className="absolute top-4 right-4 text-red-600 hover:text-red-700 transition-colors"
                                         >
                                             <X className="w-5 h-5" />
                                         </button>
 
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-2 gap-6">
                                             <Input
                                                 label="SKU"
                                                 required
@@ -334,27 +336,27 @@ export const CreateProductPage: React.FC = () => {
                                                 onChange={(e) => updateVariant(index, 'stockQuantity', Number.parseInt(e.target.value, 10))}
                                             />
                                         </div>
-                                    </Card>
+                                    </div>
                                 ))}
                             </div>
                         )}
                     </div>
 
                     {/* Submit Button */}
-                    <div className="flex justify-end space-x-4 pt-6 border-t">
+                    <div className="flex justify-end space-x-4 pt-6 border-t border-border">
                         <Button
                             type="button"
-                            variant="secondary"
                             onClick={() => navigate('/merchant/products')}
+                            className="px-6 py-3 border border-border hover:bg-canvas text-text-primary rounded-lg font-medium transition-colors"
                         >
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={isLoading}>
+                        <Button type="submit" disabled={isLoading} className="px-6 py-3 bg-accent hover:bg-accent-dark text-surface rounded-lg font-semibold transition-colors disabled:opacity-50 shadow-md">
                             {isLoading ? 'Creating...' : 'Create Product'}
                         </Button>
                     </div>
                 </form>
-            </Card>
+            </div>
         </div>
     );
 };

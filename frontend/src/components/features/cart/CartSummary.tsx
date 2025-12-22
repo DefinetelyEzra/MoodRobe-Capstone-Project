@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/common/Button';
+import { ShieldCheck, CreditCard } from 'lucide-react';
 
 interface CartSummaryProps {
     itemCount: number;
@@ -33,48 +33,53 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 sticky top-24">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Order Summary</h2>
+        <div className="bg-surface rounded-xl shadow-md border border-border p-6 sticky top-24">
+            <h2 className="text-xl font-bold text-text-primary mb-6">Order Summary</h2>
 
-            <div className="space-y-3 mb-4">
-                <div className="flex justify-between text-gray-600">
-                    <span>Items ({itemCount})</span>
-                    <span>{formatPrice(subtotal.amount)}</span>
+            <div className="space-y-4 mb-6">
+                <div className="flex justify-between text-text-primary">
+                    <span>Subtotal ({itemCount} {itemCount === 1 ? 'item' : 'items'})</span>
+                    <span className="font-medium">{formatPrice(subtotal.amount)}</span>
                 </div>
 
-                <div className="border-t border-gray-200 pt-3 mt-3">
-                    <div className="flex justify-between text-lg font-bold text-gray-900">
-                        <span>Total</span>
-                        <span>{formatPrice(subtotal.amount)}</span>
+                <div className="border-t border-border pt-4">
+                    <div className="flex justify-between">
+                        <span className="text-lg font-semibold text-text-primary">Total</span>
+                        <span className="text-2xl font-bold text-accent">{formatPrice(subtotal.amount)}</span>
                     </div>
                 </div>
             </div>
 
-            <Button
-                variant="primary"
-                size="lg"
+            <button
                 onClick={handleCheckout}
                 disabled={isLoading || itemCount === 0}
-                className="w-full"
+                className="w-full flex items-center justify-center px-6 py-3 bg-accent hover:bg-accent-dark text-surface rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md mb-3"
             >
+                <CreditCard className="w-5 h-5 mr-2" />
                 {isLoading ? 'Processing...' : 'Proceed to Checkout'}
-            </Button>
-
-            <button
-                onClick={() => navigate('/products')}
-                className="w-full mt-3 text-teal-600 hover:text-teal-700 font-medium text-sm"
-                type="button"
-            >
-                Continue Shopping
             </button>
 
             {/* Security Badge */}
-            <div className="mt-6 pt-6 border-t border-gray-200">
-                <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                    </svg>
-                    <span>Secure Checkout</span>
+            <div className="pt-4 border-t border-border">
+                <div className="flex items-center justify-center gap-2 text-sm text-text-secondary bg-canvas px-4 py-3 rounded-lg">
+                    <ShieldCheck className="w-5 h-5 text-accent" />
+                    <span>Secure Checkout Guaranteed</span>
+                </div>
+            </div>
+
+            {/* Additional Info */}
+            <div className="mt-4 space-y-2 text-xs text-text-secondary">
+                <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-accent rounded-full"></span>
+                    <span>Free shipping on orders over ₦50,000</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-accent rounded-full"></span>
+                    <span>Secure payment processing</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-accent rounded-full"></span>
+                    <span>Easy returns within 30 days</span>
                 </div>
             </div>
         </div>

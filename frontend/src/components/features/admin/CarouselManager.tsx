@@ -141,47 +141,47 @@ export const CarouselManager: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div className="text-center py-8">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
-                <p className="mt-2 text-gray-600">Loading carousel...</p>
+            <div className="text-center py-12">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+                <p className="mt-2 text-text-secondary">Loading carousel...</p>
             </div>
         );
     }
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Hero Carousel Images</h2>
-                <Button onClick={() => handleOpenModal()}>
+            <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl font-bold text-text-primary">Hero Carousel Images</h2>
+                <Button onClick={() => handleOpenModal()} className="flex items-center px-6 py-3 bg-accent hover:bg-accent-dark text-surface font-semibold rounded-lg transition-colors shadow-md">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Image
                 </Button>
             </div>
 
             {items.length === 0 ? (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
-                    <p className="text-gray-600">No carousel items yet</p>
+                <div className="text-center py-16 bg-canvas border border-border rounded-xl">
+                    <p className="text-text-secondary text-lg">No carousel items yet</p>
                 </div>
             ) : (
-                <div className="space-y-4">
+                <div className="space-y-6">
                     {items.map((item) => (
                         <div
                             key={item.id}
-                            className="flex items-center bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                            className="flex items-center bg-surface border border-border rounded-xl p-6 hover:shadow-md transition-shadow"
                         >
                             <img
                                 src={item.imageUrl}
                                 alt={item.title || 'Carousel image'}
-                                className="w-32 h-20 object-cover rounded mr-4"
+                                className="w-40 h-24 object-cover rounded-lg mr-6"
                             />
                             <div className="flex-1">
-                                <h3 className="font-semibold text-gray-900">
+                                <h3 className="text-lg font-semibold text-text-primary">
                                     {item.title || 'Untitled'}
                                 </h3>
                                 {item.subtitle && (
-                                    <p className="text-sm text-gray-600">{item.subtitle}</p>
+                                    <p className="text-text-secondary">{item.subtitle}</p>
                                 )}
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p className="text-sm text-text-secondary mt-2">
                                     Order: {item.displayOrder} | Status:{' '}
                                     <span
                                         className={
@@ -192,38 +192,38 @@ export const CarouselManager: React.FC = () => {
                                     </span>
                                 </p>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-3">
                                 <button
                                     onClick={() => handleReorder(item, 'up')}
                                     disabled={item.displayOrder === 0}
-                                    className="p-2 text-gray-600 hover:bg-gray-100 rounded disabled:opacity-50"
+                                    className="p-2 text-text-secondary hover:bg-accent/10 rounded-lg transition-colors disabled:opacity-50"
                                 >
                                     <MoveUp className="w-4 h-4" />
                                 </button>
                                 <button
                                     onClick={() => handleReorder(item, 'down')}
-                                    className="p-2 text-gray-600 hover:bg-gray-100 rounded"
+                                    className="p-2 text-text-secondary hover:bg-accent/10 rounded-lg transition-colors"
                                 >
                                     <MoveDown className="w-4 h-4" />
                                 </button>
                                 <button
                                     onClick={() => handleToggleActive(item)}
-                                    className={`px-3 py-1 text-sm rounded ${item.isActive
-                                            ? 'bg-green-100 text-green-700'
-                                            : 'bg-gray-100 text-gray-700'
+                                    className={`px-4 py-2 text-sm font-medium rounded-lg ${item.isActive
+                                        ? 'bg-green-50 text-green-700 border border-green-200'
+                                        : 'bg-canvas text-text-secondary border border-border'
                                         }`}
                                 >
                                     {item.isActive ? 'Active' : 'Inactive'}
                                 </button>
                                 <button
                                     onClick={() => handleOpenModal(item)}
-                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                                    className="p-2 text-accent hover:bg-accent/10 rounded-lg transition-colors"
                                 >
                                     <Edit2 className="w-4 h-4" />
                                 </button>
                                 <button
                                     onClick={() => handleDelete(item.id)}
-                                    className="p-2 text-red-600 hover:bg-red-50 rounded"
+                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                 >
                                     <Trash2 className="w-4 h-4" />
                                 </button>
@@ -238,7 +238,7 @@ export const CarouselManager: React.FC = () => {
                 onClose={handleCloseModal}
                 title={editingItem ? 'Edit Carousel Item' : 'Add Carousel Item'}
             >
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <Input
                         label="Image URL"
                         value={formData.imageUrl}
@@ -283,12 +283,12 @@ export const CarouselManager: React.FC = () => {
                         min={0}
                     />
 
-                    <div className="flex justify-end space-x-3 pt-4">
-                        <Button type="button" variant="secondary" onClick={handleCloseModal}>
+                    <div className="flex justify-end space-x-4 pt-4">
+                        <Button type="button" onClick={handleCloseModal} className="px-6 py-3 border border-border hover:bg-canvas text-text-primary rounded-lg font-medium transition-colors">
                             <X className="w-4 h-4 mr-2" />
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={isCreating}>
+                        <Button type="submit" disabled={isCreating} className="px-6 py-3 bg-accent hover:bg-accent-dark text-surface rounded-lg font-semibold transition-colors disabled:opacity-50 shadow-md">
                             <Save className="w-4 h-4 mr-2" />
                             {editingItem ? 'Update' : 'Create'}
                         </Button>

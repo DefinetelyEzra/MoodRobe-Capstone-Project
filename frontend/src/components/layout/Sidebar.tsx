@@ -50,7 +50,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             {/* Overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-40"
+                    className="fixed inset-0 bg-text-primary/50 z-40"
                     onClick={onClose}
                     aria-hidden="true"
                 />
@@ -58,24 +58,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
             {/* Sidebar - Mobile Only */}
             <aside
-                className={`fixed top-0 left-0 h-full w-72 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'
+                className={`fixed top-0 left-0 h-full w-72 bg-surface shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'
                     }`}
             >
                 <div className="flex flex-col h-full">
                     {/* Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                    <div className="flex items-center justify-between p-6 border-b border-border">
                         <div>
-                            <h2 className="text-xl font-bold text-teal-800">MoodRobe</h2>
+                            <h2 className="text-xl font-bold text-accent">MoodRobe</h2>
                             {isAuthenticated && user && (
-                                <p className="text-sm text-gray-600 mt-1">Hello, {user.name}</p>
+                                <p className="text-sm text-text-secondary mt-1">Hello, {user.name}</p>
                             )}
                         </div>
                         <button
                             onClick={onClose}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="p-2 hover:bg-canvas rounded-lg transition-colors"
                             aria-label="Close sidebar"
                         >
-                            <X className="w-5 h-5 text-gray-600" />
+                            <X className="w-5 h-5 text-text-secondary" />
                         </button>
                     </div>
 
@@ -91,11 +91,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                                         <button
                                             onClick={() => handleNavigation(item.path)}
                                             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${active
-                                                    ? 'bg-teal-50 text-teal-700 font-medium'
-                                                    : 'text-gray-700 hover:bg-gray-50'
+                                                    ? 'bg-accent/10 text-accent-dark font-medium'
+                                                    : 'text-text-primary hover:bg-canvas'
                                                 }`}
                                         >
-                                            <Icon className={`w-5 h-5 ${active ? 'text-teal-600' : 'text-gray-500'}`} />
+                                            <Icon className={`w-5 h-5 ${active ? 'text-accent' : 'text-text-secondary'}`} />
                                             <span className="flex-1 text-left">{item.label}</span>
                                         </button>
                                     </li>
@@ -105,16 +105,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     </nav>
 
                     {/* Footer */}
-                    <div className="p-4 border-t border-gray-200 space-y-3">
+                    <div className="p-4 border-t border-border space-y-3">
                         {/* Style Quiz CTA */}
-                        <div className="bg-linear-to-r from-teal-50 to-teal-100 rounded-lg p-4">
-                            <h3 className="font-semibold text-teal-900 mb-1">Style Quiz</h3>
-                            <p className="text-sm text-teal-700 mb-3">
+                        <div className="bg-linear-to-r from-canvas to-accent/5 rounded-lg p-4 border border-border">
+                            <h3 className="font-semibold text-text-primary mb-1">Style Quiz</h3>
+                            <p className="text-sm text-text-secondary mb-3">
                                 Discover your aesthetic
                             </p>
                             <button
                                 onClick={() => handleNavigation('/style-quiz')}
-                                className="w-full px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg transition-colors"
+                                className="w-full px-4 py-2 bg-accent hover:bg-accent-dark text-surface text-sm font-medium rounded-lg transition-colors"
                             >
                                 Take Quiz
                             </button>
@@ -126,7 +126,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                                 variant="outline"
                                 size="sm"
                                 onClick={handleLogout}
-                                className="w-full"
+                                className="w-full border-border text-text-primary hover:bg-canvas"
                             >
                                 Logout
                             </Button>
@@ -136,7 +136,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                                     variant="primary"
                                     size="sm"
                                     onClick={() => handleNavigation('/login')}
-                                    className="w-full"
+                                    className="w-full bg-accent hover:bg-accent-dark text-surface"
                                 >
                                     Login
                                 </Button>
@@ -144,7 +144,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                                     variant="outline"
                                     size="sm"
                                     onClick={() => handleNavigation('/register')}
-                                    className="w-full"
+                                    className="w-full border-border text-text-primary hover:bg-canvas"
                                 >
                                     Sign Up
                                 </Button>

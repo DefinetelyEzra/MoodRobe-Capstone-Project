@@ -5,9 +5,7 @@ import { useToast } from '@/hooks/useToast';
 import { useMerchant } from '@/hooks/useMerchant';
 import { merchantApi } from '@/api/merchant.api';
 import { CreateMerchantDto, Merchant } from '@/types/merchant.types';
-import { Card } from '@/components/common/Card';
 import { Input } from '@/components/common/Input';
-import { Button } from '@/components/common/Button';
 import { Store, ArrowLeft } from 'lucide-react';
 
 export const CreateMerchantPage: React.FC = () => {
@@ -80,163 +78,170 @@ export const CreateMerchantPage: React.FC = () => {
     };
 
     return (
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <button
-                onClick={() => navigate(-1)}
-                className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
-            >
-                <ArrowLeft className="w-5 h-5 mr-2" />
-                Back
-            </button>
-
-            <Card>
-                <div className="flex items-center mb-6">
-                    <div className="p-3 bg-teal-100 rounded-lg">
-                        <Store className="w-8 h-8 text-teal-600" />
-                    </div>
-                    <div className="ml-4">
-                        <h1 className="text-2xl font-bold text-gray-900">Create Merchant Account</h1>
-                        <p className="text-gray-600">Set up your store to start selling</p>
+        <div className="min-h-screen bg-canvas">
+            {/* Header */}
+            <div className="bg-linear-to-b from-accent/10 to-canvas border-b border-border">
+                <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="flex items-center text-accent hover:text-accent-dark mb-4 transition-colors"
+                    >
+                        <ArrowLeft className="w-5 h-5 mr-2" />
+                        Back
+                    </button>
+                    <div className="flex items-center">
+                        <div className="w-16 h-16 bg-accent/10 rounded-xl flex items-center justify-center">
+                            <Store className="w-8 h-8 text-accent" />
+                        </div>
+                        <div className="ml-4">
+                            <h1 className="text-3xl font-bold text-text-primary">Create Merchant Account</h1>
+                            <p className="text-text-secondary mt-1">Set up your store to start selling</p>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Basic Information */}
-                    <div>
-                        <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
-                        <div className="space-y-4">
-                            <Input
-                                label="Store Name"
-                                required
-                                value={formData.name}
-                                onChange={(e) => handleChange('name', e.target.value)}
-                                placeholder="My Fashion Store"
-                            />
-
-                            <Input
-                                label="Email"
-                                type="email"
-                                required
-                                value={formData.email}
-                                onChange={(e) => handleChange('email', e.target.value)}
-                                placeholder="store@example.com"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Business Details */}
-                    <div>
-                        <h2 className="text-lg font-semibold text-gray-900 mb-4">Business Details</h2>
-                        <div className="space-y-4">
-                            <Input
-                                label="Business Name"
-                                value={formData.businessDetails.businessName || ''}
-                                onChange={(e) => handleChange('businessDetails.businessName', e.target.value)}
-                                placeholder="Legal business name"
-                            />
-
-                            <Input
-                                label="Business Type"
-                                value={formData.businessDetails.businessType || ''}
-                                onChange={(e) => handleChange('businessDetails.businessType', e.target.value)}
-                                placeholder="e.g., Sole Proprietorship, LLC"
-                            />
-
-                            <div>
-                                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Description
-                                </label>
-                                <textarea
-                                    id="description"
-                                    value={formData.businessDetails.description || ''}
-                                    onChange={(e) => handleChange('businessDetails.description', e.target.value)}
-                                    rows={4}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                                    placeholder="Tell us about your business..."
-                                />
-                            </div>
-
-                            <Input
-                                label="Website"
-                                type="url"
-                                value={formData.businessDetails.website || ''}
-                                onChange={(e) => handleChange('businessDetails.website', e.target.value)}
-                                placeholder="https://yourstore.com"
-                            />
-
-                            <Input
-                                label="Contact Phone"
-                                type="tel"
-                                value={formData.businessDetails.contactPhone || ''}
-                                onChange={(e) => handleChange('businessDetails.contactPhone', e.target.value)}
-                                placeholder="+1 (555) 123-4567"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Address */}
-                    <div>
-                        <h2 className="text-lg font-semibold text-gray-900 mb-4">Business Address</h2>
-                        <div className="space-y-4">
-                            <Input
-                                label="Street Address"
-                                value={formData.businessDetails.address?.street || ''}
-                                onChange={(e) => handleChange('businessDetails.address.street', e.target.value)}
-                                placeholder="123 Main St"
-                            />
-
-                            <div className="grid grid-cols-2 gap-4">
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="bg-surface rounded-xl border border-border shadow-sm">
+                    <form onSubmit={handleSubmit} className="p-8 space-y-8">
+                        {/* Basic Information */}
+                        <div>
+                            <h2 className="text-xl font-semibold text-text-primary mb-6">Basic Information</h2>
+                            <div className="space-y-4">
                                 <Input
-                                    label="City"
-                                    value={formData.businessDetails.address?.city || ''}
-                                    onChange={(e) => handleChange('businessDetails.address.city', e.target.value)}
-                                    placeholder="New York"
+                                    label="Store Name"
+                                    required
+                                    value={formData.name}
+                                    onChange={(e) => handleChange('name', e.target.value)}
+                                    placeholder="My Fashion Store"
                                 />
 
                                 <Input
-                                    label="State/Province"
-                                    value={formData.businessDetails.address?.state || ''}
-                                    onChange={(e) => handleChange('businessDetails.address.state', e.target.value)}
-                                    placeholder="NY"
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input
-                                    label="Country"
-                                    value={formData.businessDetails.address?.country || ''}
-                                    onChange={(e) => handleChange('businessDetails.address.country', e.target.value)}
-                                    placeholder="United States"
-                                />
-
-                                <Input
-                                    label="Postal Code"
-                                    value={formData.businessDetails.address?.postalCode || ''}
-                                    onChange={(e) => handleChange('businessDetails.address.postalCode', e.target.value)}
-                                    placeholder="10001"
+                                    label="Email"
+                                    type="email"
+                                    required
+                                    value={formData.email}
+                                    onChange={(e) => handleChange('email', e.target.value)}
+                                    placeholder="store@example.com"
                                 />
                             </div>
                         </div>
-                    </div>
 
-                    {/* Submit Button */}
-                    <div className="flex justify-end space-x-4 pt-6 border-t">
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            onClick={() => navigate(-1)}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            type="submit"
-                            disabled={isLoading}
-                        >
-                            {isLoading ? 'Creating...' : 'Create Merchant Account'}
-                        </Button>
-                    </div>
-                </form>
-            </Card>
+                        {/* Business Details */}
+                        <div className="pt-6 border-t border-border">
+                            <h2 className="text-xl font-semibold text-text-primary mb-6">Business Details</h2>
+                            <div className="space-y-4">
+                                <Input
+                                    label="Business Name"
+                                    value={formData.businessDetails.businessName || ''}
+                                    onChange={(e) => handleChange('businessDetails.businessName', e.target.value)}
+                                    placeholder="Legal business name"
+                                />
+
+                                <Input
+                                    label="Business Type"
+                                    value={formData.businessDetails.businessType || ''}
+                                    onChange={(e) => handleChange('businessDetails.businessType', e.target.value)}
+                                    placeholder="e.g., Sole Proprietorship, LLC"
+                                />
+
+                                <div>
+                                    <label htmlFor="description" className="block text-sm font-medium text-text-primary mb-2">
+                                        Description
+                                    </label>
+                                    <textarea
+                                        id="description"
+                                        value={formData.businessDetails.description || ''}
+                                        onChange={(e) => handleChange('businessDetails.description', e.target.value)}
+                                        rows={4}
+                                        className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-surface text-text-primary placeholder-text-secondary"
+                                        placeholder="Tell us about your business..."
+                                    />
+                                </div>
+
+                                <Input
+                                    label="Website"
+                                    type="url"
+                                    value={formData.businessDetails.website || ''}
+                                    onChange={(e) => handleChange('businessDetails.website', e.target.value)}
+                                    placeholder="https://yourstore.com"
+                                />
+
+                                <Input
+                                    label="Contact Phone"
+                                    type="tel"
+                                    value={formData.businessDetails.contactPhone || ''}
+                                    onChange={(e) => handleChange('businessDetails.contactPhone', e.target.value)}
+                                    placeholder="+1 (555) 123-4567"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Address */}
+                        <div className="pt-6 border-t border-border">
+                            <h2 className="text-xl font-semibold text-text-primary mb-6">Business Address</h2>
+                            <div className="space-y-4">
+                                <Input
+                                    label="Street Address"
+                                    value={formData.businessDetails.address?.street || ''}
+                                    onChange={(e) => handleChange('businessDetails.address.street', e.target.value)}
+                                    placeholder="123 Main St"
+                                />
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input
+                                        label="City"
+                                        value={formData.businessDetails.address?.city || ''}
+                                        onChange={(e) => handleChange('businessDetails.address.city', e.target.value)}
+                                        placeholder="New York"
+                                    />
+
+                                    <Input
+                                        label="State/Province"
+                                        value={formData.businessDetails.address?.state || ''}
+                                        onChange={(e) => handleChange('businessDetails.address.state', e.target.value)}
+                                        placeholder="NY"
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input
+                                        label="Country"
+                                        value={formData.businessDetails.address?.country || ''}
+                                        onChange={(e) => handleChange('businessDetails.address.country', e.target.value)}
+                                        placeholder="United States"
+                                    />
+
+                                    <Input
+                                        label="Postal Code"
+                                        value={formData.businessDetails.address?.postalCode || ''}
+                                        onChange={(e) => handleChange('businessDetails.address.postalCode', e.target.value)}
+                                        placeholder="10001"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Submit Button */}
+                        <div className="flex justify-end space-x-4 pt-6 border-t border-border">
+                            <button
+                                type="button"
+                                onClick={() => navigate(-1)}
+                                className="px-6 py-3 border border-border hover:bg-canvas text-text-primary rounded-lg font-medium transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className="px-6 py-3 bg-accent hover:bg-accent-dark text-surface rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                            >
+                                {isLoading ? 'Creating...' : 'Create Merchant Account'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     );
 };

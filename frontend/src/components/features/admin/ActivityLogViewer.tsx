@@ -36,13 +36,13 @@ export const ActivityLogViewer: React.FC = () => {
     const getActionColor = (action: string) => {
         switch (action) {
             case 'create':
-                return 'bg-green-100 text-green-800';
+                return 'bg-green-50 text-green-700 border-green-200';
             case 'update':
-                return 'bg-blue-100 text-blue-800';
+                return 'bg-blue-50 text-blue-700 border-blue-200';
             case 'delete':
-                return 'bg-red-100 text-red-800';
+                return 'bg-red-50 text-red-700 border-red-200';
             default:
-                return 'bg-gray-100 text-gray-800';
+                return 'bg-canvas text-text-secondary border-border';
         }
     };
 
@@ -59,66 +59,66 @@ export const ActivityLogViewer: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div className="text-center py-8">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
-                <p className="mt-2 text-gray-600">Loading activity log...</p>
+            <div className="text-center py-12">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+                <p className="mt-2 text-text-secondary">Loading activity log...</p>
             </div>
         );
     }
 
     return (
         <div>
-            <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">Activity Log</h2>
-                <p className="text-sm text-gray-600">Recent admin actions and changes</p>
+            <div className="mb-8">
+                <h2 className="text-2xl font-bold text-text-primary mb-2">Activity Log</h2>
+                <p className="text-sm text-text-secondary">Recent admin actions and changes</p>
             </div>
 
             {!logs || logs.length === 0 ? (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
-                    <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-gray-600">No activity logged yet</p>
+                <div className="text-center py-16 bg-canvas border border-border rounded-xl">
+                    <FileText className="w-12 h-12 text-accent mx-auto mb-4" />
+                    <p className="text-text-secondary text-lg">No activity logged yet</p>
                 </div>
             ) : (
-                <div className="space-y-3">
+                <div className="space-y-4">
                     {logs.map((log) => (
                         <div
                             key={log.id}
-                            className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow"
+                            className="bg-surface border border-border rounded-xl p-6 hover:shadow-md transition-shadow"
                         >
                             <div className="flex items-start justify-between">
-                                <div className="flex items-start space-x-3 flex-1">
-                                    <div className="text-2xl mt-1">
+                                <div className="flex items-start space-x-4 flex-1">
+                                    <div className="text-3xl mt-1">
                                         {getResourceIcon(log.resourceType)}
                                     </div>
                                     <div className="flex-1">
-                                        <div className="flex items-center space-x-2 mb-1">
+                                        <div className="flex items-center space-x-3 mb-2">
                                             <span
-                                                className={`px-2 py-0.5 text-xs font-medium rounded ${getActionColor(
+                                                className={`px-3 py-1 text-xs font-medium rounded-full border ${getActionColor(
                                                     log.action
                                                 )}`}
                                             >
                                                 {log.action.toUpperCase()}
                                             </span>
-                                            <span className="text-sm font-medium text-gray-900">
+                                            <span className="text-base font-medium text-text-primary">
                                                 {log.resourceType}
                                             </span>
                                         </div>
-                                        <div className="flex items-center text-sm text-gray-600 space-x-4">
+                                        <div className="flex items-center text-sm text-text-secondary space-x-6">
                                             <div className="flex items-center">
-                                                <User className="w-4 h-4 mr-1" />
+                                                <User className="w-4 h-4 mr-2 text-accent" />
                                                 {log.adminEmail}
                                             </div>
                                             <div className="flex items-center">
-                                                <Clock className="w-4 h-4 mr-1" />
+                                                <Clock className="w-4 h-4 mr-2 text-accent" />
                                                 {formatDate(log.createdAt)}
                                             </div>
                                         </div>
                                         {Object.keys(log.details).length > 0 && (
-                                            <details className="mt-2">
-                                                <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700">
+                                            <details className="mt-4">
+                                                <summary className="text-sm text-text-secondary cursor-pointer hover:text-accent transition-colors">
                                                     View details
                                                 </summary>
-                                                <pre className="mt-2 text-xs bg-gray-50 p-2 rounded overflow-x-auto">
+                                                <pre className="mt-3 text-xs bg-canvas p-4 rounded-lg border border-border overflow-x-auto">
                                                     {JSON.stringify(log.details, null, 2)}
                                                 </pre>
                                             </details>

@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMerchant } from '@/hooks/useMerchant';
 import { useApi } from '@/hooks/useApi';
 import { useToast } from '@/hooks/useToast';
 import { merchantApi } from '@/api/merchant.api';
 import { MerchantStaff, AddStaffDto, UpdateStaffDto, StaffRole } from '@/types/merchant.types';
-import { Card } from '@/components/common/Card';
-import { Button } from '@/components/common/Button';
 import { Modal } from '@/components/common/Modal';
-import { Users, Plus, Edit, Trash2, Shield, CheckCircle } from 'lucide-react';
+import { Users, Plus, Edit, Trash2, Shield, CheckCircle, ArrowLeft } from 'lucide-react';
 
 export const ManageStaffPage: React.FC = () => {
     const { currentMerchant, staff, refreshStaff, hasPermission } = useMerchant();
     const { showToast } = useToast();
+    const navigate = useNavigate();
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedStaff, setSelectedStaff] = useState<MerchantStaff | null>(null);
@@ -91,148 +91,168 @@ export const ManageStaffPage: React.FC = () => {
 
     const getRoleBadgeColor = (role: StaffRole) => {
         switch (role) {
-            case 'owner': return 'bg-purple-100 text-purple-800';
-            case 'admin': return 'bg-blue-100 text-blue-800';
-            case 'manager': return 'bg-green-100 text-green-800';
-            case 'staff': return 'bg-gray-100 text-gray-800';
-            default: return 'bg-gray-100 text-gray-800';
+            case 'owner': return 'bg-purple-50 text-purple-700 border-purple-200';
+            case 'admin': return 'bg-blue-50 text-blue-700 border-blue-200';
+            case 'manager': return 'bg-green-50 text-green-700 border-green-200';
+            case 'staff': return 'bg-canvas text-text-secondary border-border';
+            default: return 'bg-canvas text-text-secondary border-border';
         }
     };
 
     if (!currentMerchant) {
         return (
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <Card className="text-center py-12">
-                    <p className="text-gray-600">Please select a merchant account</p>
-                </Card>
+            <div className="min-h-screen bg-canvas flex items-center justify-center">
+                <div className="bg-surface border border-border rounded-xl p-12 text-center max-w-md">
+                    <Users className="w-16 h-16 text-text-secondary mx-auto mb-4" />
+                    <p className="text-text-primary">Please select a merchant account</p>
+                </div>
             </div>
         );
     }
 
     if (!hasPermission('canManageStaff')) {
         return (
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <Card className="text-center py-12">
-                    <p className="text-red-600">You don't have permission to manage staff</p>
-                </Card>
+            <div className="min-h-screen bg-canvas flex items-center justify-center">
+                <div className="bg-surface border border-border rounded-xl p-12 text-center max-w-md">
+                    <Shield className="w-16 h-16 text-red-400 mx-auto mb-4" />
+                    <p className="text-red-600 font-medium">You don't have permission to manage staff</p>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="min-h-screen bg-canvas">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Manage Staff</h1>
-                    <p className="text-gray-600 mt-1">{currentMerchant.name}</p>
-                </div>
-                <Button
-                    onClick={() => setShowAddModal(true)}
-                    className="mt-4 md:mt-0"
-                >
-                    <Plus className="w-5 h-5 mr-2" />
-                    Add Staff Member
-                </Button>
-            </div>
-
-            {/* Staff List */}
-            <Card>
-                {staff.length === 0 ? (
-                    <div className="text-center py-12">
-                        <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">No staff members</h3>
-                        <p className="text-gray-600 mb-6">Add your first team member to get started</p>
-                        <Button onClick={() => setShowAddModal(true)}>
+            <div className="bg-linear-to-b from-accent/10 to-canvas border-b border-border">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <button
+                        onClick={() => navigate('/merchant/dashboard')}
+                        className="flex items-center text-accent hover:text-accent-dark mb-4 transition-colors"
+                    >
+                        <ArrowLeft className="w-5 h-5 mr-2" />
+                        Back to Dashboard
+                    </button>
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h1 className="text-4xl font-bold text-text-primary">Manage Staff</h1>
+                            <p className="text-text-secondary mt-2">{currentMerchant.name}</p>
+                        </div>
+                        <button
+                            onClick={() => setShowAddModal(true)}
+                            className="mt-4 md:mt-0 flex items-center px-6 py-3 bg-accent hover:bg-accent-dark text-surface rounded-lg font-semibold transition-colors shadow-md"
+                        >
                             <Plus className="w-5 h-5 mr-2" />
                             Add Staff Member
-                        </Button>
+                        </button>
                     </div>
-                ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Member</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Permissions</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {staff.map((member) => (
-                                    <tr key={member.id} className="hover:bg-gray-50">
-                                        <td className="px-4 py-4">
-                                            <div className="flex items-center">
-                                                <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center">
-                                                    <span className="text-teal-600 font-semibold">
-                                                        {member.user?.name?.charAt(0).toUpperCase() || 'U'}
-                                                    </span>
-                                                </div>
-                                                <div className="ml-3">
-                                                    <div className="font-medium text-gray-900">
-                                                        {member.user?.name || 'Unknown User'}
-                                                    </div>
-                                                    <div className="text-sm text-gray-500">{member.user?.email}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-4">
-                                            <span className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${getRoleBadgeColor(member.role)}`}>
-                                                <Shield className="w-3 h-3 mr-1" />
-                                                {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-4">
-                                            <div className="flex flex-wrap gap-1">
-                                                {Object.entries(member.permissions).map(([key, value]) => (
-                                                    value && (
-                                                        <span
-                                                            key={key}
-                                                            className="inline-flex items-center px-2 py-0.5 bg-green-50 text-green-700 text-xs rounded"
-                                                        >
-                                                            <CheckCircle className="w-3 h-3 mr-1" />
-                                                            {key.replace('can', '').replaceAll(/([A-Z])/g, ' $1').trim()}
-                                                        </span>
-                                                    )
-                                                ))}
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-4">
-                                            <div className="flex items-center space-x-2">
-                                                {member.role !== 'owner' && (
-                                                    <>
-                                                        <button
-                                                            onClick={() => openEditModal(member)}
-                                                            className="p-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
-                                                            title="Edit"
-                                                        >
-                                                            <Edit className="w-4 h-4" />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleRemoveStaff(member.id, member.user?.name || 'this user')}
-                                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                            title="Remove"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </button>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </td>
+                </div>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Staff List */}
+                <div className="bg-surface rounded-xl border border-border shadow-sm">
+                    {staff.length === 0 ? (
+                        <div className="text-center py-16 px-4">
+                            <div className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Users className="w-10 h-10 text-accent" />
+                            </div>
+                            <h3 className="text-xl font-semibold text-text-primary mb-2">No staff members</h3>
+                            <p className="text-text-secondary mb-6">Add your first team member to get started</p>
+                            <button
+                                onClick={() => setShowAddModal(true)}
+                                className="px-6 py-3 bg-accent hover:bg-accent-dark text-surface rounded-lg font-semibold transition-colors"
+                            >
+                                <Plus className="w-5 h-5 inline mr-2" />
+                                Add Staff Member
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-canvas border-b border-border">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">Member</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">Role</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">Permissions</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">Actions</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-            </Card>
+                                </thead>
+                                <tbody className="divide-y divide-border">
+                                    {staff.map((member) => (
+                                        <tr key={member.id} className="hover:bg-canvas transition-colors">
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center">
+                                                    <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center">
+                                                        <span className="text-accent font-semibold">
+                                                            {member.user?.name?.charAt(0).toUpperCase() || 'U'}
+                                                        </span>
+                                                    </div>
+                                                    <div className="ml-4">
+                                                        <div className="font-medium text-text-primary">
+                                                            {member.user?.name || 'Unknown User'}
+                                                        </div>
+                                                        <div className="text-sm text-text-secondary">{member.user?.email}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full border ${getRoleBadgeColor(member.role)}`}>
+                                                    <Shield className="w-3 h-3 mr-1" />
+                                                    {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {Object.entries(member.permissions).map(([key, value]) => (
+                                                        value && (
+                                                            <span
+                                                                key={key}
+                                                                className="inline-flex items-center px-2 py-1 bg-green-50 text-green-700 text-xs rounded border border-green-200"
+                                                            >
+                                                                <CheckCircle className="w-3 h-3 mr-1" />
+                                                                {key.replace('can', '').replaceAll(/([A-Z])/g, ' $1').trim()}
+                                                            </span>
+                                                        )
+                                                    ))}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center space-x-2">
+                                                    {member.role !== 'owner' && (
+                                                        <>
+                                                            <button
+                                                                onClick={() => openEditModal(member)}
+                                                                className="p-2 text-accent hover:bg-accent/10 rounded-lg transition-colors"
+                                                                title="Edit"
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleRemoveStaff(member.id, member.user?.name || 'this user')}
+                                                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                                title="Remove"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            </div>
 
             {/* Add Staff Modal */}
             <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add Staff Member">
                 <form onSubmit={handleAddStaff} className="space-y-4">
                     <div>
-                        <label htmlFor="add-user-id" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="add-user-id" className="block text-sm font-medium text-text-primary mb-2">
                             User ID
                         </label>
                         <input
@@ -242,19 +262,19 @@ export const ManageStaffPage: React.FC = () => {
                             value={addFormData.userId}
                             onChange={(e) => setAddFormData({ ...addFormData, userId: e.target.value })}
                             placeholder="Enter user ID or email"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-surface"
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="add-role" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="add-role" className="block text-sm font-medium text-text-primary mb-2">
                             Role
                         </label>
                         <select
                             id="add-role"
                             value={addFormData.role}
                             onChange={(e) => setAddFormData({ ...addFormData, role: e.target.value as StaffRole })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-surface"
                         >
                             <option value="staff">Staff</option>
                             <option value="manager">Manager</option>
@@ -263,16 +283,20 @@ export const ManageStaffPage: React.FC = () => {
                     </div>
 
                     <div className="flex justify-end space-x-3 pt-4">
-                        <Button
+                        <button
                             type="button"
-                            variant="secondary"
                             onClick={() => setShowAddModal(false)}
+                            className="px-6 py-3 border border-border hover:bg-canvas text-text-primary rounded-lg font-medium transition-colors"
                         >
                             Cancel
-                        </Button>
-                        <Button type="submit" disabled={isAdding}>
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={isAdding}
+                            className="px-6 py-3 bg-accent hover:bg-accent-dark text-surface rounded-lg font-semibold transition-colors disabled:opacity-50"
+                        >
                             {isAdding ? 'Adding...' : 'Add Staff'}
-                        </Button>
+                        </button>
                     </div>
                 </form>
             </Modal>
@@ -281,14 +305,14 @@ export const ManageStaffPage: React.FC = () => {
             <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)} title="Edit Staff Member">
                 <form onSubmit={handleEditStaff} className="space-y-4">
                     <div>
-                        <label htmlFor="edit-role" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="edit-role" className="block text-sm font-medium text-text-primary mb-2">
                             Role
                         </label>
                         <select
                             id="edit-role"
                             value={editFormData.role || 'staff'}
                             onChange={(e) => setEditFormData({ ...editFormData, role: e.target.value as StaffRole })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-surface"
                         >
                             <option value="staff">Staff</option>
                             <option value="manager">Manager</option>
@@ -297,10 +321,10 @@ export const ManageStaffPage: React.FC = () => {
                     </div>
 
                     <div>
-                        <span className="block text-sm font-medium text-gray-700 mb-3">
+                        <span className="block text-sm font-medium text-text-primary mb-3">
                             Permissions
                         </span>
-                        <div className="space-y-2">
+                        <div className="space-y-3 bg-canvas p-4 rounded-lg">
                             {[
                                 { key: 'canManageProducts', label: 'Manage Products' },
                                 { key: 'canManageOrders', label: 'Manage Orders' },
@@ -308,7 +332,7 @@ export const ManageStaffPage: React.FC = () => {
                                 { key: 'canViewAnalytics', label: 'View Analytics' },
                                 { key: 'canManageSettings', label: 'Manage Settings' }
                             ].map(({ key, label }) => (
-                                <label key={key} className="flex items-center">
+                                <label key={key} className="flex items-center cursor-pointer hover:bg-surface p-2 rounded transition-colors">
                                     <input
                                         type="checkbox"
                                         checked={editFormData.permissions?.[key as keyof typeof editFormData.permissions] ?? false}
@@ -319,25 +343,29 @@ export const ManageStaffPage: React.FC = () => {
                                                 [key]: e.target.checked
                                             }
                                         })}
-                                        className="rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                                        className="rounded border-border text-accent focus:ring-accent"
                                     />
-                                    <span className="ml-2 text-sm text-gray-700">{label}</span>
+                                    <span className="ml-3 text-sm text-text-primary font-medium">{label}</span>
                                 </label>
                             ))}
                         </div>
                     </div>
 
                     <div className="flex justify-end space-x-3 pt-4">
-                        <Button
+                        <button
                             type="button"
-                            variant="secondary"
                             onClick={() => setShowEditModal(false)}
+                            className="px-6 py-3 border border-border hover:bg-canvas text-text-primary rounded-lg font-medium transition-colors"
                         >
                             Cancel
-                        </Button>
-                        <Button type="submit" disabled={isUpdating}>
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={isUpdating}
+                            className="px-6 py-3 bg-accent hover:bg-accent-dark text-surface rounded-lg font-semibold transition-colors disabled:opacity-50"
+                        >
                             {isUpdating ? 'Updating...' : 'Update Staff'}
-                        </Button>
+                        </button>
                     </div>
                 </form>
             </Modal>

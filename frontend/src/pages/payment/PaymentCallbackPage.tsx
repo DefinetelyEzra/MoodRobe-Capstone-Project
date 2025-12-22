@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { useApi } from '@/hooks/useApi';
 import { paymentApi } from '@/api/payment.api';
-import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { AxiosError } from 'axios';
 
@@ -88,74 +87,74 @@ export const PaymentCallbackPage: React.FC = () => {
 
     if (verificationState === 'verifying') {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <Card className="max-w-md w-full p-8 text-center">
-                    <Loader2 className="w-16 h-16 text-teal-600 mx-auto mb-4 animate-spin" />
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <div className="min-h-screen bg-canvas flex items-center justify-center">
+                <div className="bg-surface border border-border rounded-xl p-12 shadow-md max-w-md w-full text-center">
+                    <Loader2 className="w-16 h-16 text-accent mx-auto mb-6 animate-spin" />
+                    <h2 className="text-3xl font-bold text-text-primary mb-3">
                         Verifying Payment
                     </h2>
-                    <p className="text-gray-600">
+                    <p className="text-text-secondary text-lg">
                         Please wait while we confirm your payment...
                     </p>
-                </Card>
+                </div>
             </div>
         );
     }
 
     if (verificationState === 'success') {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <Card className="max-w-md w-full p-8 text-center">
-                    <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <div className="min-h-screen bg-canvas flex items-center justify-center">
+                <div className="bg-surface border border-border rounded-xl p-12 shadow-md max-w-md w-full text-center">
+                    <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-6" />
+                    <h2 className="text-3xl font-bold text-text-primary mb-3">
                         Payment Successful!
                     </h2>
-                    <p className="text-gray-600 mb-6">
+                    <p className="text-text-secondary text-lg mb-8">
                         Your order has been confirmed and payment received.
                     </p>
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                         <Button
                             onClick={() => navigate(`/orders/${orderId}`)}
-                            className="w-full"
+                            className="w-full px-8 py-4 bg-accent hover:bg-accent-dark text-surface font-semibold rounded-lg transition-colors shadow-sm"
                         >
                             View Order Details
                         </Button>
                         <Button
                             variant="secondary"
                             onClick={() => navigate('/orders')}
-                            className="w-full"
+                            className="w-full px-8 py-4 bg-surface border border-border hover:bg-canvas text-text-primary font-semibold rounded-lg transition-colors"
                         >
                             View All Orders
                         </Button>
                     </div>
-                </Card>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <Card className="max-w-md w-full p-8 text-center">
-                <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <div className="min-h-screen bg-canvas flex items-center justify-center">
+            <div className="bg-surface border border-border rounded-xl p-12 shadow-md max-w-md w-full text-center">
+                <XCircle className="w-16 h-16 text-red-600 mx-auto mb-6" />
+                <h2 className="text-3xl font-bold text-text-primary mb-3">
                     Payment Failed
                 </h2>
-                <p className="text-gray-600 mb-6">
+                <p className="text-text-secondary text-lg mb-8">
                     {errorMessage || "We couldn't verify your payment. Please try again or contact support."}
                 </p>
-                <div className="space-y-3">
-                    <Button onClick={() => navigate('/cart')} className="w-full">
+                <div className="space-y-4">
+                    <Button onClick={() => navigate('/cart')} className="w-full px-8 py-4 bg-accent hover:bg-accent-dark text-surface font-semibold rounded-lg transition-colors shadow-sm">
                         Return to Cart
                     </Button>
                     <Button
                         variant="secondary"
                         onClick={() => navigate('/')}
-                        className="w-full"
+                        className="w-full px-8 py-4 bg-surface border border-border hover:bg-canvas text-text-primary font-semibold rounded-lg transition-colors"
                     >
                         Continue Shopping
                     </Button>
                 </div>
-            </Card>
+            </div>
         </div>
     );
 };

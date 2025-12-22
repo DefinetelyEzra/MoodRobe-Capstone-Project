@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Save, RefreshCw } from 'lucide-react';
 import { useApi } from '@/hooks/useApi';
 import { useToast } from '@/hooks/useToast';
@@ -99,48 +99,48 @@ export const ContentEditor: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div className="text-center py-8">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
-                <p className="mt-2 text-gray-600">Loading content...</p>
+            <div className="text-center py-12">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+                <p className="mt-2 text-text-secondary">Loading content...</p>
             </div>
         );
     }
 
     return (
         <div>
-            <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <div className="mb-8">
+                <h2 className="text-2xl font-bold text-text-primary mb-2">
                     Homepage Content Editor
                 </h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-text-secondary">
                     Edit text content that appears on the homepage
                 </p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-8">
                 {contents.map((content) => (
                     <div
                         key={content.id}
-                        className="bg-white border border-gray-200 rounded-lg p-6"
+                        className="bg-surface border border-border rounded-xl p-8 shadow-sm"
                     >
-                        <div className="flex justify-between items-start mb-4">
+                        <div className="flex justify-between items-start mb-6">
                             <div>
-                                <h3 className="font-semibold text-gray-900">
+                                <h3 className="text-lg font-semibold text-text-primary">
                                     {sectionLabels[content.sectionKey as ContentSectionKey] ||
                                         content.sectionKey}
                                 </h3>
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p className="text-xs text-text-secondary mt-1">
                                     Section: {content.sectionKey} | Type: {content.contentType}
                                 </p>
                             </div>
                             {hasChanges(content.sectionKey) && (
-                                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                                <span className="text-xs bg-yellow-50 text-yellow-700 px-3 py-1 rounded-full border border-yellow-200">
                                     Unsaved changes
                                 </span>
                             )}
                         </div>
 
-                        <div className="mb-4">
+                        <div className="mb-6">
                             {content.contentType === 'text' ? (
                                 <Input
                                     value={editedContents[content.sectionKey] || ''}
@@ -158,16 +158,16 @@ export const ContentEditor: React.FC = () => {
                                     }
                                     placeholder="Enter content..."
                                     rows={4}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-surface text-text-primary placeholder-text-secondary"
                                 />
                             )}
                         </div>
 
-                        <div className="flex justify-end space-x-3">
+                        <div className="flex justify-end space-x-4">
                             <Button
-                                variant="secondary"
                                 onClick={() => handleReset(content.sectionKey)}
                                 disabled={!hasChanges(content.sectionKey)}
+                                className="px-6 py-3 border border-border hover:bg-canvas text-text-primary rounded-lg font-medium transition-colors disabled:opacity-50"
                             >
                                 <RefreshCw className="w-4 h-4 mr-2" />
                                 Reset
@@ -175,6 +175,7 @@ export const ContentEditor: React.FC = () => {
                             <Button
                                 onClick={() => handleSave(content.sectionKey)}
                                 disabled={!hasChanges(content.sectionKey)}
+                                className="px-6 py-3 bg-accent hover:bg-accent-dark text-surface rounded-lg font-semibold transition-colors disabled:opacity-50 shadow-md"
                             >
                                 <Save className="w-4 h-4 mr-2" />
                                 Save
