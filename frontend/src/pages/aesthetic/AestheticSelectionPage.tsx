@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lightbulb, Star, ShoppingBag, ArrowRight } from 'lucide-react';
+import { Lightbulb, Star, ShoppingBag, ArrowRight, X } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { useAesthetic } from '@/hooks/useAesthetic';
@@ -24,17 +24,72 @@ export const AestheticSelectionPage: React.FC = () => {
         userApi.selectAesthetic(aestheticId)
     );
 
+    const aestheticsWithNone = useMemo(() => {
+        const noneOption: Aesthetic = {
+            id: 'none',
+            name: 'None',
+            description: 'Default theme - Clean and minimal design',
+            themeProperties: {
+                colors: [],
+                style: 'default'
+            },
+            imageUrl: undefined,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        return [noneOption, ...(availableAesthetics || [])];
+    }, [availableAesthetics]);
+
     const handleSelect = async (aesthetic: Aesthetic) => {
         setSelectedId(aesthetic.id);
 
         try {
-            await selectAestheticApi(aesthetic.id);
-            setSelectedAesthetic(aesthetic);
-            await refreshUser();
+            if (aesthetic.id === 'none') {
+                await userApi.clearAesthetic();
+                setSelectedAesthetic(null);
+                await refreshUser();
+            } else {
+                await selectAestheticApi(aesthetic.id);
+                setSelectedAesthetic(aesthetic);
+                await refreshUser();
+            }
             navigate('/');
         } catch (error) {
             console.error('Failed to save aesthetic:', error);
+        } finally {
+            setSelectedId(null);
         }
+    };
+
+    // Helper function to render aesthetic image
+    const renderAestheticImage = (aesthetic: Aesthetic) => {
+        const isNone = aesthetic.id === 'none';
+
+        if (isNone) {
+            return (
+                <div className="w-full h-full bg-linear-to-br from-canvas to-input flex items-center justify-center">
+                    <X className="w-20 h-20 text-text-secondary group-hover:text-accent transition-colors" />
+                </div>
+            );
+        }
+
+        if (aesthetic.imageUrl) {
+            return (
+                <img
+                    src={aesthetic.imageUrl}
+                    alt={aesthetic.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+            );
+        }
+
+        return (
+            <div className="w-full h-full bg-linear-to-br from-accent-light to-accent flex items-center justify-center">
+                <span className="text-surface font-bold text-2xl">
+                    {aesthetic.name.charAt(0)}
+                </span>
+            </div>
+        );
     };
 
     if (isLoading) {
@@ -121,7 +176,7 @@ export const AestheticSelectionPage: React.FC = () => {
             <div className="max-w-6xl mx-auto px-4 py-12">
                 <h2 className="text-2xl font-bold text-text-primary mb-8">Or, Explore Aesthetics</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                    {availableAesthetics.map((aesthetic) => (
+                    {aestheticsWithNone.map((aesthetic) => (
                         <button
                             key={aesthetic.id}
                             onClick={() => handleSelect(aesthetic)}
@@ -130,19 +185,7 @@ export const AestheticSelectionPage: React.FC = () => {
                         >
                             {/* Image */}
                             <div className="aspect-square overflow-hidden bg-canvas">
-                                {aesthetic.imageUrl ? (
-                                    <img
-                                        src={aesthetic.imageUrl}
-                                        alt={aesthetic.name}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full bg-linear-to-br from-accent-light to-accent flex items-center justify-center">
-                                        <span className="text-surface font-bold text-2xl">
-                                            {aesthetic.name.charAt(0)}
-                                        </span>
-                                    </div>
-                                )}
+                                {renderAestheticImage(aesthetic)}
                             </div>
 
                             {/* Label */}

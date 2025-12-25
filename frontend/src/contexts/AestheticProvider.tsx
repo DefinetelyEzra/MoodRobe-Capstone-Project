@@ -3,6 +3,7 @@ import { Aesthetic } from '@/types/aesthetic.types';
 import { aestheticApi } from '@/api/aesthetic.api';
 import { useAuth } from '@/hooks/useAuth';
 import { AestheticContext, AestheticContextType } from './AestheticContext';
+import { getThemeByAesthetic, applyTheme, aestheticThemes } from '@/themes/aestheticThemes';
 
 export const AestheticProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [selectedAesthetic, setSelectedAesthetic] = useState<Aesthetic | null>(null);
@@ -24,16 +25,17 @@ export const AestheticProvider: React.FC<{ children: ReactNode }> = ({ children 
                 if (selected) {
                     setSelectedAesthetic(selected);
                 }
+            } else {
+                // No aesthetic selected - use default theme
+                setSelectedAesthetic(null);
             }
         } catch (error: unknown) {
             console.error('Failed to load aesthetics:', error);
 
-            // Handle the error appropriately
             let errorMessage = 'Failed to load aesthetics';
             if (error instanceof Error) {
                 errorMessage = error.message;
             } else if (error && typeof error === 'object' && 'response' in error) {
-                // For API errors with response property
                 const apiError = error as { response?: { data?: { error?: string } } };
                 errorMessage = apiError.response?.data?.error || errorMessage;
             }
@@ -45,17 +47,35 @@ export const AestheticProvider: React.FC<{ children: ReactNode }> = ({ children 
 
     const handleSetSelectedAesthetic = useCallback((aesthetic: Aesthetic | null): void => {
         setSelectedAesthetic(aesthetic);
-        if (aesthetic) {
+
+        // Apply theme based on selected aesthetic
+        if (aesthetic && aesthetic.id !== 'none') {
+            const theme = getThemeByAesthetic(aesthetic.name);
+            applyTheme(theme);
             localStorage.setItem('selectedAesthetic', JSON.stringify(aesthetic));
         } else {
+            // Apply default theme when no aesthetic is selected or "none" is selected
+            const defaultTheme = aestheticThemes.default;
+            applyTheme(defaultTheme);
             localStorage.removeItem('selectedAesthetic');
         }
     }, []);
 
+    // Apply theme on mount based on selected aesthetic
     useEffect(() => {
-        // Only load aesthetics once when component mounts
+        if (selectedAesthetic && selectedAesthetic.id !== 'none') {
+            const theme = getThemeByAesthetic(selectedAesthetic.name);
+            applyTheme(theme);
+        } else {
+            // Apply default theme if no aesthetic is selected
+            const defaultTheme = aestheticThemes.default;
+            applyTheme(defaultTheme);
+        }
+    }, [selectedAesthetic]);
+
+    useEffect(() => {
         loadAesthetics();
-    }, [loadAesthetics]); 
+    }, [loadAesthetics]);
 
     const contextValue = useMemo<AestheticContextType>(
         () => ({

@@ -17,7 +17,7 @@ interface UpdateProfileForm {
 
 export const ProfilePage: React.FC = () => {
     const { user, refreshUser, logout } = useAuth();
-    const { selectedAesthetic } = useAesthetic();
+    const { selectedAesthetic, setSelectedAesthetic } = useAesthetic();
     const { showToast } = useToast();
     const navigate = useNavigate();
 
@@ -54,6 +54,18 @@ export const ProfilePage: React.FC = () => {
             email: user?.email || '',
         });
         setIsEditing(false);
+    };
+
+    const handleClearAesthetic = async () => {
+        try {
+            await userApi.clearAesthetic();
+            setSelectedAesthetic(null);
+            await refreshUser();
+            showToast('Aesthetic cleared - using default theme', 'success');
+        } catch (error) {
+            console.error('Failed to clear aesthetic:', error);
+            showToast('Failed to clear aesthetic', 'error');
+        }
     };
 
     const handleLogout = () => {
@@ -190,35 +202,47 @@ export const ProfilePage: React.FC = () => {
                                     Your Aesthetic
                                 </div>
                                 {selectedAesthetic ? (
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center space-x-4">
-                                            {selectedAesthetic.imageUrl && (
-                                                <img
-                                                    src={selectedAesthetic.imageUrl}
-                                                    alt={selectedAesthetic.name}
-                                                    className="w-20 h-20 rounded-lg object-cover border border-border"
-                                                />
-                                            )}
-                                            <div>
-                                                <h3 className="font-semibold text-text-primary text-lg">
-                                                    {selectedAesthetic.name}
-                                                </h3>
-                                                <p className="text-sm text-text-secondary mt-1">
-                                                    {selectedAesthetic.description}
-                                                </p>
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center space-x-4">
+                                                {selectedAesthetic.imageUrl && (
+                                                    <img
+                                                        src={selectedAesthetic.imageUrl}
+                                                        alt={selectedAesthetic.name}
+                                                        className="w-20 h-20 rounded-lg object-cover border border-border"
+                                                    />
+                                                )}
+                                                <div>
+                                                    <h3 className="font-semibold text-text-primary text-lg">
+                                                        {selectedAesthetic.name}
+                                                    </h3>
+                                                    <p className="text-sm text-text-secondary mt-1">
+                                                        {selectedAesthetic.description}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
-                                        <button
-                                            onClick={() => navigate('/aesthetic-selection')}
-                                            className="px-4 py-2 border border-border rounded-lg text-text-primary hover:bg-canvas transition-colors text-sm font-medium"
-                                        >
-                                            Change
-                                        </button>
+                                        <div className="flex gap-2 pt-2">
+                                            <button
+                                                onClick={() => navigate('/aesthetic-selection')}
+                                                className="flex-1 px-4 py-2 border border-border rounded-lg text-text-primary hover:bg-canvas transition-colors text-sm font-medium"
+                                            >
+                                                Change Aesthetic
+                                            </button>
+                                            <button
+                                                onClick={handleClearAesthetic}
+                                                className="flex-1 px-4 py-2 border border-border rounded-lg text-text-secondary hover:bg-canvas hover:text-accent transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                                            >
+                                                <X className="w-4 h-4" />
+                                                Use Default Theme
+                                            </button>
+                                        </div>
                                     </div>
                                 ) : (
                                     <div className="text-center py-8 bg-canvas rounded-lg border border-border">
                                         <Palette className="w-12 h-12 text-text-secondary mx-auto mb-3" />
-                                        <p className="text-text-secondary mb-4">No aesthetic selected</p>
+                                        <p className="text-text-secondary mb-2">No aesthetic selected</p>
+                                        <p className="text-sm text-text-secondary mb-4">Using default theme</p>
                                         <button
                                             onClick={() => navigate('/aesthetic-selection')}
                                             className="px-6 py-2 bg-accent hover:bg-accent-dark text-surface rounded-lg font-medium transition-colors"

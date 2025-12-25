@@ -120,8 +120,29 @@ export class UserController {
                 return;
             }
 
-            await this.selectAestheticUseCase.execute(req.userId, req.body.aestheticId);
-            res.status(200).json({ message: 'Aesthetic selected successfully' });
+            const { aestheticId } = req.body;
+
+            await this.selectAestheticUseCase.execute(req.userId, aestheticId ?? null);
+
+            const message = aestheticId
+                ? 'Aesthetic selected successfully'
+                : 'Aesthetic cleared successfully';
+
+            res.status(200).json({ message });
+        } catch (error) {
+            this.handleError(error, res);
+        }
+    };
+
+    public clearAesthetic = async (req: AuthRequest, res: Response): Promise<void> => {
+        try {
+            if (!req.userId) {
+                res.status(401).json({ error: 'Unauthorized' });
+                return;
+            }
+
+            await this.selectAestheticUseCase.execute(req.userId, null);
+            res.status(200).json({ message: 'Aesthetic cleared successfully' });
         } catch (error) {
             this.handleError(error, res);
         }

@@ -33,4 +33,8 @@ export const userApi = {
     saveAesthetic: async (aestheticId: string): Promise<void> => {
         await apiClient.post('/users/profile/saved-aesthetics', { aestheticId });
     },
+
+    clearAesthetic: async (): Promise<void> => {
+        await apiClient.delete('/users/aesthetic');
+    },
 };

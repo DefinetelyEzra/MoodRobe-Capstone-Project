@@ -83,6 +83,11 @@ export class UserRoutes {
             UserValidator.selectAestheticRules(),
             userController.selectAesthetic
         );
+        router.delete(
+            '/aesthetic',
+            AuthMiddleware.authenticate,
+            userController.clearAesthetic
+        );
 
         // User profile routes
         router.get(

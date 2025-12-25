@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
 import { useAesthetic } from '@/hooks/useAesthetic';
@@ -18,7 +18,29 @@ export const HomePage: React.FC = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [aestheticScrollIndex, setAestheticScrollIndex] = useState(0);
     const { currentMerchant } = useMerchant();
+
+    const aestheticsPerView = 6;
+    const aestheticsWithNone = useMemo(() => {
+        const noneOption: Aesthetic = {
+            id: 'none',
+            name: 'None',
+            description: 'Default theme - Clean and minimal',
+            themeProperties: {
+                colors: [],
+                style: 'default'
+            },
+            imageUrl: undefined,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        return [noneOption, ...(availableAesthetics || [])];
+    }, [availableAesthetics]);
+
+    const totalAestheticPages = Math.ceil(aestheticsWithNone.length / aestheticsPerView);
+    const canScrollAestheticLeft = aestheticScrollIndex > 0;
+    const canScrollAestheticRight = aestheticScrollIndex < totalAestheticPages - 1;
 
     const { data: productsData, isLoading, execute: fetchProducts } = useApi<
         { products: Product[] },
@@ -45,6 +67,18 @@ export const HomePage: React.FC = () => {
 
     const featuredProducts = productsData?.products || [];
 
+    const visibleAesthetics = aestheticsWithNone.slice(
+        aestheticScrollIndex * aestheticsPerView,
+        (aestheticScrollIndex + 1) * aestheticsPerView
+    );
+
+    const collectionLabels = [
+        'Trending Outerwear',
+        'Statement Pieces',
+        'New Arrivals',
+        'Seasonal Favorites'
+    ];
+
     const loadPageContent = useCallback(async () => {
         try {
             await Promise.all([fetchCarousel(), fetchContent()]);
@@ -58,7 +92,7 @@ export const HomePage: React.FC = () => {
     }, [loadPageContent]);
 
     useEffect(() => {
-        if (selectedAesthetic?.id) {
+        if (selectedAesthetic?.id && selectedAesthetic.id !== 'none') {
             fetchProducts(selectedAesthetic.id).catch((error) => {
                 if (error?.name !== 'AbortError' && error?.message !== 'Request aborted') {
                     console.error('Failed to fetch products:', error);
@@ -78,8 +112,13 @@ export const HomePage: React.FC = () => {
 
     const handleAestheticSelect = async (aesthetic: Aesthetic) => {
         try {
-            await selectAestheticApi(aesthetic.id);
-            setSelectedAesthetic(aesthetic);
+            if (aesthetic.id === 'none') {
+                await userApi.clearAesthetic();
+                setSelectedAesthetic(null);
+            } else {
+                await selectAestheticApi(aesthetic.id);
+                setSelectedAesthetic(aesthetic);
+            }
             if (refreshUser) {
                 await refreshUser();
             }
@@ -97,13 +136,17 @@ export const HomePage: React.FC = () => {
         return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 300 400"%3E%3Crect fill="%23EAEAE7" width="300" height="400"/%3E%3Ctext fill="%236B6B6B" font-family="sans-serif" font-size="18" dy="10.5" font-weight="bold" x="50%25" y="50%25" text-anchor="middle"%3ENo Image%3C/text%3E%3C/svg%3E';
     };
 
-    const displayAesthetics = availableAesthetics?.slice(0, 6) || [];
-    const collectionLabels = [
-        'Trending Outerwear',
-        'Statement Pieces',
-        'New Arrivals',
-        'Seasonal Favorites'
-    ];
+    const scrollAestheticsLeft = () => {
+        if (canScrollAestheticLeft) {
+            setAestheticScrollIndex(prev => prev - 1);
+        }
+    };
+
+    const scrollAestheticsRight = () => {
+        if (canScrollAestheticRight) {
+            setAestheticScrollIndex(prev => prev + 1);
+        }
+    };
 
     const nextSlide = () => {
         setCurrentSlide((prev) => (prev + 1) % carouselItems.length);
@@ -113,16 +156,43 @@ export const HomePage: React.FC = () => {
         setCurrentSlide((prev) => (prev - 1 + carouselItems.length) % carouselItems.length);
     };
 
+    // Helper function to render aesthetic image
+    const renderAestheticImage = (aesthetic: Aesthetic) => {
+        const isNone = aesthetic.id === 'none';
+
+        if (isNone) {
+            return (
+                <div className="w-full h-full bg-linear-to-br from-canvas to-input flex items-center justify-center">
+                    <X className="w-16 h-16 text-text-secondary" />
+                </div>
+            );
+        }
+
+        if (aesthetic.imageUrl) {
+            return (
+                <img
+                    src={aesthetic.imageUrl}
+                    alt={aesthetic.name}
+                    className="w-full h-full object-cover"
+                />
+            );
+        }
+
+        return (
+            <div className="w-full h-full bg-linear-to-br from-accent-light to-accent"></div>
+        );
+    };
+
     return (
         <div className="w-full bg-canvas">
             {/* Hero Carousel */}
             <div className="relative w-full h-96 md:h-125 bg-text-primary overflow-hidden">
                 {carouselItems.length > 0 ? (
                     <>
-                        {carouselItems.map((item, index) => (
+                        {carouselItems.map((item) => (
                             <div
                                 key={item.id}
-                                className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? 'opacity-100' : 'opacity-0'
+                                className={`absolute inset-0 transition-opacity duration-1000 ${carouselItems.indexOf(item) === currentSlide ? 'opacity-100' : 'opacity-0'
                                     }`}
                             >
                                 <div
@@ -169,17 +239,20 @@ export const HomePage: React.FC = () => {
 
                                 {/* Dots Indicator */}
                                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-2">
-                                    {carouselItems.map((item) => (
-                                        <button
-                                            key={item.id}
-                                            onClick={() => setCurrentSlide(carouselItems.indexOf(item))}
-                                            className={`w-3 h-3 rounded-full transition-all ${carouselItems.indexOf(item) === currentSlide
-                                                ? 'bg-surface w-8'
-                                                : 'bg-surface/50'
-                                                }`}
-                                            aria-label={`Go to slide ${carouselItems.indexOf(item) + 1}`}
-                                        />
-                                    ))}
+                                    {carouselItems.map((item) => {
+                                        const itemIndex = carouselItems.indexOf(item);
+                                        return (
+                                            <button
+                                                key={item.id}
+                                                onClick={() => setCurrentSlide(itemIndex)}
+                                                className={`w-3 h-3 rounded-full transition-all ${itemIndex === currentSlide
+                                                        ? 'bg-surface w-8'
+                                                        : 'bg-surface/50'
+                                                    }`}
+                                                aria-label={`Go to slide ${itemIndex + 1}`}
+                                            />
+                                        );
+                                    })}
                                 </div>
                             </>
                         )}
@@ -201,52 +274,95 @@ export const HomePage: React.FC = () => {
             </div>
 
             {/* Aesthetic Categories */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="overflow-x-auto pb-4 -mx-4 px-4">
-                    <div className="flex space-x-6 md:space-x-8 min-w-max md:justify-center">
-                        {displayAesthetics.map((aesthetic) => (
-                            <button
-                                key={aesthetic.id}
-                                onClick={() => handleAestheticSelect(aesthetic)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' || e.key === ' ') {
-                                        handleAestheticSelect(aesthetic);
-                                    }
-                                }}
-                                className="flex flex-col items-center group cursor-pointer transition-all"
-                            >
-                                <div
-                                    className={`w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden mb-3 ring-4 transition-all ${selectedAesthetic?.id === aesthetic.id
-                                        ? 'ring-accent scale-105'
-                                        : 'ring-border group-hover:ring-accent-light'
-                                        }`}
-                                >
-                                    {aesthetic.imageUrl ? (
-                                        <img
-                                            src={aesthetic.imageUrl}
-                                            alt={aesthetic.name}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full bg-linear-to-br from-accent-light to-accent"></div>
-                                    )}
-                                </div>
-                                <span
-                                    className={`text-sm font-medium ${selectedAesthetic?.id === aesthetic.id
-                                        ? 'text-accent underline decoration-2 underline-offset-4'
-                                        : 'text-text-primary'
-                                        }`}
-                                >
-                                    {aesthetic.name}
-                                </span>
-                            </button>
-                        ))}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <h2 className="text-2xl md:text-3xl font-semibold text-text-primary mb-8 text-center">
+                    Choose Your Aesthetic
+                </h2>
+                <div className="relative">
+                    {/* Left Arrow */}
+                    {canScrollAestheticLeft && (
+                        <button
+                            onClick={scrollAestheticsLeft}
+                            className="absolute left-0 top-[45%] -translate-y-1/2 z-10 w-12 h-12 bg-accent hover:bg-accent-dark text-surface rounded-full shadow-lg transition-all flex items-center justify-center"
+                            aria-label="Previous aesthetics"
+                        >
+                            <ChevronLeft className="w-6 h-6" />
+                        </button>
+                    )}
+
+                    {/* Aesthetics Container */}
+                    <div className="overflow-hidden py-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-8 px-12 transition-all duration-500 ease-in-out">
+                            {visibleAesthetics.map((aesthetic) => {
+                                const isNone = aesthetic.id === 'none';
+                                const isSelected = selectedAesthetic?.id === aesthetic.id ||
+                                    (isNone && !selectedAesthetic);
+
+                                return (
+                                    <button
+                                        key={aesthetic.id}
+                                        onClick={() => handleAestheticSelect(aesthetic)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                handleAestheticSelect(aesthetic);
+                                            }
+                                        }}
+                                        className="flex flex-col items-center group cursor-pointer transition-all animate-in fade-in duration-300"
+                                    >
+                                        <div
+                                            className={`w-28 h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 rounded-full overflow-hidden mb-3 ring-4 transition-all ${isSelected
+                                                    ? 'ring-accent scale-105 shadow-lg'
+                                                    : 'ring-border group-hover:ring-accent-light group-hover:scale-105'
+                                                }`}
+                                        >
+                                            {renderAestheticImage(aesthetic)}
+                                        </div>
+                                        <span
+                                            className={`text-sm font-medium text-center ${isSelected
+                                                    ? 'text-accent underline decoration-2 underline-offset-4'
+                                                    : 'text-text-primary'
+                                                }`}
+                                        >
+                                            {aesthetic.name}
+                                        </span>
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
+
+                    {/* Right Arrow */}
+                    {canScrollAestheticRight && (
+                        <button
+                            onClick={scrollAestheticsRight}
+                            className="absolute right-0 top-[45%] -translate-y-1/2 z-10 w-12 h-12 bg-accent hover:bg-accent-dark text-surface rounded-full shadow-lg transition-all flex items-center justify-center"
+                            aria-label="Next aesthetics"
+                        >
+                            <ChevronRight className="w-6 h-6" />
+                        </button>
+                    )}
+
+                    {/* Page Indicators */}
+                    {totalAestheticPages > 1 && (
+                        <div className="flex justify-center mt-6 space-x-2">
+                            {Array.from({ length: totalAestheticPages }, (_, index) => (
+                                <button
+                                    key={`aesthetic-page-${index}`}
+                                    onClick={() => setAestheticScrollIndex(index)}
+                                    className={`w-2 h-2 rounded-full transition-all ${index === aestheticScrollIndex
+                                            ? 'bg-accent w-6'
+                                            : 'bg-border hover:bg-accent/50'
+                                        }`}
+                                    aria-label={`Go to aesthetic page ${index + 1}`}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 
             {/* Curated Collections */}
-            {selectedAesthetic && featuredProducts.length > 0 && !isLoading && (
+            {selectedAesthetic && selectedAesthetic.id !== 'none' && featuredProducts.length > 0 && !isLoading && (
                 <div className="bg-surface py-16">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <h2 className="text-3xl md:text-4xl font-semibold text-text-primary mb-12 text-center">

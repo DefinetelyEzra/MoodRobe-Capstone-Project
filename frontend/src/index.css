@@ -1,9 +1,11 @@
 @import "tailwindcss";
+/* Import aesthetic fonts */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Crimson+Text:wght@400;600;700&family=Crimson+Pro:wght@300;400;500;600;700&family=Libre+Baskerville:wght@400;700&family=Playfair+Display:wght@400;500;600;700&family=Lato:wght@300;400;700&family=Work+Sans:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800&family=Rajdhani:wght@300;400;500;600;700&family=Quicksand:wght@300;400;500;600;700&family=Oswald:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Merriweather:wght@300;400;700;900&display=swap");
 
 @theme {
   --font-sans: "Inter", "system-ui", "sans-serif";
 
-  /* Curator's Canvas Palette */
+  /* Curator's Canvas Palette (Default) */
   --color-canvas: #f9f9f7;
   --color-surface: #ffffff;
   --color-text-primary: #222222;
@@ -15,13 +17,42 @@
   /* Extended accent shades for hover/active states */
   --color-accent-light: #d4856a;
   --color-accent-dark: #9a5738;
+
+  /* Font variables for dynamic theming */
+  --font-primary: "Inter", "system-ui", "sans-serif";
+  --font-secondary: "Inter", "system-ui", "sans-serif";
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--color-canvas);
+  color: var(--color-text-primary);
+  /* Add smooth transitions for theme changes */
+  transition: background-color 0.5s ease, color 0.5s ease, font-family 0.3s ease;
+}
+
+/* Smooth transitions for all themed elements */
+* {
+  transition-property: background-color, border-color, color;
+  transition-duration: 0.5s;
+  transition-timing-function: ease;
+}
+
+/* Preserve specific transitions that should be faster/different */
+button,
+a,
+input,
+textarea,
+select {
+  transition-duration: 0.3s;
+}
+
+/* Override for animations that shouldn't transition */
+.no-transition,
+.no-transition * {
+  transition: none !important;
 }
 
 @keyframes slideIn {

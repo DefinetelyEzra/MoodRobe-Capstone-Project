@@ -27,7 +27,6 @@ CREATE TABLE aesthetics (
   image_url VARCHAR(500),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-ALter 
 -- MERCHANT AGGREGATE
 CREATE TABLE merchants (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
