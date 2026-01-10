@@ -20,6 +20,13 @@ interface VariantForm {
     stockQuantity: string;
 }
 
+interface ImageForm {
+    id: string;
+    imageUrl: string;
+    isPrimary: boolean;
+    displayOrder: number;
+}
+
 export const CreateProductPage: React.FC = () => {
     const navigate = useNavigate();
     const { currentMerchant, hasPermission } = useMerchant();
@@ -35,6 +42,7 @@ export const CreateProductPage: React.FC = () => {
         aestheticTags: string[];
         isActive: boolean;
         variants: VariantForm[];
+        images: ImageForm[];
     }>({
         name: '',
         description: '',
@@ -43,7 +51,8 @@ export const CreateProductPage: React.FC = () => {
         currency: 'USD',
         aestheticTags: [],
         isActive: true,
-        variants: []
+        variants: [],
+        images: []
     });
 
     const { execute: createProduct, isLoading } = useApi<Product, CreateProductRequest>(
@@ -115,6 +124,15 @@ export const CreateProductPage: React.FC = () => {
             });
         }
 
+        // Validate and parse images
+        const parsedImages = formData.images
+            .filter(img => img.imageUrl.trim())
+            .map((img, index) => ({
+                imageUrl: img.imageUrl.trim(),
+                isPrimary: img.isPrimary,
+                displayOrder: index
+            }));
+
         try {
             const productData: CreateProductRequest = {
                 name: formData.name.trim(),
@@ -126,7 +144,8 @@ export const CreateProductPage: React.FC = () => {
                 },
                 aestheticTags: formData.aestheticTags,
                 isActive: formData.isActive,
-                variants: parsedVariants
+                variants: parsedVariants,
+                images: parsedImages.length > 0 ? parsedImages : undefined
             };
 
             await createProduct(productData);
@@ -169,6 +188,48 @@ export const CreateProductPage: React.FC = () => {
             variants: prev.variants.map(v =>
                 v.id === id ? { ...v, [field]: value } : v
             )
+        }));
+    };
+
+    // Add image management functions after variant functions
+    const addImage = () => {
+        setFormData(prev => ({
+            ...prev,
+            images: [
+                ...prev.images,
+                {
+                    id: Date.now().toString(),
+                    imageUrl: '',
+                    isPrimary: prev.images.length === 0, // First image is primary by default
+                    displayOrder: prev.images.length
+                }
+            ]
+        }));
+    };
+
+    const removeImage = (id: string) => {
+        setFormData(prev => ({
+            ...prev,
+            images: prev.images.filter(img => img.id !== id)
+        }));
+    };
+
+    const updateImage = (id: string, field: keyof Omit<ImageForm, 'id'>, value: string | boolean | number) => {
+        setFormData(prev => ({
+            ...prev,
+            images: prev.images.map(img =>
+                img.id === id ? { ...img, [field]: value } : img
+            )
+        }));
+    };
+
+    const setPrimaryImage = (id: string) => {
+        setFormData(prev => ({
+            ...prev,
+            images: prev.images.map(img => ({
+                ...img,
+                isPrimary: img.id === id
+            }))
         }));
     };
 
@@ -415,6 +476,89 @@ export const CreateProductPage: React.FC = () => {
                                                 onChange={(e) => updateVariant(variant.id, 'stockQuantity', e.target.value)}
                                                 placeholder="0"
                                             />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Product Images */}
+                    <div className="pt-6 border-t border-border">
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 className="text-xl font-semibold text-text-primary">Product Images</h2>
+                                <p className="text-sm text-text-secondary mt-1">Add image URLs for your product</p>
+                            </div>
+                            <Button
+                                type="button"
+                                onClick={addImage}
+                                className="flex items-center px-4 py-2 bg-accent hover:bg-accent-dark text-surface font-medium rounded-lg transition-colors shadow-sm"
+                            >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Add Image
+                            </Button>
+                        </div>
+
+                        {formData.images.length === 0 ? (
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+                                <p className="text-sm text-blue-800 font-medium">
+                                    No images added. Click "Add Image" to upload product images.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {formData.images.map((image, index) => (
+                                    <div key={image.id} className="relative bg-surface border border-border rounded-xl p-6 shadow-sm">
+                                        <button
+                                            type="button"
+                                            onClick={() => removeImage(image.id)}
+                                            className="absolute top-4 right-4 text-red-600 hover:text-red-700 transition-colors"
+                                        >
+                                            <X className="w-5 h-5" />
+                                        </button>
+
+                                        <div className="flex items-start gap-4">
+                                            {image.imageUrl && (
+                                                <img
+                                                    src={image.imageUrl}
+                                                    alt={`Product ${index + 1}`}
+                                                    className="w-24 h-24 object-cover rounded-lg border border-border"
+                                                    onError={(e) => {
+                                                        e.currentTarget.src = 'https://via.placeholder.com/100?text=Invalid+URL';
+                                                    }}
+                                                />
+                                            )}
+
+                                            <div className="flex-1 space-y-4">
+                                                <Input
+                                                    label="Image URL"
+                                                    required
+                                                    value={image.imageUrl}
+                                                    onChange={(e) => updateImage(image.id, 'imageUrl', e.target.value)}
+                                                    placeholder="https://example.com/image.jpg"
+                                                />
+
+                                                <div className="flex items-center gap-4">
+                                                    <label className="flex items-center">
+                                                        <input
+                                                            type="radio"
+                                                            name="primaryImage"
+                                                            checked={image.isPrimary}
+                                                            onChange={() => setPrimaryImage(image.id)}
+                                                            className="rounded-full border-border text-accent focus:ring-accent mr-2"
+                                                        />
+                                                        <span className="text-sm text-text-primary font-medium">
+                                                            Set as primary image
+                                                        </span>
+                                                    </label>
+                                                    {image.isPrimary && (
+                                                        <span className="text-xs bg-accent/10 text-accent px-2 py-1 rounded-full font-medium">
+                                                            Primary
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}

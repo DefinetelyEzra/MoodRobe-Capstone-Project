@@ -1,10 +1,48 @@
 import { IProductRepository } from '../../domain/repositories/IProductRepository';
 import { IProductVariantRepository } from '../../domain/repositories/IProductVariantRepository';
 import { IProductImageRepository } from '../../domain/repositories/IProductImageRepository';
-import { PaginatedProductsResponse } from '../dto/SearchProductDto';
 import { Product } from '../../domain/entities/Product';
 import { ProductVariant } from '../../domain/entities/ProductVariant';
 import { ProductImage } from '../../domain/entities/ProductImage';
+
+export interface ProductsByAestheticResponseDto {
+    products: Array<{
+        id: string;
+        merchantId: string;
+        name: string;
+        description: string;
+        category: string;
+        basePrice: {
+            amount: number;
+            currency: string;
+        };
+        aestheticTags: string[];
+        isActive: boolean;
+        variants: Array<{
+            id: string;
+            productId: string;
+            sku: string;
+            size: string | null;
+            color: string | null;
+            price: {
+                amount: number;
+                currency: string;
+            };
+            stockQuantity: number;
+            isActive: boolean;
+        }>;
+        images: Array<{
+            id: string;
+            productId: string;
+            imageUrl: string;
+            isPrimary: boolean;
+            displayOrder: number;
+        }>;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    total: number;
+}
 
 export class GetProductsByAestheticUseCase {
     constructor(
@@ -17,40 +55,35 @@ export class GetProductsByAestheticUseCase {
         aestheticId: string,
         limit: number = 20,
         offset: number = 0
-    ): Promise<PaginatedProductsResponse> {
+    ): Promise<ProductsByAestheticResponseDto> {
         const products = await this.productRepository.findByAestheticTag(
             aestheticId,
             limit,
             offset
         );
 
-        const total = await this.productRepository.count({
-            aestheticTags: [aestheticId],
-            isActive: true,
-        });
-
-        // Load variants and images for each product
-        const productsWithDetails = await Promise.all(
+        const productDtos = await Promise.all(
             products.map(async (product) => {
-                const variants = await this.variantRepository.findByProductId(product.id);
-                const images = await this.imageRepository.findByProductId(product.id);
-                return this.toResponseDto(product, variants, images);
+                const [variants, images] = await Promise.all([
+                    this.variantRepository.findByProductId(product.id),
+                    this.imageRepository.findByProductId(product.id)
+                ]);
+
+                return this.toProductDto(product, variants, images);
             })
         );
 
         return {
-            products: productsWithDetails,
-            total,
-            limit,
-            offset,
+            products: productDtos,
+            total: products.length,
         };
     }
 
-    private toResponseDto(
+    private toProductDto(
         product: Product,
         variants: ProductVariant[],
         images: ProductImage[]
-    ): any {
+    ) {
         return {
             id: product.id,
             merchantId: product.merchantId,
@@ -79,7 +112,7 @@ export class GetProductsByAestheticUseCase {
             images: images.map((img) => ({
                 id: img.id,
                 productId: img.productId,
-                url: img.url,
+                imageUrl: img.url,
                 isPrimary: img.isPrimary,
                 displayOrder: img.displayOrder,
             })),

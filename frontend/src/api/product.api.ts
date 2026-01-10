@@ -31,9 +31,43 @@ export interface CreateProductRequest {
         attributes?: Record<string, string>;
         isActive?: boolean;
     }>;
+    images?: Array<{
+        imageUrl: string;
+        isPrimary?: boolean;
+        displayOrder?: number;
+    }>;
 }
 
-export type UpdateProductRequest = Partial<CreateProductRequest>;
+export interface UpdateProductRequest {
+    name?: string;
+    description?: string;
+    category?: string;
+    basePrice?: {
+        amount: number;
+        currency: string;
+    };
+    aestheticTags?: string[];
+    isActive?: boolean;
+    variants?: Array<{
+        id?: string;
+        sku: string;
+        name: string;
+        size?: string;
+        color?: string;
+        price: {
+            amount: number;
+            currency: string;
+        };
+        stockQuantity: number;
+        isActive?: boolean;
+    }>;
+    images?: Array<{
+        id?: string;
+        imageUrl: string;
+        isPrimary?: boolean;
+        displayOrder?: number;
+    }>;
+}
 
 export interface UpdateStockRequest {
     stockQuantity: number;
@@ -94,7 +128,6 @@ export const productApi = {
         return response.data;
     },
 
-    // Optional: If you need to handle variant updates separately
     updateVariant: async (variantId: string, data: Partial<ProductVariant>): Promise<ProductVariant> => {
         const response = await apiClient.put(`/products/variant/${variantId}`, data);
         return response.data;

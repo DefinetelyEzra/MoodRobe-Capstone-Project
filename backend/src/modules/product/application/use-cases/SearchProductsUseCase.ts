@@ -1,10 +1,64 @@
-import { IProductRepository } from '../../domain/repositories/IProductRepository';
+import { IProductRepository, ProductSearchCriteria } from '../../domain/repositories/IProductRepository';
 import { IProductVariantRepository } from '../../domain/repositories/IProductVariantRepository';
 import { IProductImageRepository } from '../../domain/repositories/IProductImageRepository';
-import { SearchProductDto, PaginatedProductsResponse } from '../dto/SearchProductDto';
 import { Product } from '../../domain/entities/Product';
 import { ProductVariant } from '../../domain/entities/ProductVariant';
 import { ProductImage } from '../../domain/entities/ProductImage';
+
+export interface SearchProductsDto {
+    merchantId?: string;
+    category?: string;
+    aestheticTags?: string[];
+    minPrice?: number;
+    maxPrice?: number;
+    isActive?: boolean;
+    searchTerm?: string;
+    limit?: number;
+    offset?: number;
+}
+
+export interface ProductSearchResultDto {
+    id: string;
+    merchantId: string;
+    name: string;
+    description: string;
+    category: string;
+    basePrice: {
+        amount: number;
+        currency: string;
+    };
+    aestheticTags: string[];
+    isActive: boolean;
+    variants: Array<{
+        id: string;
+        productId: string;
+        sku: string;
+        size: string | null;
+        color: string | null;
+        price: {
+            amount: number;
+            currency: string;
+        };
+        stockQuantity: number;
+        isActive: boolean;
+    }>;
+    images: Array<{
+        id: string;
+        productId: string;
+        imageUrl: string;
+        isPrimary: boolean;
+        displayOrder: number;
+    }>;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface SearchProductsResponseDto {
+    products: ProductSearchResultDto[];
+    total: number;
+    limit: number;
+    offset: number;
+}
 
 export class SearchProductsUseCase {
     constructor(
@@ -13,25 +67,8 @@ export class SearchProductsUseCase {
         private readonly imageRepository: IProductImageRepository
     ) { }
 
-    public async execute(dto: SearchProductDto): Promise<PaginatedProductsResponse> {
-        const limit = dto.limit || 20;
-        const offset = dto.offset || 0;
-
-        const products = await this.productRepository.search(
-            {
-                merchantId: dto.merchantId,
-                category: dto.category,
-                aestheticTags: dto.aestheticTags,
-                minPrice: dto.minPrice,
-                maxPrice: dto.maxPrice,
-                isActive: dto.isActive,
-                searchTerm: dto.searchTerm,
-            },
-            limit,
-            offset
-        );
-
-        const total = await this.productRepository.count({
+    public async execute(dto: SearchProductsDto): Promise<SearchProductsResponseDto> {
+        const criteria: ProductSearchCriteria = {
             merchantId: dto.merchantId,
             category: dto.category,
             aestheticTags: dto.aestheticTags,
@@ -39,30 +76,40 @@ export class SearchProductsUseCase {
             maxPrice: dto.maxPrice,
             isActive: dto.isActive,
             searchTerm: dto.searchTerm,
-        });
+        };
 
-        // Load variants and images for each product
-        const productsWithDetails = await Promise.all(
+        const limit = dto.limit || 20;
+        const offset = dto.offset || 0;
+
+        // Search products
+        const products = await this.productRepository.search(criteria, limit, offset);
+        const total = await this.productRepository.count(criteria);
+
+        // Load variants and images for all products
+        const productDtos = await Promise.all(
             products.map(async (product) => {
-                const variants = await this.variantRepository.findByProductId(product.id);
-                const images = await this.imageRepository.findByProductId(product.id);
-                return this.toResponseDto(product, variants, images);
+                const [variants, images] = await Promise.all([
+                    this.variantRepository.findByProductId(product.id),
+                    this.imageRepository.findByProductId(product.id)
+                ]);
+
+                return this.toProductDto(product, variants, images);
             })
         );
 
         return {
-            products: productsWithDetails,
+            products: productDtos,
             total,
             limit,
             offset,
         };
     }
 
-    private toResponseDto(
+    private toProductDto(
         product: Product,
         variants: ProductVariant[],
         images: ProductImage[]
-    ): any {
+    ): ProductSearchResultDto {
         return {
             id: product.id,
             merchantId: product.merchantId,
@@ -91,7 +138,7 @@ export class SearchProductsUseCase {
             images: images.map((img) => ({
                 id: img.id,
                 productId: img.productId,
-                url: img.url,
+                imageUrl: img.url,
                 isPrimary: img.isPrimary,
                 displayOrder: img.displayOrder,
             })),

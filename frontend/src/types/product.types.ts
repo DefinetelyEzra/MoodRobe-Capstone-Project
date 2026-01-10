@@ -20,13 +20,15 @@ export interface ProductVariant {
     id: string;
     productId: string;
     sku: string;
-    name: string;
+    name?: string;
+    size?: string | null;
+    color?: string | null;
     price: {
         amount: number;
         currency: string;
     };
     stockQuantity: number;
-    attributes: Record<string, string>;
+    attributes?: Record<string, string>;
     isActive: boolean;
     createdAt: string;
     updatedAt: string;
