@@ -2,7 +2,7 @@ export interface CreateProductDto {
     name: string;
     description: string;
     category: string;
-    basePrice: number;
+    basePrice: number | { amount: number; currency: string };
     currency?: string;
     aestheticTags?: string[];
     variants: CreateVariantDto[];
@@ -11,10 +11,13 @@ export interface CreateProductDto {
 
 export interface CreateVariantDto {
     sku: string;
+    name: string;
     size?: string;
     color?: string;
-    price: number;
+    price: number | { amount: number; currency: string }; 
     stockQuantity: number;
+    attributes?: Record<string, string>;
+    isActive?: boolean;
 }
 
 export interface CreateImageDto {

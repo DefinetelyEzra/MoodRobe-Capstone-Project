@@ -13,12 +13,12 @@ export const MerchantProvider: React.FC<{ children: ReactNode }> = ({ children }
 
     const refreshMerchants = useCallback(async (): Promise<void> => {
         if (!user) return;
-        
+
         setIsLoading(true);
         try {
             const data = await merchantApi.getUserMerchants();
             setMerchants(data);
-            
+
             // Auto-select first merchant if none selected
             if (!currentMerchant && data.length > 0) {
                 setCurrentMerchant(data[0]);
@@ -67,7 +67,8 @@ export const MerchantProvider: React.FC<{ children: ReactNode }> = ({ children }
 
     const hasPermission = useCallback((permission: keyof MerchantStaff['permissions']): boolean => {
         if (!currentUserStaff) return false;
-        return currentUserStaff.permissions[permission];
+        const permissionValue = currentUserStaff.permissions[permission];
+        return Boolean(permissionValue);
     }, [currentUserStaff]);
 
     const isOwner = useCallback((): boolean => {

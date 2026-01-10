@@ -71,7 +71,6 @@ export class ProductController {
                 return;
             }
 
-            // Extract nested ternary to independent statement
             const aestheticTags = req.query.aestheticTags;
             let parsedAestheticTags: string[] | undefined;
 
@@ -79,6 +78,11 @@ export class ProductController {
                 parsedAestheticTags = Array.isArray(aestheticTags)
                     ? aestheticTags as string[]
                     : [aestheticTags as string];
+            }
+
+            let isActive: boolean | undefined;
+            if (req.query.isActive !== undefined) {
+                isActive = req.query.isActive === 'true';
             }
 
             const searchDto = {
@@ -91,7 +95,7 @@ export class ProductController {
                 maxPrice: req.query.maxPrice
                     ? Number.parseFloat(req.query.maxPrice as string)
                     : undefined,
-                isActive: req.query.isActive === 'true',
+                isActive: isActive,
                 searchTerm: req.query.searchTerm as string | undefined,
                 limit: req.query.limit ? Number.parseInt(req.query.limit as string, 10) : undefined,
                 offset: req.query.offset ? Number.parseInt(req.query.offset as string, 10) : undefined,

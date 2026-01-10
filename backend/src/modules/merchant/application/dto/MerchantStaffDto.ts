@@ -1,7 +1,8 @@
 import { StaffRole, StaffPermissions } from '../../domain/entities/MerchantStaff';
 
 export interface AddStaffDto {
-    userId: string;
+    userId?: string;
+    email?: string;
     role: StaffRole;
 }
 
@@ -18,4 +19,9 @@ export interface StaffResponseDto {
     permissions: StaffPermissions;
     createdAt: Date;
     updatedAt: Date;
+    user?: {
+        id: string;
+        name: string;
+        email: string;
+    } | null;
 }

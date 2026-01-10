@@ -31,7 +31,13 @@ export class CreateProductUseCase {
 
         // Create product
         const productId = uuidv4();
-        const basePrice = new Money(dto.basePrice, dto.currency);
+
+        const { amount: basePriceAmount, currency: baseCurrency } = this.extractPrice(
+            dto.basePrice,
+            dto.currency || 'USD'
+        );
+        const basePrice = new Money(basePriceAmount, baseCurrency);
+
         const product = Product.create({
             id: productId,
             merchantId: merchantId,
@@ -48,7 +54,13 @@ export class CreateProductUseCase {
         // Create and save variants
         const variants = dto.variants.map((variantDto) => {
             const variantId = uuidv4();
-            const variantPrice = new Money(variantDto.price, dto.currency);
+
+            const { amount: variantPriceAmount, currency: variantCurrency } = this.extractPrice(
+                variantDto.price,
+                baseCurrency
+            );
+            const variantPrice = new Money(variantPriceAmount, variantCurrency);
+
             return ProductVariant.create({
                 id: variantId,
                 productId: productId,
@@ -78,6 +90,20 @@ export class CreateProductUseCase {
         }
 
         return this.toResponseDto(savedProduct, savedVariants, savedImages);
+    }
+
+    /**
+     * Helper method to extract amount and currency from price
+     * Handles both formats: number and { amount, currency }
+     */
+    private extractPrice(
+        price: number | { amount: number; currency: string },
+        defaultCurrency: string
+    ): { amount: number; currency: string } {
+        if (typeof price === 'number') {
+            return { amount: price, currency: defaultCurrency };
+        }
+        return { amount: price.amount, currency: price.currency };
     }
 
     private async verifyUserPermission(merchantId: string, userId: string): Promise<void> {

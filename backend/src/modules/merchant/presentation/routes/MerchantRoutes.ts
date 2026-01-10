@@ -5,6 +5,7 @@ import { MerchantValidator } from '../validators/MerchantValidator';
 import { AuthMiddleware } from '../../../user/presentation/middleware/AuthMiddleware';
 import { TypeOrmMerchantRepository } from '../../infrastructure/persistence/repositories/TypeOrmMerchantRepository';
 import { TypeOrmMerchantStaffRepository } from '../../infrastructure/persistence/repositories/TypeOrmMerchantStaffRepository';
+import { TypeOrmUserRepository } from '../../../user/infrastructure/persistence/repositories/TypeOrmUserRepository';
 import { CreateMerchantUseCase } from '../../application/use-cases/CreateMerchantUseCase';
 import { GetMerchantByIdUseCase } from '../../application/use-cases/GetMerchantByIdUseCase';
 import { GetAllMerchantsUseCase } from '../../application/use-cases/GetAllMerchantsUseCase';
@@ -23,6 +24,7 @@ export class MerchantRoutes {
         // Initialize repositories
         const merchantRepository = new TypeOrmMerchantRepository();
         const merchantStaffRepository = new TypeOrmMerchantStaffRepository();
+        const userRepository = new TypeOrmUserRepository();
 
         // Initialize merchant use cases
         const createMerchantUseCase = new CreateMerchantUseCase(
@@ -45,9 +47,10 @@ export class MerchantRoutes {
         // Initialize staff use cases
         const addMerchantStaffUseCase = new AddMerchantStaffUseCase(
             merchantRepository,
-            merchantStaffRepository
+            merchantStaffRepository,
+            userRepository
         );
-        const getMerchantStaffUseCase = new GetMerchantStaffUseCase(merchantStaffRepository);
+        const getMerchantStaffUseCase = new GetMerchantStaffUseCase(merchantStaffRepository, userRepository);
         const updateStaffRoleUseCase = new UpdateStaffRoleUseCase(merchantStaffRepository);
         const removeMerchantStaffUseCase = new RemoveMerchantStaffUseCase(
             merchantStaffRepository

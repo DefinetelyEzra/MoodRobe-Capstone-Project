@@ -11,11 +11,13 @@ import { Button } from '@/components/common/Button';
 import { Package, ArrowLeft, Plus, X } from 'lucide-react';
 
 interface VariantForm {
+    id: string;
     sku: string;
     name: string;
-    price: number;
-    stockQuantity: number;
-    attributes: Record<string, string>;
+    size: string;
+    color: string;
+    price: string;
+    stockQuantity: string;
 }
 
 export const CreateProductPage: React.FC = () => {
@@ -28,7 +30,7 @@ export const CreateProductPage: React.FC = () => {
         name: string;
         description: string;
         category: string;
-        basePrice: number;
+        basePrice: string;
         currency: string;
         aestheticTags: string[];
         isActive: boolean;
@@ -37,7 +39,7 @@ export const CreateProductPage: React.FC = () => {
         name: '',
         description: '',
         category: '',
-        basePrice: 0,
+        basePrice: '',
         currency: 'USD',
         aestheticTags: [],
         isActive: true,
@@ -56,28 +58,75 @@ export const CreateProductPage: React.FC = () => {
             return;
         }
 
+        // Parse and validate base price
+        const basePrice = Number.parseFloat(formData.basePrice);
+        if (Number.isNaN(basePrice) || basePrice < 0) {
+            showToast('Please enter a valid base price', 'error');
+            return;
+        }
+
+        // Validate and parse variants
+        if (formData.variants.length === 0) {
+            showToast('Please add at least one product variant', 'error');
+            return;
+        }
+
+        const parsedVariants = [];
+        for (let i = 0; i < formData.variants.length; i++) {
+            const variant = formData.variants[i];
+
+            // Validate SKU
+            if (!variant.sku.trim()) {
+                showToast(`Variant ${i + 1}: SKU is required`, 'error');
+                return;
+            }
+
+            // Validate name
+            if (!variant.name.trim()) {
+                showToast(`Variant ${i + 1}: Name is required`, 'error');
+                return;
+            }
+
+            // Parse and validate price
+            const variantPrice = Number.parseFloat(variant.price);
+            if (Number.isNaN(variantPrice) || variantPrice < 0) {
+                showToast(`Variant ${i + 1}: Please enter a valid price`, 'error');
+                return;
+            }
+
+            // Parse and validate stock quantity
+            const stockQuantity = Number.parseInt(variant.stockQuantity, 10);
+            if (Number.isNaN(stockQuantity) || stockQuantity < 0) {
+                showToast(`Variant ${i + 1}: Please enter a valid stock quantity`, 'error');
+                return;
+            }
+
+            parsedVariants.push({
+                sku: variant.sku.trim(),
+                name: variant.name.trim(),
+                size: variant.size.trim() || undefined,
+                color: variant.color.trim() || undefined,
+                price: {
+                    amount: variantPrice,
+                    currency: formData.currency
+                },
+                stockQuantity: stockQuantity,
+                isActive: true
+            });
+        }
+
         try {
             const productData: CreateProductRequest = {
-                name: formData.name,
-                description: formData.description,
-                category: formData.category,
+                name: formData.name.trim(),
+                description: formData.description.trim(),
+                category: formData.category.trim(),
                 basePrice: {
-                    amount: formData.basePrice,
+                    amount: basePrice,
                     currency: formData.currency
                 },
                 aestheticTags: formData.aestheticTags,
                 isActive: formData.isActive,
-                variants: formData.variants.map(v => ({
-                    sku: v.sku,
-                    name: v.name,
-                    price: {
-                        amount: v.price,
-                        currency: formData.currency
-                    },
-                    stockQuantity: v.stockQuantity,
-                    attributes: v.attributes,
-                    isActive: true
-                }))
+                variants: parsedVariants
             };
 
             await createProduct(productData);
@@ -95,28 +144,30 @@ export const CreateProductPage: React.FC = () => {
             variants: [
                 ...prev.variants,
                 {
+                    id: Date.now().toString(),
                     sku: '',
                     name: '',
-                    price: prev.basePrice,
-                    stockQuantity: 0,
-                    attributes: {}
+                    size: '',
+                    color: '',
+                    price: prev.basePrice || '0',
+                    stockQuantity: '0'
                 }
             ]
         }));
     };
 
-    const removeVariant = (index: number) => {
+    const removeVariant = (id: string) => {
         setFormData(prev => ({
             ...prev,
-            variants: prev.variants.filter((_, i) => i !== index)
+            variants: prev.variants.filter(v => v.id !== id)
         }));
     };
 
-    const updateVariant = (index: number, field: keyof VariantForm, value: string | number | Record<string, string>) => {
+    const updateVariant = (id: string, field: keyof Omit<VariantForm, 'id'>, value: string) => {
         setFormData(prev => ({
             ...prev,
-            variants: prev.variants.map((v, i) =>
-                i === index ? { ...v, [field]: value } : v
+            variants: prev.variants.map(v =>
+                v.id === id ? { ...v, [field]: value } : v
             )
         }));
     };
@@ -219,7 +270,7 @@ export const CreateProductPage: React.FC = () => {
                                     min="0"
                                     step="0.01"
                                     value={formData.basePrice}
-                                    onChange={(e) => setFormData({ ...formData, basePrice: Number.parseFloat(e.target.value) })}
+                                    onChange={(e) => setFormData({ ...formData, basePrice: e.target.value })}
                                     placeholder="0.00"
                                 />
 
@@ -279,33 +330,46 @@ export const CreateProductPage: React.FC = () => {
                     {/* Variants */}
                     <div className="pt-6 border-t border-border">
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-semibold text-text-primary">Product Variants</h2>
-                            <Button type="button" onClick={addVariant} className="flex items-center px-4 py-2 bg-accent hover:bg-accent-dark text-surface font-medium rounded-lg transition-colors shadow-sm">
+                            <div>
+                                <h2 className="text-xl font-semibold text-text-primary">Product Variants</h2>
+                                <p className="text-sm text-text-secondary mt-1">At least one variant is required</p>
+                            </div>
+                            <Button
+                                type="button"
+                                onClick={addVariant}
+                                className="flex items-center px-4 py-2 bg-accent hover:bg-accent-dark text-surface font-medium rounded-lg transition-colors shadow-sm"
+                            >
                                 <Plus className="w-4 h-4 mr-2" />
                                 Add Variant
                             </Button>
                         </div>
 
                         {formData.variants.length === 0 ? (
-                            <p className="text-sm text-text-secondary">No variants added. Add variants for different sizes, colors, etc.</p>
+                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 text-center">
+                                <p className="text-sm text-amber-800 font-medium">
+                                    No variants added. Click "Add Variant" to create your first variant.
+                                </p>
+                            </div>
                         ) : (
                             <div className="space-y-6">
                                 {formData.variants.map((variant, index) => (
-                                    <div key={`variant-${variant.sku || index}`} className="relative bg-surface border border-border rounded-xl p-6 shadow-sm">
+                                    <div key={variant.id} className="relative bg-surface border border-border rounded-xl p-6 shadow-sm">
                                         <button
                                             type="button"
-                                            onClick={() => removeVariant(index)}
+                                            onClick={() => removeVariant(variant.id)}
                                             className="absolute top-4 right-4 text-red-600 hover:text-red-700 transition-colors"
                                         >
                                             <X className="w-5 h-5" />
                                         </button>
+
+                                        <h3 className="text-sm font-semibold text-text-primary mb-4">Variant {index + 1}</h3>
 
                                         <div className="grid grid-cols-2 gap-6">
                                             <Input
                                                 label="SKU"
                                                 required
                                                 value={variant.sku}
-                                                onChange={(e) => updateVariant(index, 'sku', e.target.value)}
+                                                onChange={(e) => updateVariant(variant.id, 'sku', e.target.value)}
                                                 placeholder="PROD-001"
                                             />
 
@@ -313,8 +377,22 @@ export const CreateProductPage: React.FC = () => {
                                                 label="Variant Name"
                                                 required
                                                 value={variant.name}
-                                                onChange={(e) => updateVariant(index, 'name', e.target.value)}
+                                                onChange={(e) => updateVariant(variant.id, 'name', e.target.value)}
                                                 placeholder="e.g., Small / Black"
+                                            />
+
+                                            <Input
+                                                label="Size (optional)"
+                                                value={variant.size}
+                                                onChange={(e) => updateVariant(variant.id, 'size', e.target.value)}
+                                                placeholder="e.g., S, M, L, XL"
+                                            />
+
+                                            <Input
+                                                label="Color (optional)"
+                                                value={variant.color}
+                                                onChange={(e) => updateVariant(variant.id, 'color', e.target.value)}
+                                                placeholder="e.g., Black, White, Red"
                                             />
 
                                             <Input
@@ -324,7 +402,8 @@ export const CreateProductPage: React.FC = () => {
                                                 min="0"
                                                 step="0.01"
                                                 value={variant.price}
-                                                onChange={(e) => updateVariant(index, 'price', Number.parseFloat(e.target.value))}
+                                                onChange={(e) => updateVariant(variant.id, 'price', e.target.value)}
+                                                placeholder="0.00"
                                             />
 
                                             <Input
@@ -333,7 +412,8 @@ export const CreateProductPage: React.FC = () => {
                                                 required
                                                 min="0"
                                                 value={variant.stockQuantity}
-                                                onChange={(e) => updateVariant(index, 'stockQuantity', Number.parseInt(e.target.value, 10))}
+                                                onChange={(e) => updateVariant(variant.id, 'stockQuantity', e.target.value)}
+                                                placeholder="0"
                                             />
                                         </div>
                                     </div>
@@ -351,7 +431,11 @@ export const CreateProductPage: React.FC = () => {
                         >
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={isLoading} className="px-6 py-3 bg-accent hover:bg-accent-dark text-surface rounded-lg font-semibold transition-colors disabled:opacity-50 shadow-md">
+                        <Button
+                            type="submit"
+                            disabled={isLoading}
+                            className="px-6 py-3 bg-accent hover:bg-accent-dark text-surface rounded-lg font-semibold transition-colors disabled:opacity-50 shadow-md"
+                        >
                             {isLoading ? 'Creating...' : 'Create Product'}
                         </Button>
                     </div>

@@ -27,6 +27,7 @@ export const ManageProductsPage: React.FC = () => {
 
     const { execute: deleteProduct } = useApi<void, string>((id) => productApi.delete(id));
 
+    // Load products when merchant or filters change
     useEffect(() => {
         if (currentMerchant) {
             fetchProducts({
@@ -35,7 +36,8 @@ export const ManageProductsPage: React.FC = () => {
                 category: filterCategory || undefined
             }).catch(console.error);
         }
-    }, [currentMerchant, fetchProducts, searchTerm, filterCategory]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentMerchant?.id, searchTerm, filterCategory]);
 
     const products = productsData?.products || [];
     const categories = Array.from(new Set(products.map(p => p.category)));
@@ -47,8 +49,13 @@ export const ManageProductsPage: React.FC = () => {
         try {
             await deleteProduct(productId);
             showToast('Product deleted successfully', 'success');
+            // Reload products after deletion
             if (currentMerchant) {
-                await fetchProducts({ merchantId: currentMerchant.id });
+                fetchProducts({
+                    merchantId: currentMerchant.id,
+                    searchTerm: searchTerm || undefined,
+                    category: filterCategory || undefined
+                }).catch(console.error);
             }
         } catch (error) {
             console.error('Failed to delete product:', error);
@@ -155,7 +162,6 @@ export const ManageProductsPage: React.FC = () => {
     );
 };
 
-// Helper component to avoid nested ternary
 interface ProductsTableContentProps {
     products: ProductSearchResponse['products'];
     searchTerm: string;
@@ -213,12 +219,14 @@ const ProductsTableContent: React.FC<ProductsTableContentProps> = ({
                             <td className="px-6 py-4">
                                 <div className="flex items-center">
                                     <div className="w-12 h-12 bg-accent/10 rounded shrink-0 flex items-center justify-center">
-                                        {product.images && product.images.length > 0 && (
+                                        {product.images && product.images.length > 0 ? (
                                             <img
                                                 src={product.images.find(i => i.isPrimary)?.imageUrl || product.images[0].imageUrl}
                                                 alt={product.name}
                                                 className="w-full h-full object-cover rounded"
                                             />
+                                        ) : (
+                                            <Package className="w-6 h-6 text-accent" />
                                         )}
                                     </div>
                                     <div className="ml-4">
@@ -229,7 +237,7 @@ const ProductsTableContent: React.FC<ProductsTableContentProps> = ({
                             </td>
                             <td className="px-6 py-4 text-sm text-text-secondary">{product.category}</td>
                             <td className="px-6 py-4 text-sm text-text-primary font-medium">
-                                ${product.basePrice.amount.toFixed(2)}
+                                {product.basePrice.currency} {product.basePrice.amount.toFixed(2)}
                             </td>
                             <td className="px-6 py-4 text-sm text-text-secondary">
                                 {product.variants?.reduce((sum, v) => sum + v.stockQuantity, 0) || 0}

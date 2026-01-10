@@ -8,11 +8,13 @@ import {
     UnauthorizedMerchantAccessException,
 } from '../../domain/exceptions/MerchantExceptions';
 import { AddStaffDto, StaffResponseDto } from '../dto/MerchantStaffDto';
+import { IUserRepository } from '@modules/user/domain/repositories/IUserRepository';
 
 export class AddMerchantStaffUseCase {
     constructor(
         private readonly merchantRepository: IMerchantRepository,
-        private readonly merchantStaffRepository: IMerchantStaffRepository
+        private readonly merchantStaffRepository: IMerchantStaffRepository,
+        private readonly userRepository: IUserRepository,
     ) { }
 
     public async execute(
@@ -29,18 +31,32 @@ export class AddMerchantStaffUseCase {
         // Verify requesting user has permission
         await this.verifyUserPermission(merchantId, requestingUserId);
 
+        // Resolve userId from email if email was provided
+        let targetUserId = dto.userId;
+        if (dto.email && !targetUserId) {
+            const user = await this.userRepository.findByEmail(dto.email);
+            if (!user) {
+                throw new Error(`User with email ${dto.email} not found`);
+            }
+            targetUserId = user.id;
+        }
+
+        if (!targetUserId) {
+            throw new Error('User ID could not be determined');
+        }
+
         // Check if user is already staff
         const existingStaff = await this.merchantStaffRepository.findByMerchantAndUser(
             merchantId,
-            dto.userId
+            targetUserId
         );
         if (existingStaff) {
-            throw new StaffAlreadyExistsException(merchantId, dto.userId);
+            throw new StaffAlreadyExistsException(merchantId, targetUserId);
         }
 
         // Create staff member
         const staffId = uuidv4();
-        const staff = MerchantStaff.create(staffId, merchantId, dto.userId, dto.role);
+        const staff = MerchantStaff.create(staffId, merchantId, targetUserId, dto.role);
 
         // Save staff
         const savedStaff = await this.merchantStaffRepository.save(staff);

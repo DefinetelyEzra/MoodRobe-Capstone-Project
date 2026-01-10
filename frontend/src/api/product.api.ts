@@ -7,7 +7,7 @@ import {
     ProductImage
 } from '@/types/product.types';
 
-// Define types for API request payloads
+// Define types for API request payloads that match backend DTOs
 export interface CreateProductRequest {
     name: string;
     description: string;
@@ -21,17 +21,18 @@ export interface CreateProductRequest {
     variants?: Array<{
         sku: string;
         name: string;
+        size?: string;
+        color?: string;
         price: {
             amount: number;
             currency: string;
         };
         stockQuantity: number;
-        attributes: Record<string, string>;
+        attributes?: Record<string, string>;
         isActive?: boolean;
     }>;
 }
 
-// Use type alias instead of empty interface
 export type UpdateProductRequest = Partial<CreateProductRequest>;
 
 export interface UpdateStockRequest {

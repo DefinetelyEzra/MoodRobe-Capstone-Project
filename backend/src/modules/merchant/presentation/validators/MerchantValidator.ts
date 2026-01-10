@@ -72,10 +72,21 @@ export class MerchantValidator {
     public static addStaffRules(): ValidationChain[] {
         return [
             body('userId')
-                .notEmpty()
-                .withMessage('User ID is required')
+                .optional()
                 .isUUID()
                 .withMessage('User ID must be a valid UUID'),
+            body('email')
+                .optional()
+                .isEmail()
+                .withMessage('Invalid email format')
+                .normalizeEmail(),
+            body()
+                .custom((value, { req }) => {
+                    if (!req.body.userId && !req.body.email) {
+                        throw new Error('Either userId or email must be provided');
+                    }
+                    return true;
+                }),
             body('role')
                 .notEmpty()
                 .withMessage('Role is required')

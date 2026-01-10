@@ -5,7 +5,7 @@ export class User {
     private constructor(
         public readonly id: string,
         public name: string,
-        private email: Email,
+        private _email: Email,
         private passwordHash: string,
         public selectedAestheticId?: string,
         public readonly createdAt: Date = new Date(),
@@ -44,6 +44,10 @@ export class User {
         );
     }
 
+    public get email(): string {
+        return this._email.toString();
+    }
+
     public updateName(name: string): void {
         if (!name || name.trim().length === 0) {
             throw new Error('Name cannot be empty');
@@ -56,7 +60,7 @@ export class User {
     }
 
     public updateEmail(email: string): void {
-        this.email = new Email(email);
+        this._email = new Email(email);
         this.updatedAt = new Date();
     }
 
@@ -89,7 +93,7 @@ export class User {
     }
 
     public getEmail(): string {
-        return this.email.toString();
+        return this._email.toString();
     }
 
     public getPasswordHash(): string {

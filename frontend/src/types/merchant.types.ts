@@ -1,5 +1,3 @@
-// frontend/src/types/merchant.types.ts
-
 export type StaffRole = 'owner' | 'admin' | 'manager' | 'staff';
 
 export interface StaffPermissions {
@@ -49,7 +47,7 @@ export interface MerchantStaff {
         id: string;
         name: string;
         email: string;
-    };
+    } | null;
 }
 
 export interface CreateMerchantDto {
@@ -65,7 +63,8 @@ export interface UpdateMerchantDto {
 }
 
 export interface AddStaffDto {
-    userId: string;
+    userId?: string;
+    email?: string;
     role: StaffRole;
 }
 

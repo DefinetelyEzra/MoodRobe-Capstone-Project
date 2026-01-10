@@ -20,8 +20,25 @@ export class ProductValidator {
                 .isLength({ max: 100 })
                 .withMessage('Category cannot exceed 100 characters'),
             body('basePrice')
+                .optional()
+                .custom((value) => {
+                    if (typeof value === 'object' && value.amount !== undefined) {
+                        return true;
+                    }
+                    if (typeof value === 'number') {
+                        return true;
+                    }
+                    throw new Error('Base price must be a number or price object');
+                }),
+            body('basePrice.amount')
+                .optional()
                 .isFloat({ min: 0 })
-                .withMessage('Base price must be a positive number'),
+                .withMessage('Base price amount must be a positive number'),
+            body('basePrice.currency')
+                .optional()
+                .isLength({ min: 3, max: 3 })
+                .withMessage('Currency must be a 3-letter code'),
+
             body('currency')
                 .optional()
                 .isLength({ min: 3, max: 3 })
@@ -38,36 +55,39 @@ export class ProductValidator {
                 .withMessage('SKU is required for each variant')
                 .isLength({ max: 100 })
                 .withMessage('SKU cannot exceed 100 characters'),
-            body('variants.*.size')
-                .optional()
-                .isString()
-                .withMessage('Size must be a string'),
-            body('variants.*.color')
-                .optional()
-                .isString()
-                .withMessage('Color must be a string'),
+            body('variants.*.name')
+                .notEmpty()
+                .withMessage('Variant name is required'),
             body('variants.*.price')
+                .custom((value) => {
+                    if (typeof value === 'object' && value.amount !== undefined) {
+                        return true;
+                    }
+                    if (typeof value === 'number') {
+                        return true;
+                    }
+                    throw new Error('Variant price must be a number or price object');
+                }),
+            body('variants.*.price.amount')
+                .optional()
                 .isFloat({ min: 0 })
-                .withMessage('Variant price must be a positive number'),
+                .withMessage('Variant price amount must be a positive number'),
+            body('variants.*.price.currency')
+                .optional()
+                .isLength({ min: 3, max: 3 })
+                .withMessage('Currency must be a 3-letter code'),
+
             body('variants.*.stockQuantity')
                 .isInt({ min: 0 })
                 .withMessage('Stock quantity must be a non-negative integer'),
+            body('variants.*.attributes')
+                .optional()
+                .isObject()
+                .withMessage('Attributes must be an object'),
             body('images')
                 .optional()
                 .isArray()
                 .withMessage('Images must be an array'),
-            body('images.*.url')
-                .optional()
-                .isURL()
-                .withMessage('Image URL must be valid'),
-            body('images.*.isPrimary')
-                .optional()
-                .isBoolean()
-                .withMessage('isPrimary must be a boolean'),
-            body('images.*.displayOrder')
-                .optional()
-                .isInt({ min: 0 })
-                .withMessage('Display order must be a non-negative integer'),
         ];
     }
     public static updateRules(): ValidationChain[] {

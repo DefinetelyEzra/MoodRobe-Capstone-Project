@@ -17,7 +17,7 @@ export const ManageStaffPage: React.FC = () => {
     const [selectedStaff, setSelectedStaff] = useState<MerchantStaff | null>(null);
 
     const [addFormData, setAddFormData] = useState<AddStaffDto>({
-        userId: '',
+        email: '',
         role: 'staff'
     });
 
@@ -41,7 +41,7 @@ export const ManageStaffPage: React.FC = () => {
             await addStaff(addFormData);
             showToast('Staff member added successfully', 'success');
             setShowAddModal(false);
-            setAddFormData({ userId: '', role: 'staff' });
+            setAddFormData({ email: '', role: 'staff' });
             await refreshStaff();
         } catch (error) {
             console.error('Failed to add staff:', error);
@@ -204,8 +204,9 @@ export const ManageStaffPage: React.FC = () => {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-wrap gap-1.5">
-                                                    {Object.entries(member.permissions).map(([key, value]) => (
-                                                        value && (
+                                                    {Object.entries(member.permissions)
+                                                        .filter(([, value]) => value === true)
+                                                        .map(([key]) => (
                                                             <span
                                                                 key={key}
                                                                 className="inline-flex items-center px-2 py-1 bg-green-50 text-green-700 text-xs rounded border border-green-200"
@@ -213,8 +214,8 @@ export const ManageStaffPage: React.FC = () => {
                                                                 <CheckCircle className="w-3 h-3 mr-1" />
                                                                 {key.replace('can', '').replaceAll(/([A-Z])/g, ' $1').trim()}
                                                             </span>
-                                                        )
-                                                    ))}
+                                                        ))
+                                                    }
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
@@ -252,16 +253,16 @@ export const ManageStaffPage: React.FC = () => {
             <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add Staff Member">
                 <form onSubmit={handleAddStaff} className="space-y-4">
                     <div>
-                        <label htmlFor="add-user-id" className="block text-sm font-medium text-text-primary mb-2">
-                            User ID
+                        <label htmlFor="add-user-email" className="block text-sm font-medium text-text-primary mb-2">
+                            User Email
                         </label>
                         <input
-                            id="add-user-id"
-                            type="text"
+                            id="add-user-email"
+                            type="email"
                             required
-                            value={addFormData.userId}
-                            onChange={(e) => setAddFormData({ ...addFormData, userId: e.target.value })}
-                            placeholder="Enter user ID or email"
+                            value={addFormData.email}
+                            onChange={(e) => setAddFormData({ ...addFormData, email: e.target.value })}
+                            placeholder="user@example.com"
                             className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-surface"
                         />
                     </div>
