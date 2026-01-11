@@ -1,21 +1,21 @@
 export type OutfitType = 'full' | 'dress' | 'casual' | 'formal';
 
 export type OutfitSlotType = 
-    | 'hat' 
+    | 'headwear' 
     | 'top' 
     | 'bottom' 
     | 'dress' 
-    | 'shoes' 
+    | 'footwear' 
     | 'accessories'
     | 'outerwear'
     | 'suit';
 
 export interface OutfitItems {
-    hat?: string;
+    headwear?: string;
     top?: string;
     bottom?: string;
     dress?: string;
-    shoes?: string;
+    footwear?: string;
     accessories?: string;
     outerwear?: string;
     suit?: string;
@@ -77,45 +77,45 @@ export const OUTFIT_TEMPLATES: OutfitTemplate[] = [
         type: 'full',
         label: 'Full Outfit',
         description: 'Complete look with all pieces',
-        slots: ['hat', 'top', 'bottom', 'shoes', 'accessories']
+        slots: ['headwear', 'top', 'bottom', 'footwear', 'accessories']
     },
     {
         type: 'dress',
         label: 'Dress Outfit',
         description: 'Dress-based ensemble',
-        slots: ['hat', 'dress', 'shoes', 'accessories']
+        slots: ['headwear', 'dress', 'footwear', 'accessories']
     },
     {
         type: 'casual',
         label: 'Casual',
         description: 'Everyday casual wear',
-        slots: ['top', 'bottom', 'shoes']
+        slots: ['top', 'bottom', 'footwear']
     },
     {
         type: 'formal',
         label: 'Formal',
         description: 'Professional or formal attire',
-        slots: ['suit', 'shoes', 'accessories']
+        slots: ['suit', 'footwear', 'accessories']
     }
 ];
 
 export const SLOT_LABELS: Record<OutfitSlotType, string> = {
-    hat: 'Hat / Headwear',
+    headwear: 'headwear / Headwear',
     top: 'Top',
     bottom: 'Bottom',
     dress: 'Dress',
-    shoes: 'Shoes',
+    footwear: 'footwear',
     accessories: 'Accessories',
     outerwear: 'Outerwear',
     suit: 'Suit / Formal Wear'
 };
 
 export const SLOT_CATEGORIES: Record<OutfitSlotType, string[]> = {
-    hat: ['Accessories', 'Headwear'],
+    headwear: ['Accessories', 'Headwear'],
     top: ['Tops', 'Outerwear'],
     bottom: ['Bottoms'],
     dress: ['Dresses'],
-    shoes: ['Shoes', 'Footwear'],
+    footwear: ['footwear', 'Footwear'],
     accessories: ['Accessories', 'Jewelry', 'Bags'],
     outerwear: ['Outerwear', 'Jackets'],
     suit: ['Formal', 'Suits', 'Dresses']

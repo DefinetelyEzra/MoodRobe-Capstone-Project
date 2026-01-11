@@ -9,6 +9,15 @@ import {
     OutfitType
 } from '@/types/outfit.types';
 
+interface AxiosErrorResponse {
+    response?: {
+        data?: {
+            message?: string | string[];
+            error?: string;
+        };
+    };
+}
+
 export const useOutfit = () => {
     const [outfits, setOutfits] = useState<OutfitResponseDto[]>([]);
     const [currentOutfit, setCurrentOutfit] = useState<OutfitResponseDto | null>(null);
@@ -43,6 +52,52 @@ export const useOutfit = () => {
         }
     }, [showToast]);
 
+    const buildCreateOutfitDto = (
+        name: string,
+        outfitType: OutfitType,
+        items: OutfitItems,
+        description?: string,
+        aestheticTags?: string[],
+        isPublic?: boolean
+    ): CreateOutfitDto => {
+        const dto: CreateOutfitDto = {
+            name: name.trim(),
+            outfitType,
+            items
+        };
+
+        if (description?.trim()) {
+            dto.description = description.trim();
+        }
+
+        if (aestheticTags?.length) {
+            dto.aestheticTags = aestheticTags;
+        }
+
+        if (typeof isPublic === 'boolean') {
+            dto.isPublic = isPublic;
+        }
+
+        return dto;
+    };
+
+    const extractErrorMessage = (error: unknown): string => {
+        if (!error || typeof error !== 'object' || !('response' in error)) {
+            return 'Failed to save outfit';
+        }
+
+        const axiosError = error as AxiosErrorResponse;
+        const responseData = axiosError.response?.data;
+
+        if (responseData?.message) {
+            return Array.isArray(responseData.message)
+                ? responseData.message.join(', ')
+                : responseData.message;
+        }
+
+        return responseData?.error ?? 'Failed to save outfit';
+    };
+
     const createOutfit = useCallback(async (
         name: string,
         outfitType: OutfitType,
@@ -53,40 +108,74 @@ export const useOutfit = () => {
     ) => {
         try {
             setIsLoading(true);
-            const dto: CreateOutfitDto = {
-                name,
-                outfitType,
-                items,
-                description,
-                aestheticTags,
-                isPublic
-            };
+
+            const dto = buildCreateOutfitDto(name, outfitType, items, description, aestheticTags, isPublic);
+            console.log('Creating outfit with DTO:', dto);
+
             const newOutfit = await outfitApi.create(dto);
             setOutfits(prev => [...prev, newOutfit]);
             showToast('Outfit saved successfully!', 'success');
             return newOutfit;
         } catch (error) {
             console.error('Failed to create outfit:', error);
-            showToast('Failed to save outfit', 'error');
+            const errorMessage = extractErrorMessage(error);
+            showToast(errorMessage, 'error');
             throw error;
         } finally {
             setIsLoading(false);
         }
     }, [showToast]);
 
+    const buildUpdateOutfitDto = (data: UpdateOutfitDto): UpdateOutfitDto => {
+        const cleanData: UpdateOutfitDto = {};
+
+        if (data.name?.trim()) {
+            cleanData.name = data.name.trim();
+        }
+
+        if (data.description !== undefined) {
+            cleanData.description = data.description.trim() || undefined;
+        }
+
+        if (data.outfitType) {
+            cleanData.outfitType = data.outfitType;
+        }
+
+        if (data.items) {
+            cleanData.items = data.items;
+        }
+
+        if (data.aestheticTags?.length) {
+            cleanData.aestheticTags = data.aestheticTags;
+        }
+
+        if (typeof data.isPublic === 'boolean') {
+            cleanData.isPublic = data.isPublic;
+        }
+
+        return cleanData;
+    };
+
     const updateOutfit = useCallback(async (id: string, data: UpdateOutfitDto) => {
         try {
             setIsLoading(true);
-            const updated = await outfitApi.update(id, data);
+
+            const cleanData = buildUpdateOutfitDto(data);
+            console.log('Updating outfit with data:', cleanData);
+
+            const updated = await outfitApi.update(id, cleanData);
+
             setOutfits(prev => prev.map(o => o.id === id ? updated : o));
             if (currentOutfit?.id === id) {
                 setCurrentOutfit(updated);
             }
+
             showToast('Outfit updated successfully!', 'success');
             return updated;
         } catch (error) {
             console.error('Failed to update outfit:', error);
-            showToast('Failed to update outfit', 'error');
+            const errorMessage = extractErrorMessage(error);
+            showToast(errorMessage, 'error');
             throw error;
         } finally {
             setIsLoading(false);
@@ -97,10 +186,12 @@ export const useOutfit = () => {
         try {
             setIsLoading(true);
             await outfitApi.delete(id);
+
             setOutfits(prev => prev.filter(o => o.id !== id));
             if (currentOutfit?.id === id) {
                 setCurrentOutfit(null);
             }
+
             showToast('Outfit deleted successfully!', 'success');
         } catch (error) {
             console.error('Failed to delete outfit:', error);

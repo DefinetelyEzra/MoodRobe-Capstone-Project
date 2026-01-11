@@ -31,37 +31,46 @@ export const OutfitActions: React.FC<OutfitActionsProps> = ({
     const { selectedAesthetic } = useAesthetic();
 
     const handleSave = async () => {
-        if (!outfitName.trim()) {
+        const trimmedName = outfitName.trim();
+
+        if (!trimmedName) {
+            alert('Please enter an outfit name');
             return;
         }
 
         try {
             setIsSaving(true);
-            await onSave(outfitName.trim(), description.trim(), isPublic);
+            console.log('OutfitActions - Saving with:', {
+                name: trimmedName,
+                description: description.trim(),
+                isPublic
+            });
+
+            await onSave(trimmedName, description.trim(), isPublic);
+
+            // Only close modal and reset on success
             setShowSaveModal(false);
             setOutfitName('');
             setDescription('');
             setIsPublic(false);
         } catch (error) {
-            console.error('Failed to save outfit:', error);
+            console.error('OutfitActions - Save error:', error);
         } finally {
             setIsSaving(false);
         }
     };
 
     const handleShare = () => {
-        // TODO: Implement sharing functionality
+        // Implementation of sharing functionality
+        // TODO: Add actual sharing logic (generate shareable link/image)
+        console.log('Share outfit functionality not implemented yet');
         alert('Sharing feature coming soon!');
     };
 
-    let saveButtonText;
-    if (isSaving) {
-        saveButtonText = 'Saving...';
-    } else if (isEditing) {
-        saveButtonText = 'Update';
-    } else {
-        saveButtonText = 'Save';
-    }
+    const getSaveButtonText = (): string => {
+        if (isSaving) return 'Saving...';
+        return isEditing ? 'Update' : 'Save';
+    };
 
     return (
         <>
@@ -106,7 +115,7 @@ export const OutfitActions: React.FC<OutfitActionsProps> = ({
             {/* Save Modal */}
             <Modal
                 isOpen={showSaveModal}
-                onClose={() => setShowSaveModal(false)}
+                onClose={() => !isSaving && setShowSaveModal(false)}
                 title={isEditing ? 'Update Outfit' : 'Save Outfit'}
             >
                 <div className="space-y-4">
@@ -116,6 +125,7 @@ export const OutfitActions: React.FC<OutfitActionsProps> = ({
                         onChange={(e) => setOutfitName(e.target.value)}
                         placeholder="My Awesome Outfit"
                         required
+                        disabled={isSaving}
                     />
 
                     <div>
@@ -123,12 +133,12 @@ export const OutfitActions: React.FC<OutfitActionsProps> = ({
                             Description (Optional)
                         </label>
                         <textarea
-                            id="outfit-description"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Describe your outfit..."
                             rows={3}
-                            className="w-full px-3 py-2.5 border border-border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
+                            disabled={isSaving}
+                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
                         />
                     </div>
 
@@ -146,7 +156,8 @@ export const OutfitActions: React.FC<OutfitActionsProps> = ({
                             id="isPublic"
                             checked={isPublic}
                             onChange={(e) => setIsPublic(e.target.checked)}
-                            className="w-4 h-4 text-accent border-border rounded focus:ring-accent"
+                            disabled={isSaving}
+                            className="w-4 h-4 text-accent border-gray-300 rounded focus:ring-accent disabled:cursor-not-allowed"
                         />
                         <label htmlFor="isPublic" className="ml-2 text-sm text-text-primary">
                             Make this outfit public (others can see it)
@@ -156,7 +167,8 @@ export const OutfitActions: React.FC<OutfitActionsProps> = ({
                     <div className="flex gap-3 pt-4">
                         <button
                             onClick={() => setShowSaveModal(false)}
-                            className="flex-1 px-4 py-2 border border-border hover:bg-canvas text-text-primary rounded-lg font-medium transition-colors"
+                            disabled={isSaving}
+                            className="flex-1 px-4 py-2 border border-border hover:bg-canvas text-text-primary rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             Cancel
                         </button>
@@ -165,7 +177,7 @@ export const OutfitActions: React.FC<OutfitActionsProps> = ({
                             disabled={!outfitName.trim() || isSaving}
                             className="flex-1 px-4 py-2 bg-accent hover:bg-accent-dark text-surface rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {saveButtonText}
+                            {getSaveButtonText()}
                         </button>
                     </div>
                 </div>

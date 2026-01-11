@@ -144,31 +144,70 @@ export const OutfitBuilderPage: React.FC = () => {
     };
 
     const handleSave = async (name: string, description: string, isPublic: boolean) => {
+        // Validate inputs
+        if (!name || name.trim().length === 0) {
+            showToast('Please provide an outfit name', 'error');
+            return;
+        }
+
+        if (Object.keys(selectedProducts).length === 0) {
+            showToast('Please add at least one item to your outfit', 'warning');
+            return;
+        }
+
+        // Build items object with only product IDs
         const items: OutfitItems = {};
         Object.entries(selectedProducts).forEach(([slot, product]) => {
             items[slot as OutfitSlotType] = product.id;
         });
 
+        // Only include aesthetic tags if one is selected
         const aestheticTags = selectedAesthetic ? [selectedAesthetic.id] : [];
+
+        console.log('Saving outfit with data:', {
+            name: name.trim(),
+            description: description.trim() || undefined,
+            outfitType,
+            items,
+            aestheticTags,
+            isPublic
+        });
 
         try {
             if (outfitId && currentOutfit) {
                 await updateOutfit(outfitId, {
-                    name,
-                    description,
+                    name: name.trim(),
+                    description: description.trim() || undefined,
                     items,
-                    aestheticTags,
+                    aestheticTags: aestheticTags.length > 0 ? aestheticTags : undefined,
                     isPublic
                 });
             } else {
-                await createOutfit(name, outfitType, items, description, aestheticTags, isPublic);
+                await createOutfit(
+                    name.trim(),
+                    outfitType,
+                    items,
+                    description.trim() || undefined,
+                    aestheticTags.length > 0 ? aestheticTags : undefined,
+                    isPublic
+                );
             }
 
             showToast('Outfit saved successfully!', 'success');
             navigate('/outfits');
         } catch (error) {
-            // Error already handled in useOutfit hook
             console.error('Failed to save outfit:', error);
+
+            // Extract error message if available
+            let errorMessage = 'Failed to save outfit';
+            if (error && typeof error === 'object' && 'response' in error) {
+                const axiosError = error as { response?: { data?: { message?: string; error?: string } } };
+                errorMessage = axiosError.response?.data?.message ||
+                    axiosError.response?.data?.error ||
+                    errorMessage;
+            }
+
+            showToast(errorMessage, 'error');
         }
     };
 
