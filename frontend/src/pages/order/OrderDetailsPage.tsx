@@ -122,7 +122,19 @@ export const OrderDetailsPage: React.FC = () => {
                                             key={line.id}
                                             className="flex items-center space-x-4 pb-4 border-b border-border last:border-b-0"
                                         >
-                                            <div className="w-20 h-20 bg-canvas rounded-lg border border-border shrink-0" />
+                                            <div className="w-20 h-20 bg-canvas rounded-lg border border-border shrink-0 overflow-hidden">
+                                                {line.imageUrl ? (
+                                                    <img
+                                                        src={line.imageUrl}
+                                                        alt={line.productName}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center">
+                                                        <Package className="w-8 h-8 text-text-secondary" />
+                                                    </div>
+                                                )}
+                                            </div>
                                             <div className="flex-1">
                                                 <h3 className="font-semibold text-text-primary">{line.productName}</h3>
                                                 <div className="flex items-center space-x-4 text-sm text-text-secondary mt-1.5">
@@ -275,8 +287,8 @@ export const OrderDetailsPage: React.FC = () => {
                                         </div>
                                         <span
                                             className={`px-3 py-1 text-xs font-semibold rounded-full ${order.paymentStatus === 'paid'
-                                                    ? 'bg-green-50 text-green-700 border border-green-200'
-                                                    : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                                ? 'bg-green-50 text-green-700 border border-green-200'
+                                                : 'bg-amber-50 text-amber-700 border border-amber-200'
                                                 }`}
                                         >
                                             {order.paymentStatus.toUpperCase()}

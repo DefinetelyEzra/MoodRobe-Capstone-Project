@@ -287,7 +287,15 @@ export const CheckoutPage: React.FC = () => {
                                         {cartItems.map((item) => (
                                             <div key={item.id} className="flex items-center space-x-4 pb-4 border-b border-border last:border-b-0">
                                                 <div className="w-16 h-16 bg-canvas rounded-lg border border-border flex items-center justify-center overflow-hidden">
-                                                    <Package className="w-6 h-6 text-text-secondary" />
+                                                    {item.imageUrl ? (
+                                                        <img
+                                                            src={item.imageUrl}
+                                                            alt={item.productName}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <Package className="w-6 h-6 text-text-secondary" />
+                                                    )}
                                                 </div>
                                                 <div className="flex-1">
                                                     <h3 className="font-semibold text-text-primary">{item.productName}</h3>

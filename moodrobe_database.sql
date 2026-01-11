@@ -99,6 +99,9 @@ CREATE TABLE cart_items (
   currency VARCHAR(3) DEFAULT 'NGN',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  image_url VARCHAR(500),
+  product_id UUID,
+  variant_attributes JSONB;
   UNIQUE(cart_id, product_variant_id)
 );
 -- ORDER AGGREGATE
@@ -123,7 +126,8 @@ CREATE TABLE order_lines (
   variant_details JSONB,
   quantity INTEGER NOT NULL,
   unit_price DECIMAL(10, 2) NOT NULL,
-  line_total DECIMAL(10, 2) NOT NULL
+  line_total DECIMAL(10, 2) NOT NULL,
+  image_url VARCHAR(500)
 );
 -- PAYMENT AGGREGATE
 CREATE TABLE payments (

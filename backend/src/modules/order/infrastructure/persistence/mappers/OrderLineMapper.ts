@@ -1,6 +1,7 @@
 import { OrderLine, OrderLineProps } from '../../../domain/entities/OrderLine';
 import { Money } from '@shared/domain/value-objects/Money';
 import { OrderLineEntity } from '../../entities/OrderLineEntity';
+import { OrderLineResponseDto } from '../../../application/dto/CreateOrderDto';
 
 export class OrderLineMapper {
     public static toDomain(entity: OrderLineEntity): OrderLine {
@@ -32,5 +33,24 @@ export class OrderLineMapper {
         entity.unitPrice = domain.getUnitPrice().getAmount();
         entity.lineTotal = domain.getLineTotal().getAmount();
         return entity;
+    }
+
+    public static toResponseDto(entity: OrderLineEntity): OrderLineResponseDto {
+        return {
+            id: entity.id,
+            productVariantId: entity.productVariantId,
+            productName: entity.productName,
+            variantDetails: entity.variantDetails,
+            quantity: entity.quantity,
+            unitPrice: {
+                amount: entity.unitPrice,
+                currency: 'NGN'
+            },
+            lineTotal: {
+                amount: entity.lineTotal,
+                currency: 'NGN'
+            },
+            imageUrl: entity.imageUrl
+        };
     }
 }

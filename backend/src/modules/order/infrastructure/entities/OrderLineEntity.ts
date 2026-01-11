@@ -25,4 +25,7 @@ export class OrderLineEntity {
 
     @Column({ name: 'line_total', type: 'decimal', precision: 10, scale: 2 })
     lineTotal!: number;
+
+    @Column({ name: 'image_url', type: 'varchar', length: 500, nullable: true })
+    imageUrl?: string;
 }

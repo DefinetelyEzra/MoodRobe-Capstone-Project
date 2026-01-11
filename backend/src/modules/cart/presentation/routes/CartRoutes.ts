@@ -6,6 +6,7 @@ import { TypeOrmCartRepository } from '../../infrastructure/persistence/reposito
 import { TypeOrmCartItemRepository } from '../../infrastructure/persistence/repositories/TypeOrmCartItemRepository';
 import { TypeOrmProductRepository } from '../../../product/infrastructure/persistence/repositories/TypeOrmProductRepository';
 import { TypeOrmProductVariantRepository } from '../../../product/infrastructure/persistence/repositories/TypeOrmProductVariantRepository';
+import { TypeOrmProductImageRepository } from '@modules/product/infrastructure/persistence/repositories/TypeOrmProductImageRepository';
 import { GetOrCreateCartUseCase } from '../../application/use-cases/GetOrCreateCartUseCase';
 import { AddItemToCartUseCase } from '../../application/use-cases/AddItemToCartUseCase';
 import { UpdateCartItemQuantityUseCase } from '../../application/use-cases/UpdateCartItemQuantityUseCase';
@@ -20,6 +21,7 @@ export class CartRoutes {
         const cartRepository = new TypeOrmCartRepository();
         const cartItemRepository = new TypeOrmCartItemRepository();
         const productRepository = new TypeOrmProductRepository();
+        const productImageRepository = new TypeOrmProductImageRepository();
         const variantRepository = new TypeOrmProductVariantRepository();
 
         // Initialize use cases; pass product repositories to GetOrCreateCartUseCase
@@ -33,7 +35,8 @@ export class CartRoutes {
             cartRepository,
             cartItemRepository,
             productRepository,
-            variantRepository
+            variantRepository,
+            productImageRepository
         );
         const updateCartItemQuantityUseCase = new UpdateCartItemQuantityUseCase(
             cartRepository,

@@ -38,6 +38,15 @@ export class CartItemEntity {
     @Column({ name: 'currency', type: 'varchar', length: 3, default: 'NGN' })
     currency!: string;
 
+    @Column({ name: 'product_id', type: 'uuid', nullable: true })
+    productId?: string;
+
+    @Column({ name: 'image_url', type: 'varchar', length: 500, nullable: true })
+    imageUrl?: string;
+
+    @Column({ name: 'variant_attributes', type: 'jsonb', nullable: true })
+    variantAttributes?: Record<string, string | number | boolean>;
+
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt!: Date;
 

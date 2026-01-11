@@ -5,7 +5,10 @@ import { AuthMiddleware } from '../../../user/presentation/middleware/AuthMiddle
 import { TypeOrmOrderRepository } from '../../infrastructure/persistence/repositories/TypeOrmOrderRepository';
 import { TypeOrmOrderLineRepository } from '../../infrastructure/persistence/repositories/TypeOrmOrderLineRepository';
 import { TypeOrmCartRepository } from '@modules/cart/infrastructure/persistence/repositories/TypeOrmCartRepository';
+import { TypeOrmCartItemRepository } from '@modules/cart/infrastructure/persistence/repositories/TypeOrmCartItemRepository';
 import { TypeOrmProductVariantRepository } from '../../../product/infrastructure/persistence/repositories/TypeOrmProductVariantRepository';
+import { TypeOrmProductRepository } from '@modules/product/infrastructure/persistence/repositories/TypeOrmProductRepository';
+import { TypeOrmProductImageRepository } from '@modules/product/infrastructure/persistence/repositories/TypeOrmProductImageRepository';
 import { CreateOrderFromCartUseCase } from '../../application/use-cases/CreateOrderFromCartUseCase';
 import { GetOrderByIdUseCase } from '../../application/use-cases/GetOrderByIdUseCase';
 import { GetUserOrdersUseCase } from '../../application/use-cases/GetUserOrdersUseCase';
@@ -22,7 +25,10 @@ export class OrderRoutes {
         // Initialize repositories
         const orderRepository = new TypeOrmOrderRepository();
         const orderLineRepository = new TypeOrmOrderLineRepository();
+        const productRepository = new TypeOrmProductRepository();
+        const productImageRepository = new TypeOrmProductImageRepository();
         const cartRepository = new TypeOrmCartRepository();
+        const cartItemRepository = new TypeOrmCartItemRepository();
         const variantRepository = new TypeOrmProductVariantRepository();
 
         // Initialize use cases
@@ -30,11 +36,15 @@ export class OrderRoutes {
             orderRepository,
             orderLineRepository,
             cartRepository,
-            variantRepository
+            cartItemRepository,
+            variantRepository,
+            productImageRepository
         );
         const getOrderByIdUseCase = new GetOrderByIdUseCase(
             orderRepository,
-            orderLineRepository
+            orderLineRepository,
+            productRepository,
+            variantRepository
         );
         const getUserOrdersUseCase = new GetUserOrdersUseCase(
             orderRepository,

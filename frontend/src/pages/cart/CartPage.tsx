@@ -161,9 +161,17 @@ export const CartPage: React.FC = () => {
                                         <div className="flex items-center space-x-4">
                                             {/* Product Image */}
                                             <div className="w-24 h-24 bg-canvas rounded-lg border border-border overflow-hidden shrink-0">
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <ShoppingBag className="w-8 h-8 text-text-secondary" />
-                                                </div>
+                                                {item.imageUrl ? (
+                                                    <img
+                                                        src={item.imageUrl}
+                                                        alt={item.productName}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center">
+                                                        <ShoppingBag className="w-8 h-8 text-text-secondary" />
+                                                    </div>
+                                                )}
                                             </div>
 
                                             {/* Product Details */}

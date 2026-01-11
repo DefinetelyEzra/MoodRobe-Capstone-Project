@@ -55,4 +55,5 @@ export interface OrderLineResponseDto {
         amount: number;
         currency: string;
     };
+    imageUrl?: string; 
 }

@@ -8,6 +8,10 @@ export class ProductImage {
         public readonly createdAt: Date = new Date()
     ) { }
 
+    public get imageUrl(): string {
+        return this.url;
+    }
+
     public static create(
         id: string,
         productId: string,

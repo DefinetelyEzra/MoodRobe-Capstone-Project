@@ -7,9 +7,12 @@ import { OrderCalculationService } from '../../domain/services/OrderCalculationS
 import { IOrderRepository } from '../../domain/repositories/IOrderRepository';
 import { IOrderLineRepository } from '../../domain/repositories/IOrderLineRepository';
 import { ICartRepository } from '../../../cart/domain/repositories/ICartRepository';
+import { ICartItemRepository } from '../../../cart/domain/repositories/ICartItemRepository';
 import { IProductVariantRepository } from '../../../product/domain/repositories/IProductVariantRepository';
+import { IProductImageRepository } from '../../../product/domain/repositories/IProductImageRepository';
 import { CreateOrderDto, OrderResponseDto } from '../dto/CreateOrderDto';
 import { EmptyCartException, InsufficientStockException } from '../../domain/exceptions/OrderExceptions';
+import { OrderLineMapper } from '../../infrastructure/persistence/mappers/OrderLineMapper';
 
 export class CreateOrderFromCartUseCase {
     private readonly calculationService: OrderCalculationService;
@@ -18,9 +21,33 @@ export class CreateOrderFromCartUseCase {
         private readonly orderRepository: IOrderRepository,
         private readonly orderLineRepository: IOrderLineRepository,
         private readonly cartRepository: ICartRepository,
-        private readonly variantRepository: IProductVariantRepository
+        private readonly cartItemRepository: ICartItemRepository,
+        private readonly variantRepository: IProductVariantRepository,
+        private readonly productImageRepository: IProductImageRepository
     ) {
         this.calculationService = new OrderCalculationService();
+    }
+
+    private async getProductPrimaryImage(productId: string): Promise<string | undefined> {
+        try {
+            const images = await this.productImageRepository.findByProductId(productId);
+
+            if (!images || images.length === 0) {
+                return undefined;
+            }
+
+            const primaryImage = images.find(img => img.isPrimary);
+            if (primaryImage) {
+                return primaryImage.imageUrl;
+            }
+
+            // Create new array before sorting
+            const sortedImages = [...images].sort((a, b) => a.displayOrder - b.displayOrder);
+            return sortedImages[0]?.imageUrl;
+        } catch (error) {
+            console.error('Error fetching product images:', error);
+            return undefined;
+        }
     }
 
     public async execute(
@@ -74,7 +101,7 @@ export class CreateOrderFromCartUseCase {
         const orderTotal = this.calculationService.calculateTotal(
             orderItems,
             dto.discountPercentage || 0,
-            dto.shippingAddress.state // Pass state for potential shipping calculation
+            dto.shippingAddress.state
         );
         console.log('💰 Order total calculated:', {
             subtotal: orderTotal.getSubtotal().getAmount(),
@@ -102,13 +129,33 @@ export class CreateOrderFromCartUseCase {
 
         // Create order lines
         const orderLines: OrderLine[] = [];
+        const orderLineEntities: any[] = [];
         console.log('📝 Creating order lines...');
 
         for (const cartItem of cartItems) {
+            // Get variant details
             const variant = await this.variantRepository.findById(cartItem.productVariantId);
             if (!variant) {
                 console.error('❌ Variant not found:', cartItem.productVariantId);
                 throw new Error(`Variant not found: ${cartItem.productVariantId}`);
+            }
+
+            // Get cart item entity from repository to retrieve stored image and product ID
+            const cartItemEntity = await this.cartItemRepository.findByCartAndVariant(
+                cart.id,
+                cartItem.productVariantId
+            );
+
+            let imageUrl: string | undefined;
+
+            // Try to get image from cart item entity first
+            if (cartItemEntity && 'imageUrl' in cartItemEntity) {
+                imageUrl = (cartItemEntity as any).imageUrl;
+            }
+
+            // If image not in cart item, fetch from product images
+            if (!imageUrl && variant.productId) {
+                imageUrl = await this.getProductPrimaryImage(variant.productId);
             }
 
             const orderLineId = uuidv4();
@@ -127,9 +174,15 @@ export class CreateOrderFromCartUseCase {
             );
             orderLines.push(orderLine);
 
+            // Convert to entity and add image URL
+            const orderLineEntity = OrderLineMapper.toEntity(orderLine);
+            orderLineEntity.imageUrl = imageUrl;
+            orderLineEntities.push(orderLineEntity);
+
             console.log('📝 Order line created:', {
                 productName: cartItem.productName,
-                quantity: cartItem.quantity
+                quantity: cartItem.quantity,
+                hasImage: !!imageUrl
             });
 
             // Decrease stock
@@ -143,7 +196,7 @@ export class CreateOrderFromCartUseCase {
         const savedOrder = await this.orderRepository.save(order);
         console.log('✅ Order saved:', savedOrder.id);
 
-        // Save order lines
+        // Save order lines with images
         console.log('💾 Saving order lines to database...');
         await this.orderLineRepository.saveMany(orderLines);
         console.log('✅ Order lines saved:', orderLines.length);
@@ -154,7 +207,7 @@ export class CreateOrderFromCartUseCase {
         console.log('✅ Cart cleared');
 
         console.log('🎉 Order creation completed successfully');
-        return this.toResponseDto(savedOrder, orderLines);
+        return this.toResponseDto(savedOrder, orderLineEntities);
     }
 
     private async validateStock(cartItems: any[]): Promise<void> {
@@ -174,7 +227,7 @@ export class CreateOrderFromCartUseCase {
         }
     }
 
-    private toResponseDto(order: Order, orderLines: OrderLine[]): OrderResponseDto {
+    private toResponseDto(order: Order, orderLineEntities: any[]): OrderResponseDto {
         return {
             id: order.id,
             userId: order.userId,
@@ -202,20 +255,21 @@ export class CreateOrderFromCartUseCase {
                 currency: order.getTotal().getTotalAmount().getCurrency(),
             },
             shippingAddress: order.shippingAddress.toJSON(),
-            orderLines: orderLines.map((line) => ({
-                id: line.id,
-                productVariantId: line.productVariantId,
-                productName: line.productName,
-                variantDetails: line.variantDetails,
-                quantity: line.quantity,
+            orderLines: orderLineEntities.map((entity) => ({
+                id: entity.id,
+                productVariantId: entity.productVariantId,
+                productName: entity.productName,
+                variantDetails: entity.variantDetails,
+                quantity: entity.quantity,
                 unitPrice: {
-                    amount: line.getUnitPrice().getAmount(),
-                    currency: line.getUnitPrice().getCurrency(),
+                    amount: entity.unitPrice,
+                    currency: 'NGN',
                 },
                 lineTotal: {
-                    amount: line.getLineTotal().getAmount(),
-                    currency: line.getLineTotal().getCurrency(),
+                    amount: entity.lineTotal,
+                    currency: 'NGN',
                 },
+                imageUrl: entity.imageUrl,
             })),
             createdAt: order.createdAt,
             updatedAt: order.updatedAt,

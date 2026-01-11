@@ -34,6 +34,7 @@ export interface OrderLine {
     quantity: number;
     unitPrice: MoneyAmount;
     lineTotal: MoneyAmount;
+    imageUrl?: string; 
 }
 
 export interface Order {
