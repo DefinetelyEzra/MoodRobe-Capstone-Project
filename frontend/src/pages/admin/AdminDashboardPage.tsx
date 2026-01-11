@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Settings, Image, FileText, Activity } from 'lucide-react';
 import { CarouselManager } from '@/components/features/admin/CarouselManager';
 import { ContentEditor } from '@/components/features/admin/ContentEditor';
+import { AestheticImageManager } from '@/components/features/admin/AestheticImageManager';
 import { ActivityLogViewer } from '@/components/features/admin/ActivityLogViewer';
 
-type TabType = 'carousel' | 'content' | 'activity';
+type TabType = 'carousel' | 'content' | 'aesthetics' | 'activity';
 
 export const AdminDashboardPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<TabType>('carousel');
@@ -12,6 +13,7 @@ export const AdminDashboardPage: React.FC = () => {
     const tabs = [
         { id: 'carousel' as TabType, label: 'Hero Carousel', icon: Image },
         { id: 'content' as TabType, label: 'Content Editor', icon: FileText },
+        { id: 'aesthetics' as TabType, label: 'Aesthetic Images', icon: Image },
         { id: 'activity' as TabType, label: 'Activity Log', icon: Activity }
     ];
 
@@ -65,6 +67,7 @@ export const AdminDashboardPage: React.FC = () => {
                 <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden p-8">
                     {activeTab === 'carousel' && <CarouselManager />}
                     {activeTab === 'content' && <ContentEditor />}
+                    {activeTab === 'aesthetics' && <AestheticImageManager />}
                     {activeTab === 'activity' && <ActivityLogViewer />}
                 </div>
             </div>

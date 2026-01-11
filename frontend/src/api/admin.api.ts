@@ -1,3 +1,4 @@
+import { Aesthetic } from '@/types/aesthetic.types';
 import { apiClient } from './client';
 import {
     CarouselItem,
@@ -47,6 +48,14 @@ export const adminApi = {
 
     updateContent: async (sectionKey: string, data: UpdateContentDto): Promise<HomepageContent> => {
         const response = await apiClient.put(`/admin/content/${sectionKey}`, data);
+        return response.data;
+    },
+
+    // Aesthetic Image Management
+    updateAestheticImage: async (aestheticId: string, imageUrl: string): Promise<Aesthetic> => {
+        const response = await apiClient.put(`/admin/aesthetics/${aestheticId}/image`, {
+            imageUrl
+        });
         return response.data;
     },
 

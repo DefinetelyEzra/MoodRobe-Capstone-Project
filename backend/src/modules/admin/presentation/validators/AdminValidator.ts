@@ -75,4 +75,16 @@ export class AdminValidator {
                 .withMessage('Metadata must be an object')
         ];
     }
+
+    public static updateAestheticImageRules() {
+        return [
+            body('imageUrl')
+                .notEmpty()
+                .withMessage('Image URL is required')
+                .isString()
+                .withMessage('Image URL must be a string')
+                .isURL()
+                .withMessage('Invalid image URL')
+        ];
+    }
 }

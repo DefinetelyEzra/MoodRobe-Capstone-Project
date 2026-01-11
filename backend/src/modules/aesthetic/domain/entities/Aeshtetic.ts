@@ -69,6 +69,10 @@ export class Aesthetic {
         this.updatedAt = new Date();
     }
 
+    public getImageUrl(): string | undefined {
+        return this.imageUrl;
+    }
+
     private static validateName(name: string): void {
         if (!name || name.trim().length === 0) {
             throw new Error('Aesthetic name cannot be empty');

@@ -3,6 +3,7 @@ import { validationResult } from 'express-validator';
 import { AuthRequest } from '@modules/user/presentation/middleware/AuthMiddleware';
 import { ManageCarouselUseCase } from '../../application/use-cases/ManageCarouselUseCase';
 import { ManageContentUseCase } from '../../application/use-cases/ManageContentUseCase';
+import { ManageAestheticImageUseCase } from '@modules/admin/application/use-cases/ManageAestheticImageUseCase';
 import { GetActivityLogUseCase } from '../../application/use-cases/GetActivityLogUseCase';
 import {
     ContentNotFoundException,
@@ -15,7 +16,8 @@ export class AdminController {
         private readonly manageCarouselUseCase: ManageCarouselUseCase,
         private readonly manageContentUseCase: ManageContentUseCase,
         private readonly getActivityLogUseCase: GetActivityLogUseCase,
-        private readonly userRepository: TypeOrmUserRepository
+        private readonly userRepository: TypeOrmUserRepository,
+        private readonly manageAestheticImageUseCase: ManageAestheticImageUseCase
     ) { }
 
     private async getAdminEmail(userId: string): Promise<string> {
@@ -187,6 +189,54 @@ export class AdminController {
             res.status(200).json(content);
         } catch (error) {
             console.error('Update content error:', error);
+            this.handleError(error, res);
+        }
+    };
+
+    // Aesthetic Image Management
+    public updateAestheticImage = async (req: AuthRequest, res: Response): Promise<void> => {
+        try {
+            console.log('Update aesthetic image request:', {
+                id: req.params.id,
+                body: req.body
+            });
+
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                console.log('Validation errors:', errors.array());
+                res.status(400).json({
+                    error: 'Validation failed',
+                    errors: errors.array()
+                });
+                return;
+            }
+
+            if (!req.userId) {
+                res.status(401).json({ error: 'Unauthorized' });
+                return;
+            }
+
+            const adminEmail = await this.getAdminEmail(req.userId);
+            const aesthetic = await this.manageAestheticImageUseCase.updateImage(
+                req.params.id,
+                req.body.imageUrl,
+                adminEmail
+            );
+
+            // Convert to plain object for JSON response
+            const response = {
+                id: aesthetic.id,
+                name: aesthetic.name,
+                description: aesthetic.description,
+                themeProperties: aesthetic.themeProperties,
+                imageUrl: aesthetic.imageUrl,
+                createdAt: aesthetic.createdAt,
+                updatedAt: aesthetic.updatedAt
+            };
+
+            res.status(200).json(response);
+        } catch (error) {
+            console.error('Update aesthetic image error:', error);
             this.handleError(error, res);
         }
     };

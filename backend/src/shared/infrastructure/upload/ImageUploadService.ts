@@ -40,17 +40,11 @@ export class ImageUploadService {
     }
 
     public async uploadToCloudinary(file: UploadedFile): Promise<UploadResult> {
-        // This is a placeholder implementation
-        // In production, you would integrate with a service like:
-        // - Cloudinary
-        // - AWS S3
-        // - Google Cloud Storage
-        // - Azure Blob Storage
 
         this.validateImage(file);
 
         // For now, I'll return a mock URL
-        // In production, upload the file and return the actual URL
+        // In production, we'll upload the file and return the actual URL
         const filename = `${uuidv4()}-${file.originalname}`;
         const mockUrl = `https://storage.moodrobe.com/products/${filename}`;
 
