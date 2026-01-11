@@ -67,13 +67,6 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                             >
                                 Aesthetics
                             </button>
-                            <button
-                                onClick={() => navigate('/outfits')}
-                                className="hover:text-accent transition-colors text-sm font-medium flex items-center"
-                            >
-                                <Shirt className="w-4 h-4 mr-1" />
-                                Outfits
-                            </button>
                             {hasMerchantAccount && (
                                 <button
                                     onClick={() => navigate('/merchant/dashboard')}
