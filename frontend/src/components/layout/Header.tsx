@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, User, Menu, LogOut, Store, Shield } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, LogOut, Store, Shield, Shirt } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useMerchant } from '@/hooks/useMerchant';
 import { useToast } from '@/hooks/useToast';
@@ -67,6 +67,13 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                             >
                                 Aesthetics
                             </button>
+                            <button
+                                onClick={() => navigate('/outfits')}
+                                className="hover:text-accent transition-colors text-sm font-medium flex items-center"
+                            >
+                                <Shirt className="w-4 h-4 mr-1" />
+                                Outfits
+                            </button>
                             {hasMerchantAccount && (
                                 <button
                                     onClick={() => navigate('/merchant/dashboard')}
@@ -100,6 +107,14 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                         </div>
 
                         {/* Icons */}
+                        <button
+                            onClick={() => navigate('/outfits')}
+                            className="hover:text-accent transition-colors"
+                            aria-label="My outfits"
+                            title="My Outfits"
+                        >
+                            <Shirt className="w-5 h-5" />
+                        </button>
                         <button
                             onClick={() => navigate('/cart')}
                             className="hover:text-accent transition-colors"

@@ -148,6 +148,19 @@ CREATE TABLE inventory_reservations (
   expires_at TIMESTAMP NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- USER OUTFIT TABLE
+CREATE TABLE user_outfits (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  outfit_type VARCHAR(50) DEFAULT 'full', -- 'full', 'dress', 'casual', 'formal'
+  items JSONB NOT NULL, -- {hat: productId, top: productId, bottom: productId, etc.}
+  aesthetic_tags UUID[] DEFAULT ARRAY[]::UUID[],
+  is_public BOOLEAN DEFAULT false,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 -- INDEXES
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_products_merchant ON products(merchant_id);
@@ -163,6 +176,9 @@ CREATE INDEX idx_payments_transaction ON payments(transaction_id);
 CREATE INDEX idx_payments_status ON payments(status);
 CREATE INDEX idx_payments_provider ON payments(provider);
 CREATE INDEX idx_payments_created_at ON payments(created_at);
+CREATE INDEX idx_user_outfits_user ON user_outfits(user_id);
+CREATE INDEX idx_user_outfits_public ON user_outfits(is_public);
+CREATE INDEX idx_user_outfits_type ON user_outfits(outfit_type);
 --TRIGGERS
 -- Trigger to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_payments_updated_at()

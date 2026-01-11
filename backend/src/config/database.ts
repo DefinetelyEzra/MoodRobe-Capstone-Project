@@ -10,6 +10,7 @@ import { ProductImageEntity } from '@modules/product/infrastructure/entities/Pro
 import { ProductVariantEntity } from '@modules/product/infrastructure/entities/ProductVariantEntity';
 import { OrderEntity } from '@modules/order/infrastructure/entities/OrderEntity';
 import { OrderLineEntity } from '@modules/order/infrastructure/entities/OrderLineEntity';
+import { OutfitEntity } from '@modules/outfit/infrastructure/entities/OutfitEntity';
 import { CartEntity } from '@modules/cart/infrastructure/entities/CartEntity';
 import { CartItemEntity } from '@modules/cart/infrastructure/entities/CartItemEntity';
 import { PaymentEntity } from '@modules/payment/infrastructure/entities/PaymentEntity';
@@ -37,6 +38,7 @@ export const AppDataSource = new DataSource({
         ProductEntity,
         ProductImageEntity,
         ProductVariantEntity,
+        OutfitEntity,
         CartEntity,
         CartItemEntity,
         OrderEntity,

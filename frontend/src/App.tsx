@@ -47,6 +47,10 @@ import { MerchantSettingsPage } from '@/pages/merchant/MerchantSettingsPage';
 // Admin Pages
 import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
 
+// Outfit Pages
+import { OutfitBuilderPage } from '@/pages/outfit/OutfitBuilderPage';
+import { SavedOutfitsPage } from '@/pages/outfit/SavedOutfitsPage';
+
 function App() {
   return (
     <BrowserRouter>
@@ -76,18 +80,22 @@ function App() {
                     <Route path="aesthetic-selection" element={<AestheticSelectionPage />} />
                     <Route path="style-quiz" element={<StyleQuizPage />} />
                     <Route path="profile" element={<ProfilePage />} />
-                    
+
                     {/* Products */}
                     <Route path="products" element={<ProductsPage />} />
                     <Route path="products/:id" element={<ProductDetailsPage />} />
-                    
+
                     {/* Cart & Checkout */}
                     <Route path="cart" element={<CartPage />} />
                     <Route path="checkout" element={<CheckoutPage />} />
-                    
+
                     {/* Orders */}
                     <Route path="orders" element={<OrderHistoryPage />} />
                     <Route path="orders/:id" element={<OrderDetailsPage />} />
+
+                    {/* Outfits */}
+                    <Route path="outfits" element={<SavedOutfitsPage />} />
+                    <Route path="outfit-builder" element={<OutfitBuilderPage />} />
                   </Route>
 
                   {/* Protected merchant routes with Layout */}

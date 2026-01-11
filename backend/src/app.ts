@@ -9,6 +9,7 @@ import { CartRoutes } from '@modules/cart/presentation/routes/CartRoutes';
 import { OrderRoutes } from '@modules/order/presentation/routes/OrderRoutes';
 import { PaymentRoutes } from '@modules/payment/presentation/routes/PaymentRoutes';
 import { AdminRoutes } from '@modules/admin/presentation/routes/AdminRoutes';
+import { OutfitRoutes } from '@modules/outfit/presentation/routes/OutfitRoutes';
 
 export const createApp = (): Application => {
     const app = express();
@@ -40,6 +41,7 @@ export const createApp = (): Application => {
     app.use('/api/orders', OrderRoutes.create());
     app.use('/api/payments', PaymentRoutes.create());
     app.use('/api/admin', AdminRoutes.create());
+    app.use('/api/outfits', OutfitRoutes.create());
 
     return app;
 };
