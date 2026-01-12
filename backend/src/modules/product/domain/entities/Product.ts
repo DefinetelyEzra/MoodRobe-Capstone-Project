@@ -1,6 +1,7 @@
 import { Money } from '@shared/domain/value-objects/Money';
 import { ProductVariant } from './ProductVariant';
 import { ProductImage } from './ProductImage';
+import { validateCategory } from '@shared/constants/ProductCategories';
 
 export interface ProductProps {
     id: string;
@@ -175,5 +176,8 @@ export class Product {
         if (category.length > 100) {
             throw new Error('Product category cannot exceed 100 characters');
         }
+
+        // Validate against allowed categories
+        validateCategory(category);
     }
 }

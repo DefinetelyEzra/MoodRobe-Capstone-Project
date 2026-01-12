@@ -1,11 +1,11 @@
 export type OutfitType = 'full' | 'dress' | 'casual' | 'formal';
 
-export type OutfitSlotType = 
-    | 'headwear' 
-    | 'top' 
-    | 'bottom' 
-    | 'dress' 
-    | 'footwear' 
+export type OutfitSlotType =
+    | 'headwear'
+    | 'top'
+    | 'bottom'
+    | 'dress'
+    | 'footwear'
     | 'accessories'
     | 'outerwear'
     | 'suit';
@@ -111,12 +111,12 @@ export const SLOT_LABELS: Record<OutfitSlotType, string> = {
 };
 
 export const SLOT_CATEGORIES: Record<OutfitSlotType, string[]> = {
-    headwear: ['Accessories', 'Headwear'],
-    top: ['Tops', 'Outerwear'],
+    headwear: ['Headwear', 'Accessories'],
+    top: ['Tops'],
     bottom: ['Bottoms'],
     dress: ['Dresses'],
-    footwear: ['footwear', 'Footwear'],
+    footwear: ['Footwear'],
     accessories: ['Accessories', 'Jewelry', 'Bags'],
     outerwear: ['Outerwear', 'Jackets'],
-    suit: ['Formal', 'Suits', 'Dresses']
+    suit: ['Suits', 'Formal']
 };

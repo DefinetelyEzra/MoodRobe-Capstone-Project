@@ -9,17 +9,7 @@ import { Card } from '@/components/common/Card';
 import { Input } from '@/components/common/Input';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { ProductCard } from '@/components/features/product/ProductCard';
-
-const CATEGORIES = [
-    'Tops',
-    'Bottoms',
-    'Dresses',
-    'Outerwear',
-    'Shoes',
-    'Accessories',
-    'Bags',
-    'Jewelry'
-];
+import { PRODUCT_CATEGORIES } from '@/constants/productCategories';
 
 export const ProductsPage: React.FC = () => {
     const { selectedAesthetic } = useAesthetic();
@@ -254,7 +244,7 @@ export const ProductsPage: React.FC = () => {
                                                 Category
                                             </legend>
                                             <div className="flex flex-wrap gap-2">
-                                                {CATEGORIES.map((category) => (
+                                                {PRODUCT_CATEGORIES.map((category) => (
                                                     <button
                                                         key={category}
                                                         onClick={() => handleCategoryChange(category)}

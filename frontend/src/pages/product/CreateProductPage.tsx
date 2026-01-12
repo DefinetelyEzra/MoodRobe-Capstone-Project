@@ -9,6 +9,7 @@ import { Product } from '@/types/product.types';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 import { Package, ArrowLeft, Plus, X } from 'lucide-react';
+import { PRODUCT_CATEGORIES, CATEGORY_INFO } from '@/constants/productCategories';
 
 interface VariantForm {
     id: string;
@@ -315,13 +316,28 @@ export const CreateProductPage: React.FC = () => {
                                 />
                             </div>
 
-                            <Input
-                                label="Category"
-                                required
-                                value={formData.category}
-                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                placeholder="e.g., T-Shirts, Dresses, Pants"
-                            />
+                            <div>
+                                <label htmlFor="category" className="block text-sm font-medium text-text-primary mb-2">
+                                    Category <span className="text-red-500">*</span>
+                                </label>
+                                <select
+                                    id="category"
+                                    required
+                                    value={formData.category}
+                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                    className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-surface text-text-primary"
+                                >
+                                    <option value="">Select a category...</option>
+                                    {PRODUCT_CATEGORIES.map((category) => (
+                                        <option key={category} value={category}>
+                                            {CATEGORY_INFO[category].label}
+                                            {CATEGORY_INFO[category].description &&
+                                                ` - ${CATEGORY_INFO[category].description}`
+                                            }
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
 
                             <div className="grid grid-cols-2 gap-6">
                                 <Input
@@ -571,7 +587,7 @@ export const CreateProductPage: React.FC = () => {
                         <Button
                             type="button"
                             onClick={() => navigate('/merchant/products')}
-                            className="px-6 py-3 border border-border hover:bg-canvas text-text-primary rounded-lg font-medium transition-colors"
+                            className="px-6 py-3 border border-border hover:bg-canvas text-red-400! rounded-lg font-medium transition-colors"
                         >
                             Cancel
                         </Button>

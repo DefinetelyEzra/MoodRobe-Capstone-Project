@@ -158,7 +158,7 @@ export const AestheticImageManager: React.FC = () => {
                                 <Button
                                     onClick={() => handleReset(aesthetic)}
                                     disabled={!hasChanges(aesthetic)}
-                                    className="px-6 py-3 border border-border hover:bg-canvas text-text-primary rounded-lg font-medium transition-colors disabled:opacity-50"
+                                    className="px-6 py-3 border border-border hover:bg-canvas text-blue-400! rounded-lg font-medium transition-colors disabled:opacity-50"
                                 >
                                     <RefreshCw className="w-4 h-4 mr-2" />
                                     Reset

@@ -167,7 +167,7 @@ export const ContentEditor: React.FC = () => {
                             <Button
                                 onClick={() => handleReset(content.sectionKey)}
                                 disabled={!hasChanges(content.sectionKey)}
-                                className="px-6 py-3 border border-border hover:bg-canvas text-text-primary rounded-lg font-medium transition-colors disabled:opacity-50"
+                                className="px-6 py-3 border border-border hover:bg-canvas text-blue-400! rounded-lg font-medium transition-colors disabled:opacity-50"
                             >
                                 <RefreshCw className="w-4 h-4 mr-2" />
                                 Reset

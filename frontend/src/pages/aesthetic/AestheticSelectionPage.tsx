@@ -235,7 +235,7 @@ export const AestheticSelectionPage: React.FC = () => {
                             "MoodRobe helped me finally find clothes that truly express me!"
                         </p>
                         <p className="text-text-secondary text-sm">
-                            - Sarah K, from Brooklyn
+                            - Mishael Edegwa, from Lagos
                         </p>
                     </div>
 
