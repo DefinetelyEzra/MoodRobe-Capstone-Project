@@ -284,7 +284,7 @@ export const CarouselManager: React.FC = () => {
                     />
 
                     <div className="flex justify-end space-x-4 pt-4">
-                        <Button type="button" onClick={handleCloseModal} className="px-6 py-3 border border-border hover:bg-canvas text-text-primary rounded-lg font-medium transition-colors">
+                        <Button type="button" onClick={handleCloseModal} className="px-6 py-3 border border-border hover:bg-canvas text-text-primary! rounded-lg font-medium transition-colors">
                             <X className="w-4 h-4 mr-2" />
                             Cancel
                         </Button>

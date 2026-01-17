@@ -105,7 +105,7 @@ export const HomePage: React.FC = () => {
         if (carouselItems.length > 1) {
             const timer = setInterval(() => {
                 setCurrentSlide((prev) => (prev + 1) % carouselItems.length);
-            }, 5000);
+            }, 10000);
             return () => clearInterval(timer);
         }
     }, [carouselItems.length]);

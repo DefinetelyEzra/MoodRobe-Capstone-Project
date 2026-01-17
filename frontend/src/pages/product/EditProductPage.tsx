@@ -642,7 +642,7 @@ export const EditProductPage: React.FC = () => {
                         <Button
                             type="button"
                             onClick={() => navigate('/merchant/products')}
-                            className="px-6 py-3 border border-border hover:bg-surface text-red-400! rounded-lg font-medium transition-colors"
+                            className="px-6 py-3 border border-border hover:bg-surface text-text-primary! rounded-lg font-medium transition-colors"
                         >
                             Cancel
                         </Button>
