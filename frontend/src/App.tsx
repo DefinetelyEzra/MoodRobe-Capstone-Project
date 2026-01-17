@@ -31,6 +31,9 @@ import { EditProductPage } from '@/pages/product/EditProductPage';
 import { CartPage } from './pages/cart/CartPage';
 import { CheckoutPage } from './pages/cart/CheckoutPage';
 
+// Collection Pages
+import { CollectionDetailsPage } from '@/pages/collections/CollectionDetailsPage';
+
 // Order Pages
 import { OrderHistoryPage } from '@/pages/order/OrderHistoryPage';
 import { OrderDetailsPage } from '@/pages/order/OrderDetailsPage';
@@ -88,6 +91,9 @@ function App() {
                     {/* Cart & Checkout */}
                     <Route path="cart" element={<CartPage />} />
                     <Route path="checkout" element={<CheckoutPage />} />
+
+                    {/* Collection */}
+                    <Route path="/collections/:id" element={<CollectionDetailsPage />} />
 
                     {/* Orders */}
                     <Route path="orders" element={<OrderHistoryPage />} />

@@ -2,6 +2,10 @@ import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 import { UserEntity } from '@modules/user/infrastructure/entities/UserEntity';
 import { UserProfileEntity } from '@modules/user/infrastructure/entities/UserProfileEntity';
+import { UserFavoriteEntity } from '@modules/user/infrastructure/entities/UserFavoriteEntity';
+import { CollectionEntity } from '@modules/user/infrastructure/entities/CollectionEntity';
+import { CollectionItemEntity } from '@modules/user/infrastructure/entities/CollectionItemEntity';
+import { StyleBoardEntity } from '@modules/user/infrastructure/entities/StyleBoardEntity';
 import { AestheticEntity } from '@modules/aesthetic/infrastructure/entities/AestheticEntity';
 import { MerchantEntity } from '@modules/merchant/infrastructure/entities/MerchantEntity';
 import { MerchantStaffEntity } from '@modules/merchant/infrastructure/entities/MerchantStaffEntity';
@@ -32,6 +36,10 @@ export const AppDataSource = new DataSource({
     entities: [
         UserEntity,
         UserProfileEntity,
+        UserFavoriteEntity,
+        CollectionEntity,
+        CollectionItemEntity,
+        StyleBoardEntity,
         AestheticEntity,
         MerchantEntity,
         MerchantStaffEntity,

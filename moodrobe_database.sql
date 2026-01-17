@@ -18,6 +18,41 @@ CREATE TABLE user_profiles (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE user_favorites (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, product_id)
+);
+CREATE TABLE collections (
+	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+	user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+	name VARCHAR(255) NOT NULL,
+	description TEXT,
+	is_public BOOLEAN DEFAULT false,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+        
+CREATE TABLE collection_items (                
+	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+	collection_id UUID NOT NULL REFERENCES collections(id) ON DELETE CASCADE,
+	product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+	added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	UNIQUE(collection_id, product_id)
+);
+CREATE TABLE style_boards (
+	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+	user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+	name VARCHAR(255) NOT NULL,
+	description TEXT,
+	aesthetic_tags UUID[] DEFAULT ARRAY[]::UUID[],
+	items JSONB NOT NULL DEFAULT '[]',
+	is_public BOOLEAN DEFAULT false,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+); 
 -- AESTHETIC AGGREGATE
 CREATE TABLE aesthetics (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -183,6 +218,12 @@ CREATE INDEX idx_payments_created_at ON payments(created_at);
 CREATE INDEX idx_user_outfits_user ON user_outfits(user_id);
 CREATE INDEX idx_user_outfits_public ON user_outfits(is_public);
 CREATE INDEX idx_user_outfits_type ON user_outfits(outfit_type);
+CREATE INDEX idx_user_favorites_user_id ON user_favorites(user_id);
+CREATE INDEX idx_user_favorites_product_id ON user_favorites(product_id);
+CREATE INDEX idx_collections_user_id ON collections(user_id);
+CREATE INDEX idx_collection_items_collection_id ON collection_items(collection_id);
+CREATE INDEX idx_collection_items_product_id ON collection_items(product_id);
+CREATE INDEX idx_style_boards_user_id ON style_boards(user_id);
 --TRIGGERS
 -- Trigger to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_payments_updated_at()

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Calendar, Palette, Edit2, Save, X, Package, LogOut, ShoppingBag } from 'lucide-react';
+import { User, Mail, Calendar, Palette, Edit2, Save, X, Package, LogOut, ShoppingBag, Palette as PaletteIcon, Heart, FolderOpen } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useAesthetic } from '@/hooks/useAesthetic';
 import { useApi } from '@/hooks/useApi';
@@ -9,6 +9,8 @@ import { userApi } from '@/api/user.api';
 import { Card } from '@/components/common/Card';
 import { Input } from '@/components/common/Input';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { FavoritesSection } from '@/components/features/favorites/FavoritesSection';
+import { CollectionsSection } from '@/components/features/collections/CollectionsSection';
 
 interface UpdateProfileForm {
     name: string;
@@ -17,6 +19,7 @@ interface UpdateProfileForm {
 
 export const ProfilePage: React.FC = () => {
     const { user, refreshUser, logout } = useAuth();
+    const [activeTab, setActiveTab] = useState<'favorites' | 'collections' | 'boards'>('favorites');
     const { selectedAesthetic, setSelectedAesthetic } = useAesthetic();
     const { showToast } = useToast();
     const navigate = useNavigate();
@@ -316,6 +319,59 @@ export const ProfilePage: React.FC = () => {
                             </div>
                         </Card>
                     </div>
+                </div>
+
+                {/* Favorites, Collections, and Style Boards Section */}
+                <div className="mt-6">
+                    <Card className="bg-surface border border-border">
+                        <div className="border-b border-border">
+                            <div className="flex space-x-1 p-2">
+                                <button
+                                    onClick={() => setActiveTab('favorites')}
+                                    className={`flex-1 flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === 'favorites'
+                                        ? 'bg-accent text-surface'
+                                        : 'text-text-secondary hover:bg-canvas hover:text-text-primary'
+                                        }`}
+                                >
+                                    <Heart className="w-5 h-5 mr-2" />
+                                    Favorites
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('collections')}
+                                    className={`flex-1 flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === 'collections'
+                                        ? 'bg-accent text-surface'
+                                        : 'text-text-secondary hover:bg-canvas hover:text-text-primary'
+                                        }`}
+                                >
+                                    <FolderOpen className="w-5 h-5 mr-2" />
+                                    Collections
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('boards')}
+                                    className={`flex-1 flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === 'boards'
+                                        ? 'bg-accent text-surface'
+                                        : 'text-text-secondary hover:bg-canvas hover:text-text-primary'
+                                        }`}
+                                >
+                                    <PaletteIcon className="w-5 h-5 mr-2" />
+                                    Style Boards
+                                </button>
+                            </div>
+                        </div>
+                        <div className="p-6">
+                            {activeTab === 'favorites' && <FavoritesSection />}
+                            {activeTab === 'collections' && <CollectionsSection />}
+                            {activeTab === 'boards' && (
+                                <div className="text-center py-12">
+                                    <div className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <PaletteIcon className="w-10 h-10 text-accent" />
+                                    </div>
+                                    <h3 className="text-xl font-semibold text-text-primary mb-2">Style Boards Coming Soon</h3>
+                                    <p className="text-text-secondary">Create visual mood boards with your favorite items!</p>
+                                </div>
+                            )}
+                        </div>
+                    </Card>
                 </div>
             </div>
         </div>

@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ShoppingCart, Heart, Share2, Check, Package, Truck, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Share2, Check, Package, Truck, ShoppingBag } from 'lucide-react';
 import { productApi } from '@/api/product.api';
 import { useApi } from '@/hooks/useApi';
 import { useToast } from '@/hooks/useToast';
 import { useCart } from '@/hooks/useCart';
 import { useAesthetic } from '@/hooks/useAesthetic';
 import { Product, ProductVariant } from '@/types/product.types';
+import { FavoriteButton } from '@/components/features/favorites/FavoriteButton';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 export const ProductDetailsPage: React.FC = () => {
@@ -311,10 +312,7 @@ export const ProductDetailsPage: React.FC = () => {
                                 {isInStock ? 'Add to Cart' : 'Out of Stock'}
                             </button>
                             <div className="grid grid-cols-2 gap-3">
-                                <button className="flex items-center justify-center px-6 py-3 border border-border hover:bg-canvas text-text-primary rounded-lg font-medium transition-colors">
-                                    <Heart className="w-5 h-5 mr-2" />
-                                    Save
-                                </button>
+                                <FavoriteButton productId={product.id} showLabel={true} size="lg" />
                                 <button className="flex items-center justify-center px-6 py-3 border border-border hover:bg-canvas text-text-primary rounded-lg font-medium transition-colors">
                                     <Share2 className="w-5 h-5 mr-2" />
                                     Share
