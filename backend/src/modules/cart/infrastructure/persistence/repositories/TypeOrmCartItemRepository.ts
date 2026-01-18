@@ -13,9 +13,8 @@ export class TypeOrmCartItemRepository implements ICartItemRepository {
     }
 
     public async save(item: CartItem): Promise<CartItem> {
-        console.log('💾 Saving cart item:', {
+        console.log('💾 Saving cart item domain entity:', {
             id: item.id,
-            cartId: item.cartId,
             productVariantId: item.productVariantId,
             productName: item.productName,
             quantity: item.quantity
@@ -28,6 +27,28 @@ export class TypeOrmCartItemRepository implements ICartItemRepository {
             id: savedEntity.id,
             cartId: savedEntity.cartId,
             productName: savedEntity.productName
+        });
+
+        return CartItemMapper.toDomain(savedEntity);
+    }
+
+    public async saveEntity(entity: CartItemEntity): Promise<CartItem> {
+        console.log('💾 Saving cart item entity directly:', {
+            id: entity.id,
+            productVariantId: entity.productVariantId,
+            hasImage: !!entity.imageUrl,
+            hasProductId: !!entity.productId,
+            hasVariantAttributes: !!entity.variantAttributes
+        });
+
+        const savedEntity = await this.repository.save(entity);
+
+        console.log('✅ Cart item entity saved to DB:', {
+            id: savedEntity.id,
+            cartId: savedEntity.cartId,
+            productName: savedEntity.productName,
+            imageUrl: savedEntity.imageUrl,
+            productId: savedEntity.productId
         });
 
         return CartItemMapper.toDomain(savedEntity);
@@ -60,11 +81,33 @@ export class TypeOrmCartItemRepository implements ICartItemRepository {
             items: entities.map(e => ({
                 id: e.id,
                 productName: e.productName,
-                quantity: e.quantity
+                quantity: e.quantity,
+                hasImage: !!e.imageUrl
             }))
         });
 
         return entities.map(entity => CartItemMapper.toDomain(entity));
+    }
+
+    public async findEntitiesByCartId(cartId: string): Promise<CartItemEntity[]> {
+        console.log('🔍 Finding cart item entities for cartId:', cartId);
+
+        const entities = await this.repository.find({
+            where: { cartId },
+            order: { createdAt: 'ASC' },
+        });
+
+        console.log('📦 Found entities:', {
+            count: entities.length,
+            withImages: entities.filter(e => e.imageUrl).length,
+            items: entities.map(e => ({
+                name: e.productName,
+                hasImage: !!e.imageUrl,
+                imageUrl: e.imageUrl
+            }))
+        });
+
+        return entities;
     }
 
     public async findByCartAndVariant(
@@ -78,6 +121,15 @@ export class TypeOrmCartItemRepository implements ICartItemRepository {
         if (!entity) return null;
 
         return CartItemMapper.toDomain(entity);
+    }
+
+    public async findEntityByCartAndVariant(
+        cartId: string,
+        productVariantId: string
+    ): Promise<CartItemEntity | null> {
+        return await this.repository.findOne({
+            where: { cartId, productVariantId },
+        });
     }
 
     public async update(item: CartItem): Promise<CartItem> {

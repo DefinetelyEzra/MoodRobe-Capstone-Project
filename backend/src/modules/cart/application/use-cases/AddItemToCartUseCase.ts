@@ -42,7 +42,7 @@ export class AddItemToCartUseCase {
                 return primaryImage.imageUrl;
             }
 
-            // Fallback to first image sorted by display order (create new array with toSorted or slice)
+            // Fallback to first image sorted by display order
             const sortedImages = [...images].sort((a, b) => a.displayOrder - b.displayOrder);
             return sortedImages[0]?.imageUrl;
         } catch (error) {
@@ -141,7 +141,8 @@ export class AddItemToCartUseCase {
 
             cartItemEntity.variantAttributes = variantAttributes;
 
-            await this.cartItemRepository.save(cartItem);
+            // Save the entity (with imageUrl and other fields) instead of domain object
+            await this.cartItemRepository.saveEntity(cartItemEntity);
         }
 
         // Update cart timestamp

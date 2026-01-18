@@ -6,6 +6,7 @@ import { IProductRepository } from '../../../product/domain/repositories/IProduc
 import { IProductVariantRepository } from '../../../product/domain/repositories/IProductVariantRepository';
 import { CartResponseDto, CartItemResponseDto } from '../dto/CartDto';
 import { Money } from '@shared/domain/value-objects/Money';
+import { CartItemEntity } from '../../infrastructure/entities/CartItemEntity';
 
 export class GetOrCreateCartUseCase {
     constructor(
@@ -35,9 +36,46 @@ export class GetOrCreateCartUseCase {
         const items = cart.getItems();
         const subtotal = new Money(cart.calculateSubtotal());
 
-        const itemsWithDetails: CartItemResponseDto[] = await Promise.all(
-            items.map(async (item) => this.getItemDto(item))
-        );
+        // Get cart item entities with imageUrl
+        const entities = await this.getCartItemEntities(cart.id);
+
+        const itemsWithDetails: CartItemResponseDto[] = items.map((item) => {
+            // Find matching entity
+            const entity = entities.find(e => e.id === item.id);
+
+            const dto: CartItemResponseDto = {
+                id: item.id,
+                productVariantId: item.productVariantId,
+                productName: item.productName,
+                quantity: item.quantity,
+                unitPrice: {
+                    amount: item.getUnitPrice().getAmount(),
+                    currency: item.getUnitPrice().getCurrency(),
+                },
+                lineTotal: {
+                    amount: item.getLineTotal().getAmount(),
+                    currency: item.getLineTotal().getCurrency(),
+                },
+                addedAt: item.addedAt,
+                productId: entity?.productId,
+                imageUrl: entity?.imageUrl,
+                variantAttributes: entity?.variantAttributes
+            };
+
+            console.log('🛒 Cart item DTO:', {
+                name: dto.productName,
+                hasImage: !!dto.imageUrl,
+                imageUrl: dto.imageUrl
+            });
+
+            return dto;
+        });
+
+        console.log('🛒 Returning cart response:', {
+            cartId: cart.id,
+            totalItems: itemsWithDetails.length,
+            itemsWithImages: itemsWithDetails.filter(i => i.imageUrl).length
+        });
 
         return {
             id: cart.id,
@@ -53,58 +91,19 @@ export class GetOrCreateCartUseCase {
         };
     }
 
-    private async getItemDto(item: any): Promise<CartItemResponseDto> {
-        const baseItem: CartItemResponseDto = {
-            id: item.id,
-            productVariantId: item.productVariantId,
-            productName: item.productName,
-            quantity: item.quantity,
-            unitPrice: {
-                amount: item.getUnitPrice().getAmount(),
-                currency: item.getUnitPrice().getCurrency(),
-            },
-            lineTotal: {
-                amount: item.getLineTotal().getAmount(),
-                currency: item.getLineTotal().getCurrency(),
-            },
-            addedAt: item.addedAt,
-        };
-
-        if (!this.variantRepository || !this.productRepository) {
-            return baseItem;
+    private async getCartItemEntities(cartId: string): Promise<CartItemEntity[]> {
+        // Access the TypeORM repository directly to get entities with all fields
+        if ('findEntitiesByCartId' in this.cartItemRepository) {
+            return await (this.cartItemRepository as any).findEntitiesByCartId(cartId);
         }
 
-        try {
-            const variant = await this.variantRepository.findById(item.productVariantId);
-            if (!variant) {
-                return baseItem;
-            }
-
-            baseItem.productId = variant.productId;
-            baseItem.variantAttributes = {
-                ...(variant.size && { size: variant.size }),
-                ...(variant.color && { color: variant.color })
-            };
-
-            const product = await this.productRepository.findById(variant.productId);
-            if (!product) {
-                return baseItem;
-            }
-
-            const images = product.getImages();
-            if (!images || images.length === 0) {
-                return baseItem;
-            }
-
-            const sortedImages = [...images].sort((a, b) => a.displayOrder - b.displayOrder);
-            const primaryImage = sortedImages.find(img => img.isPrimary) || sortedImages[0];
-            if (primaryImage) {
-                baseItem.imageUrl = primaryImage.url;
-            }
-        } catch (error) {
-            console.error('Failed to fetch product details for cart item:', error);
+        // Fallback: try to access repository directly
+        const repo = (this.cartItemRepository as any).repository;
+        if (repo) {
+            return await repo.find({ where: { cartId } });
         }
 
-        return baseItem;
+        console.warn('⚠️ Cannot access cart item entities - images will not be loaded');
+        return [];
     }
 }

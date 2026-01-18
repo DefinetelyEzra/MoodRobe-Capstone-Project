@@ -5,6 +5,7 @@ import { IProductVariantRepository } from '../../../product/domain/repositories/
 import { CartItemNotFoundException, InsufficientStockException } from '../../domain/exceptions/CartExceptions';
 import { UpdateCartItemDto, CartResponseDto } from '../dto/CartDto';
 import { GetOrCreateCartUseCase } from './GetOrCreateCartUseCase';
+import { CartItemMapper } from '../../infrastructure/persistence/mappers/CartItemMapper';
 
 export class UpdateCartItemQuantityUseCase {
     private readonly getOrCreateCartUseCase: GetOrCreateCartUseCase;
@@ -52,9 +53,27 @@ export class UpdateCartItemQuantityUseCase {
             );
         }
 
+        // Get the existing entity to preserve imageUrl and other fields
+        const existingEntity = await this.cartItemRepository.findEntityByCartAndVariant(
+            cart.id,
+            productVariantId
+        );
+
         // Update quantity
         cartItem.updateQuantity(dto.quantity);
-        await this.cartItemRepository.update(cartItem);
+
+        // Convert to entity
+        const updatedEntity = CartItemMapper.toEntity(cartItem, cart.id);
+
+        // Preserve the existing image and product data
+        if (existingEntity) {
+            updatedEntity.productId = existingEntity.productId;
+            updatedEntity.imageUrl = existingEntity.imageUrl;
+            updatedEntity.variantAttributes = existingEntity.variantAttributes;
+        }
+
+        // Save the entity instead of domain object to preserve imageUrl
+        await this.cartItemRepository.saveEntity(updatedEntity);
 
         // Update cart timestamp
         cart.updatedAt = new Date();
